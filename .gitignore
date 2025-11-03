@@ -1,6 +1,4 @@
-.vscode
-.clang-format
-Test
 **.exe
 **.pch
 **.out
+tmp/
