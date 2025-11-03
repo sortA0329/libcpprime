@@ -1,0 +1,133 @@
+name: Build and Test
+
+on:
+    push:
+        branches: [main, developing]
+    pull_request:
+        branches: [main, developing]
+
+jobs:
+    build-and-test:
+        strategy:
+            matrix:
+                include:
+                    # Linux with Clang
+                    - os: ubuntu-latest
+                      os_name: Linux (Clang)
+                      cc: clang
+                      cxx: clang++
+                      cmake_generator: Ninja
+                      build_type: Release
+
+                    - os: ubuntu-latest
+                      os_name: Linux (Clang, Debug)
+                      cc: clang
+                      cxx: clang++
+                      cmake_generator: Ninja
+                      build_type: Debug
+
+                    # Linux with GCC
+                    - os: ubuntu-latest
+                      os_name: Linux (GCC)
+                      cc: gcc
+                      cxx: g++
+                      cmake_generator: Ninja
+                      build_type: Release
+
+                    # macOS with Clang
+                    - os: macos-latest
+                      os_name: macOS (Clang)
+                      cc: clang
+                      cxx: clang++
+                      cmake_generator: Ninja
+                      build_type: Release
+
+                    - os: macos-latest
+                      os_name: macOS (Clang, Debug)
+                      cc: clang
+                      cxx: clang++
+                      cmake_generator: Ninja
+                      build_type: Debug
+
+                    # Windows with MSVC
+                    - os: windows-latest
+                      os_name: Windows (MSVC)
+                      cc: cl
+                      cxx: cl
+                      cmake_generator: Ninja
+                      build_type: Release
+
+                    - os: windows-latest
+                      os_name: Windows (MSVC, Debug)
+                      cc: cl
+                      cxx: cl
+                      cmake_generator: Ninja
+                      build_type: Debug
+
+                    # Windows with MinGW (clang++)
+                    - os: windows-latest
+                      os_name: Windows (MinGW/Clang)
+                      cc: clang
+                      cxx: clang++
+                      cmake_generator: Ninja
+                      build_type: Release
+
+        runs-on: ${{ matrix.os }}
+        name: ${{ matrix.os_name }}
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up build tools on Ubuntu
+              if: runner.os == 'Linux'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y ninja-build clang g++
+
+            - name: Set up build tools on macOS
+              if: runner.os == 'macOS'
+              run: |
+                  brew install ninja
+
+            - name: Set up build tools on Windows (MSVC)
+              if: runner.os == 'Windows' && matrix.cc == 'cl'
+              uses: ilammy/msvc-dev-cmd@v1
+              with:
+                  arch: x64
+
+            - name: Set up build tools on Windows (MinGW)
+              if: runner.os == 'Windows' && matrix.cc == 'clang'
+              uses: msys2/setup-msys2@v2
+              with:
+                  msystem: MINGW64
+                  update: true
+                  install: >-
+                      mingw-w64-x86_64-clang
+                      mingw-w64-x86_64-cmake
+                      mingw-w64-x86_64-ninja
+
+            - name: Install Ninja on Windows (MSVC)
+              if: runner.os == 'Windows' && matrix.cc == 'cl'
+              run: choco install ninja -y
+
+            - name: Configure CMake
+              env:
+                  CC: ${{ matrix.cc }}
+                  CXX: ${{ matrix.cxx }}
+              run: |
+                  cmake -B build -G "${{ matrix.cmake_generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+            - name: Build
+              run: cmake --build build --config ${{ matrix.build_type }}
+
+            - name: Run tests
+              run: ctest --build-config ${{ matrix.build_type }} --output-on-failure --verbose
+              working-directory: build
+
+            - name: Upload compile_commands.json
+              if: matrix.build_type == 'Release'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: compile_commands-${{ matrix.os_name }}
+                  path: build/compile_commands.json
+                  if-no-files-found: ignore

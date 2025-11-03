@@ -24,6 +24,7 @@
 **/
 
 #include "./internal/IsPrimeCommon.hpp"
+#include <cstdint>
 
 #ifndef LIBCPPRIME_INCLUDED_IS_PRIME
 #define LIBCPPRIME_INCLUDED_IS_PRIME

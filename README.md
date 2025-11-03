@@ -66,6 +66,89 @@ This library is header-only, so you only need to specify the include path.
 g++ -I ./libcpprime -O3 Main.cpp
 ```
 
+## Building with CMake
+
+libcpprime uses CMake for building and testing. The project supports multiple platforms and compilers.
+
+### Prerequisites
+
+- CMake 3.20 or later
+- A C++20 compatible compiler (clang++, g++, MSVC, or MinGW)
+- Ninja (recommended) or other CMake generators
+
+### Quick Start
+
+```bash
+# Configure (Release build with clang++)
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+# Build
+cmake --build build
+
+# Run tests
+ctest --build-config Release --output-on-failure --verbose
+```
+
+### For Different Configurations
+
+#### Debug Build
+```bash
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+ctest --build-config Debug --output-on-failure
+```
+
+#### Using GCC instead of Clang
+```bash
+cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+cmake --build build
+```
+
+#### Using MSVC on Windows
+```bash
+cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+#### Using MinGW on Windows
+```bash
+cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++
+cmake --build build
+```
+
+### Running Tests
+
+The test suite includes:
+- Basic tests with known prime and composite numbers
+- Data-driven tests using test data files (Primes.txt, Composites.txt)
+- Constexpr compile-time tests (C++20 only)
+
+```bash
+# Run all tests
+ctest --build-config Release --output-on-failure --verbose
+
+# Run specific test
+ctest --build-config Release -R "IsPrimeBasicTest" --output-on-failure
+```
+
+### VS Code Integration
+
+The project includes VS Code configuration for:
+- **clangd** support with compile_commands.json
+- CMake build and test tasks
+- Debug configurations
+- C++ IntelliSense
+
+#### Recommended Extensions
+- clangd (llvm-vs-code-extensions.vscode-clangd)
+- CMake Tools (ms-vscode.cmake-tools)
+- C/C++ (ms-vscode.cpptools)
+
+#### Quick Tasks in VS Code
+- `Ctrl+Shift+B`: Build (default task)
+- `Ctrl+Shift+T`: Run tests
+- `F5`: Debug tests or examples
+
 # Performance
 
 ### `cppr::IsPrime`

@@ -13,7 +13,7 @@
         "editor.defaultFormatter": "redhat.vscode-yaml"
     },
     "[cpp]": {
-        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
     },
     "editor.tabSize": 4,
     "terminal.integrated.defaultProfile.windows": "PowerShell",
@@ -26,5 +26,12 @@
     "files.trimTrailingWhitespace": true,
     "github.copilot.enable": {
         "*": true
+    },
+    "files.exclude": {
+        "build": true,
+        ".git": true
+    },
+    "search.exclude": {
+        "build": true
     }
 }

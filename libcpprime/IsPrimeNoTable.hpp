@@ -3,10 +3,11 @@
  *
  * Copyright (c) 2025 Rac75116
  * SPDX-License-Identifier: MIT
- * 
+ *
 **/
 
 #include "./internal/IsPrimeCommon.hpp"
+#include <cstdint>
 
 #ifndef LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
 #define LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
