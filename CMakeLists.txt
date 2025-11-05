@@ -67,7 +67,3 @@ target_link_libraries(libcpprime_tests PRIVATE libcpprime gtest gtest_main)
 target_include_directories(libcpprime_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_test(NAME LibcpprimeTests COMMAND libcpprime_tests)
-
-# Optional: Example usage
-add_executable(example_basic EXCLUDE_FROM_ALL examples/basic.cpp)
-target_link_libraries(example_basic PRIVATE libcpprime)

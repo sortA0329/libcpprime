@@ -24,14 +24,20 @@
     "files.eol": "\n",
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
-    "github.copilot.enable": {
-        "*": true
+    "files.associations": {
+        ".clang-format": "yaml",
+        ".clangd": "yaml"
     },
     "files.exclude": {
         "build": true,
-        ".git": true
+        ".cache": true
     },
     "search.exclude": {
-        "build": true
-    }
+        "build": true,
+        ".cache": true
+    },
+    "github.copilot.enable": {
+        "*": true,
+        "*.txt": false,
+    },
 }
