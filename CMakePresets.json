@@ -1,0 +1,15 @@
+{
+    "version": 10,
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "Default (Ninja -> ./build, Release)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ]
+}

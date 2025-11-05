@@ -36,6 +36,11 @@
         "build": true,
         ".cache": true
     },
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.generator": "Ninja",
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build"
+    ],
     "github.copilot.enable": {
         "*": true,
         "*.txt": false,
