@@ -4,7 +4,7 @@ project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
 
 # Options
 option(LIBCPPRIME_BUILD_EXAMPLES "Build examples" ON)
-option(LIBCPPRIME_BUILD_TESTS "Build tests (GoogleTest)" ON)
+option(LIBCPPRIME_BUILD_TESTS "Build tests" ON)
 option(LIBCPPRIME_WARNINGS "Enable strict warnings for local targets" ON)
 
 # Header-only library target

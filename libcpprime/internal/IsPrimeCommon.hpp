@@ -382,7 +382,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
     const std::uint32_t h = x * 0xad625b89;
     std::uint32_t d = x - 1;
     std::uint32_t pw = static_cast<std::uint32_t>(Bases[h >> 24]);
-    std::uint32_t s = CountrZero(d);
+    std::int32_t s = CountrZero(d);
     d >>= s;
     if (x < (1u << 21)) {
         std::uint64_t m = 0xffffffffffffffff / x + 1;
@@ -429,6 +429,11 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
         }
         return false;
     }
+}
+
+LIBCPPRIME_CONSTEXPR inline bool TrialDivision(const std::uint64_t n) noexcept {
+    return (n & 1) == 0 || 6148914691236517205u >= 12297829382473034411u * n || 3689348814741910323u >= 14757395258967641293u * n || 2635249153387078802u >= 7905747460161236407u * n ||
+           1676976733973595601u >= 3353953467947191203u * n || 1418980313362273201u >= 5675921253449092805u * n || 1085102592571150095u >= 17361641481138401521u * n;
 }
 
 }  // namespace internal

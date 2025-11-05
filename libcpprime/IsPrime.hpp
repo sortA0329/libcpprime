@@ -43,8 +43,9 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime16(const std::uint64_t n) noexcept { ret
 constexpr const std::uint16_t Bases64[16384] = {
 #include "./internal/IsPrimeBases64.txt"
 };
+template <bool Strict>
 LIBCPPRIME_CONSTEXPR inline bool IsPrime64(const std::uint64_t x) noexcept {
-    const MontgomeryModint64Impl<true> mint(x);
+    const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
@@ -144,14 +145,15 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime(std::uint64_t n) noexcept {
     if (n < 65536) {
         return internal::IsPrime16(n);
     } else {
-        if ((n & 1) == 0 || 6148914691236517205u >= 12297829382473034411u * n || 3689348814741910323u >= 14757395258967641293u * n || 2635249153387078802u >= 7905747460161236407u * n ||
-            1676976733973595601u >= 3353953467947191203u * n || 1418980313362273201u >= 5675921253449092805u * n || 1085102592571150095u >= 17361641481138401521u * n) {
+        if (internal::TrialDivision(n)) {
             return false;
         }
         if (n <= 0xffffffff) {
             return internal::IsPrime32(static_cast<std::uint32_t>(n));
+        } else if (n < (std::uint64_t(1) << 62)) {
+            return internal::IsPrime64<false>(n);
         } else {
-            return internal::IsPrime64(n);
+            return internal::IsPrime64<true>(n);
         }
     }
 }
