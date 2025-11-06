@@ -23,7 +23,7 @@ constexpr std::uint32_t FlagTable10[32] = {
 LIBCPPRIME_CONSTEXPR inline bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
 LIBCPPRIME_CONSTEXPR inline std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
-    std::uint32_t tmp = x % 5;
+    std::uint64_t tmp = x % 5;
     if (tmp == 2 || tmp == 3) {
         return 5;
     }
@@ -205,16 +205,19 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64MillerRabin(const std::uint64_t x) noe
     // These bases were discovered by Steve Worley and Jim Sinclair.
     if (x < 585226005592931977ull) {
         if (x < 7999252175582851ull) {
-            if (x < 350269456337ull)
+            if (x < 350269456337ull) {
                 return test3(4230279247111683200ull, 14694767155120705706ull, 16641139526367750375ull);
-            else if (x < 55245642489451ull)
+            } else if (x < 55245642489451ull) {
                 return test2(2ull, 141889084524735ull) && test2(1199124725622454117ull, 11096072698276303650ull);
-            else
+            } else {
                 return test2(2ull, 4130806001517ull) && test3(149795463772692060ull, 186635894390467037ull, 3967304179347715805ull);
-        } else
+            }
+        } else {
             return test3(2ull, 123635709730000ull, 9233062284813009ull) && test3(43835965440333360ull, 761179012939631437ull, 1263739024124850375ull);
-    } else
+        }
+    } else {
         return test3(2ull, 325ull, 9375ull) && test4(28178ull, 450775ull, 9780504ull, 1795265022ull);
+    }
 }
 
 LIBCPPRIME_CONSTEXPR inline bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
@@ -281,9 +284,9 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64BailliePSW(const std::uint64_t x) noex
 }  // namespace internal
 
 LIBCPPRIME_CONSTEXPR inline bool IsPrimeNoTable(std::uint64_t n) noexcept {
-    if (n < 1024)
+    if (n < 1024) {
         return internal::IsPrime10(n);
-    else {
+    } else {
         if (internal::TrialDivision(n)) return false;
         if (n <= 0xffffffff) {
             return internal::IsPrime32(static_cast<std::uint32_t>(n));

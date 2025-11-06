@@ -60,7 +60,14 @@ namespace cppr {
 namespace internal {
 
 #if defined(__SIZEOF_INT128__)
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 using UInt128 = unsigned __int128;
+#pragma GCC diagnostic pop
+#else
+using UInt128 = unsigned __int128;
+#endif
 #endif
 
 struct Int64Pair {
@@ -410,21 +417,21 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
     } else {
         std::uint32_t cur = pw;
         if (d != 1) {
-            pw = std::uint64_t(pw) * pw % x;
+            pw = static_cast<std::uint32_t>(std::uint64_t(pw) * pw % x);
             d >>= 1;
             while (d != 1) {
-                std::uint32_t tmp = std::uint64_t(pw) * pw % x;
-                if (d & 1) cur = std::uint64_t(cur) * pw % x;
+                std::uint32_t tmp = static_cast<std::uint32_t>(std::uint64_t(pw) * pw % x);
+                if (d & 1) cur = static_cast<std::uint32_t>(std::uint64_t(cur) * pw % x);
                 pw = tmp;
                 d >>= 1;
             }
-            cur = std::uint64_t(cur) * pw % x;
+            cur = static_cast<std::uint32_t>(std::uint64_t(cur) * pw % x);
         }
         bool flag = cur == 1 || cur == x - 1;
         if (x % 4 == 3) return flag;
         if (flag) return true;
         while (--s) {
-            cur = std::uint64_t(cur) * cur % x;
+            cur = static_cast<std::uint32_t>(std::uint64_t(cur) * cur % x);
             if (cur == x - 1) return true;
         }
         return false;
