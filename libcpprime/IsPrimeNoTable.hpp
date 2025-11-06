@@ -5,13 +5,12 @@
  * SPDX-License-Identifier: MIT
  *
  **/
+#ifndef LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
+#define LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
 
 #include <cstdint>
 
 #include "./internal/IsPrimeCommon.hpp"
-
-#ifndef LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
-#define LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
 
 namespace cppr {
 

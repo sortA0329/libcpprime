@@ -371,7 +371,7 @@ class MontgomeryModint64Impl {
     }
 };
 
-constexpr std::uint16_t Bases[256] = {
+constexpr std::uint16_t Bases32[256] = {
 #include "./IsPrimeBases32.txt"
 };
 LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
@@ -388,7 +388,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
     }
     const std::uint32_t h = x * 0xad625b89;
     std::uint32_t d = x - 1;
-    std::uint32_t pw = static_cast<std::uint32_t>(Bases[h >> 24]);
+    std::uint32_t pw = static_cast<std::uint32_t>(Bases32[h >> 24]);
     std::int32_t s = CountrZero(d);
     d >>= s;
     if (x < (1u << 21)) {
