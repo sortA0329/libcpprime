@@ -6,6 +6,7 @@ project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
 option(LIBCPPRIME_BUILD_EXAMPLES "Build examples" ON)
 option(LIBCPPRIME_BUILD_TESTS "Build tests" ON)
 option(LIBCPPRIME_WARNINGS "Enable strict warnings for local targets" ON)
+option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks (ankerl::nanobench)" ON)
 
 # Header-only library target
 add_library(libcpprime INTERFACE)
@@ -57,6 +58,36 @@ if(LIBCPPRIME_BUILD_TESTS)
 		# Ensure test data files are found; run tests with source dir as working directory
 		add_test(NAME libcpprime_tests COMMAND libcpprime_tests)
 		set_tests_properties(libcpprime_tests PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	endif()
+endif()
+
+# Benchmarks
+if(LIBCPPRIME_BUILD_BENCHMARKS)
+	include(FetchContent)
+	# nanobench is a single-header library; we fetch and expose as an INTERFACE target
+	FetchContent_Declare(
+		nanobench
+		GIT_REPOSITORY https://github.com/martinus/nanobench.git
+		GIT_TAG v4.3.11
+	)
+	FetchContent_GetProperties(nanobench)
+	if(NOT nanobench_POPULATED)
+		FetchContent_Populate(nanobench)
+		add_library(nanobench INTERFACE)
+		target_include_directories(nanobench INTERFACE
+			${nanobench_SOURCE_DIR}/src/include
+			${nanobench_SOURCE_DIR}/include
+		)
+	endif()
+
+	add_executable(benchmark_isprime benchmarks/isprime_bench.cpp)
+	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench)
+	if(LIBCPPRIME_WARNINGS)
+		if(MSVC)
+			target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)
+		else()
+			target_compile_options(benchmark_isprime PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
+		endif()
 	endif()
 endif()
 
