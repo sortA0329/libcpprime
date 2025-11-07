@@ -52,7 +52,9 @@ def save_scatter_loglog(
     ax.set_title(title)
 
     # Grid and tight layout for readability
-    ax.grid(True, linestyle=":", linewidth=0.8, alpha=0.6)
+    ax.minorticks_on()
+    ax.grid(True, linestyle=":", linewidth=1.0, alpha=0.6, which="major")
+    ax.grid(True, linestyle=":", linewidth=0.5, alpha=0.3, which="minor")
     fig.tight_layout()
 
     fig.savefig(out_path + "." + file_type, format=file_type)

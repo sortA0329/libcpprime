@@ -34,12 +34,14 @@
     "files.exclude": {
         "build": true,
         "build-*": true,
-        ".cache": true
+        ".cache": true,
+        ".venv": true
     },
     "search.exclude": {
         "build": true,
         "build-*": true,
-        ".cache": true
+        ".cache": true,
+        ".venv": true
     },
     "ruff.enable": true,
     "python.analysis.ignore": [
