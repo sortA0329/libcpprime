@@ -33,18 +33,21 @@
     },
     "files.exclude": {
         "build": true,
+        "build-*": true,
         ".cache": true
     },
     "search.exclude": {
         "build": true,
+        "build-*": true,
         ".cache": true
     },
     "ruff.enable": true,
     "python.analysis.ignore": [
         "*"
     ],
-    "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.generator": "Ninja",
+    "cmake.buildBeforeRun": false,
+    "cmake.configureOnOpen": false,
     "clangd.arguments": [
         "--compile-commands-dir=${workspaceFolder}/build"
     ],

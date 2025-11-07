@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Configure GCC Build",
+            "type": "shell",
+            "command": "cmake -S . -B build-gcc -G \"Ninja\" -DLIBCPPRIME_COMPILER=gcc"
+        },
+        {
+            "label": "Configure Clang Build",
+            "type": "shell",
+            "command": "cmake -S . -B build-clang -G \"Ninja\" -DLIBCPPRIME_COMPILER=clang"
+        },
+        {
+            "label": "Configure MSVC Build",
+            "type": "shell",
+            "command": "cmake -S . -B build-msvc -G \"Visual Studio 17 2022\" -DLIBCPPRIME_COMPILER=msvc"
+        },
+        {
+            "label": "Run Tests (GCC)",
+            "type": "shell",
+            "command": "cmake --build build-gcc --parallel --config Release --target libcpprime_tests; ctest --test-dir build-gcc -C Release",
+            "dependsOn": "Configure GCC Build"
+        },
+        {
+            "label": "Run Tests (Clang)",
+            "type": "shell",
+            "command": "cmake --build build-clang --parallel --config Release --target libcpprime_tests; ctest --test-dir build-clang -C Release",
+            "dependsOn": "Configure Clang Build"
+        },
+        {
+            "label": "Run Tests (MSVC)",
+            "type": "shell",
+            "command": "cmake --build build-msvc --parallel --config Release --target libcpprime_tests; ctest --test-dir build-msvc -C Release",
+            "dependsOn": "Configure MSVC Build"
+        },
+        {
+            "label": "Benchmark (GCC)",
+            "type": "shell",
+            "command": "cmake --build build-gcc --parallel --config Release --target benchmark_isprime; ./build-gcc/benchmark_isprime; uv run benchmarks/plot_isprime.py",
+            "dependsOn": "Configure GCC Build"
+        },
+        {
+            "label": "Benchmark (Clang)",
+            "type": "shell",
+            "command": "cmake --build build-clang --parallel --config Release --target benchmark_isprime; ./build-clang/benchmark_isprime; uv run benchmarks/plot_isprime.py",
+            "dependsOn": "Configure Clang Build"
+        },
+        {
+            "label": "Benchmark (MSVC)",
+            "type": "shell",
+            "command": "cmake --build build-msvc --parallel --config Release --target benchmark_isprime; ./build-msvc/Release/benchmark_isprime.exe; uv run benchmarks/plot_isprime.py",
+            "dependsOn": "Configure MSVC Build"
+        }
+    ]
+}
