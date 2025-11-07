@@ -26,11 +26,11 @@ jobs:
             - uses: actions/checkout@v4
             - run: |
                   sudo apt-get update -y
-                  sudo apt-get install -y ninja-build ccache curl
-            - name: "Install go-task"
-              run: |
-                  curl -sL https://taskfile.dev/install.sh -o /tmp/install_task.sh
-                  sudo sh /tmp/install_task.sh -d -b /usr/local/bin
+                  sudo apt-get install -y ninja-build ccache
+            - name: Install Task
+              uses: go-task/setup-task@v1
+              with:
+                  version: 3.x
             - uses: "actions/cache@v4"
               with:
                   path: build-${{ matrix.compiler }}/_deps
@@ -54,7 +54,9 @@ jobs:
                   key: ${{ runner.os }}-msvc-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
                   restore-keys: |
                       ${{ runner.os }}-msvc-deps-
-            - name: "Install go-task"
-              run: winget install Task.Task --silent --accept-source-agreements --accept-package-agreements
+            - name: "Install Task"
+              uses: go-task/setup-task@v1
+              with:
+                  version: 3.x
             - name: "Run tests via go-task"
               run: task test:msvc
