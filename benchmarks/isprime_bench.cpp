@@ -1,17 +1,15 @@
+#include <nanobench.h>
+
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <fstream>
 #include <ios>
 #include <iostream>
-#include <limits>
-#include <tuple>
-
-#define ANKERL_NANOBENCH_IMPLEMENT
-#include <nanobench.h>
-
 #include <libcpprime/IsPrime.hpp>
 #include <libcpprime/IsPrimeNoTable.hpp>
+#include <limits>
+#include <tuple>
 
 int main() {
     using namespace ankerl::nanobench;
