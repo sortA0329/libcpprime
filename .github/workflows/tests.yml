@@ -55,6 +55,6 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-msvc-deps-
             - name: "Install go-task"
-              run: winget install Task.Task
+              run: winget install Task.Task --silent --accept-source-agreements --accept-package-agreements
             - name: "Run tests via go-task"
               run: task test:msvc
