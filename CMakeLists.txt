@@ -6,7 +6,7 @@ project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
 option(LIBCPPRIME_BUILD_EXAMPLES "Build examples" ON)
 option(LIBCPPRIME_BUILD_TESTS "Build tests" ON)
 option(LIBCPPRIME_WARNINGS "Enable strict warnings for local targets" ON)
-option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks (ankerl::nanobench)" ON)
+option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks" ON)
 
 # Header-only library target
 add_library(libcpprime INTERFACE)
@@ -99,4 +99,3 @@ install(EXPORT libcpprimeTargets
 	NAMESPACE libcpprime::
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libcpprime
 )
-

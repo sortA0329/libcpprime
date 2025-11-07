@@ -15,6 +15,9 @@
     "[cpp]": {
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
     },
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
     "editor.tabSize": 4,
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "terminal.integrated.env.windows": {
@@ -36,6 +39,10 @@
         "build": true,
         ".cache": true
     },
+    "ruff.enable": true,
+    "python.analysis.ignore": [
+        "*"
+    ],
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.generator": "Ninja",
     "clangd.arguments": [

@@ -1,0 +1,10 @@
+[project]
+name = "libcpprime"
+version = "0.1.0"
+description = "A C++ library for fast primality testing"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+]

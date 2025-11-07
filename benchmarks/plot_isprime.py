@@ -10,7 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-file_type = "png"
+file_type = "jpg"
 
 
 def read_tsv_fast(path: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -39,9 +39,8 @@ def save_scatter_loglog(
     ylabel: str = "log10(time [ns])",
 ) -> None:
     # Vectorized log10 with small epsilon to avoid log(0)
-    eps = 1e-12
-    x = np.log10(n)
-    y = np.log10(np.maximum(t, eps))
+    x = np.log2(n)
+    y = t
 
     fig = plt.figure(figsize=(12, 7), dpi=240)
     ax = fig.add_subplot(1, 1, 1)
