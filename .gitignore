@@ -49,3 +49,4 @@ ENV/
 CMakeUserPresets.json
 
 /tmp
+compile_commands.json

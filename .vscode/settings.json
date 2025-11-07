@@ -48,9 +48,6 @@
     "cmake.generator": "Ninja",
     "cmake.buildBeforeRun": false,
     "cmake.configureOnOpen": false,
-    "clangd.arguments": [
-        "--compile-commands-dir=${workspaceFolder}/build-clang"
-    ],
     "github.copilot.enable": {
         "*": true,
         "*.txt": false,

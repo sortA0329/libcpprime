@@ -4,17 +4,20 @@ tasks:
   configure:gcc:
     desc: Configure GCC build (Ninja)
     cmds:
-      - cmake -S . -B build-gcc -G "Ninja" -DLIBCPPRIME_COMPILER=gcc
+      - cmake -S . -B build-gcc -G "Ninja" -DLIBCPPRIME_COMPILER=gcc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - cp build-gcc/compile_commands.json .
 
   configure:clang:
     desc: Configure Clang build (Ninja)
     cmds:
-      - cmake -S . -B build-clang -G "Ninja" -DLIBCPPRIME_COMPILER=clang
+      - cmake -S . -B build-clang -G "Ninja" -DLIBCPPRIME_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - cp build-clang/compile_commands.json .
 
   configure:msvc:
     desc: Configure MSVC build (Visual Studio 17 2022)
     cmds:
-      - cmake -S . -B build-msvc -G "Visual Studio 17 2022" -DLIBCPPRIME_COMPILER=msvc
+      - cmake -S . -B build-msvc -G "Visual Studio 17 2022" -DLIBCPPRIME_COMPILER=msvc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - cp build-msvc/compile_commands.json .
 
   clean:gcc:
     desc: Clean GCC build directory
