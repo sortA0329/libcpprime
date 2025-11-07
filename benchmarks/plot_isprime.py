@@ -35,10 +35,9 @@ def save_scatter_loglog(
     t: np.ndarray,
     out_path: str,
     title: str,
-    xlabel: str = "log10(n)",
-    ylabel: str = "log10(time [ns])",
+    xlabel: str = "log2(n)",
+    ylabel: str = "time [ns]",
 ) -> None:
-    # Vectorized log10 with small epsilon to avoid log(0)
     x = np.log2(n)
     y = t
 

@@ -1,0 +1,66 @@
+name: C++ Tests
+
+on:
+    push:
+        branches: [main, developing]
+    pull_request:
+        branches: [main, developing]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    linux:
+        name: Linux (${{ matrix.compiler }})
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                compiler: [gcc, clang]
+        steps:
+            - uses: actions/checkout@v4
+            - run: |
+                  sudo apt-get update -y
+                  sudo apt-get install -y ninja-build ccache curl
+            - name: "Install go-task"
+              run: |
+                  curl -sL https://taskfile.dev/install.sh -o /tmp/install_task.sh
+                  sudo sh /tmp/install_task.sh -d -b /usr/local/bin
+            - uses: "actions/cache@v4"
+              with:
+                  path: ~/.cache/ccache
+                  key: ${{ runner.os }}-${{ matrix.compiler }}-ccache
+                  restore-keys: |
+                      ${{ runner.os }}-${{ matrix.compiler }}-ccache-
+            - uses: "actions/cache@v4"
+              with:
+                  path: build-${{ matrix.compiler }}/_deps
+                  key: ${{ runner.os }}-${{ matrix.compiler }}-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  restore-keys: |
+                      ${{ runner.os }}-${{ matrix.compiler }}-deps-
+            - name: "Run tests via go-task"
+              env:
+                  CC: ${{ matrix.compiler }}
+                  CXX: ${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
+              run: task test:${{ matrix.compiler }}
+
+    windows:
+        name: Windows (msvc)
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: "actions/cache@v4"
+              with:
+                  path: build-msvc/_deps
+                  key: ${{ runner.os }}-msvc-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  restore-keys: |
+                      ${{ runner.os }}-msvc-deps-
+            - name: "Install go-task"
+              run: choco install go-task -y
+            - name: "Run tests via go-task"
+              run: task test:msvc
