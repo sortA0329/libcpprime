@@ -16,12 +16,8 @@ concurrency:
 
 jobs:
     linux:
-        name: Linux (${{ matrix.compiler }})
+        name: Linux (gcc & clang)
         runs-on: ubuntu-latest
-        strategy:
-            fail-fast: false
-            matrix:
-                compiler: [gcc, clang]
         steps:
             - uses: actions/checkout@v4
             - run: |
@@ -31,17 +27,30 @@ jobs:
               uses: go-task/setup-task@v1
               with:
                   version: 3.x
-            - uses: "actions/cache@v4"
+            - name: Cache deps (gcc)
+              uses: actions/cache@v4
               with:
-                  path: build-${{ matrix.compiler }}/_deps
-                  key: ${{ runner.os }}-${{ matrix.compiler }}-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  path: build-gcc/_deps
+                  key: ${{ runner.os }}-gcc-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
                   restore-keys: |
-                      ${{ runner.os }}-${{ matrix.compiler }}-deps-
-            - name: "Run tests via go-task"
+                      ${{ runner.os }}-gcc-deps-
+            - name: Run tests (gcc)
               env:
-                  CC: ${{ matrix.compiler }}
-                  CXX: ${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
-              run: task test:${{ matrix.compiler }}
+                  CC: gcc
+                  CXX: g++
+              run: task test:gcc
+            - name: Cache deps (clang)
+              uses: actions/cache@v4
+              with:
+                  path: build-clang/_deps
+                  key: ${{ runner.os }}-clang-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  restore-keys: |
+                      ${{ runner.os }}-clang-deps-
+            - name: Run tests (clang)
+              env:
+                  CC: clang
+                  CXX: clang++
+              run: task test:clang
 
     windows:
         name: Windows (msvc)
