@@ -18,14 +18,14 @@ int main() {
     const char* out_notable = "benchmarks/bench_IsPrimeNoTable.tsv";
     const int samples = 32000;
 
-    static std::uint32_t weighted[2080];
+    static std::uint32_t weighted[89440];
     for (std::uint32_t i = 1, count = 0; i <= 64; ++i) {
-        for (std::uint32_t j = 0; j < i; ++j) {
+        for (std::uint32_t j = 0; j < i * i; ++j) {
             weighted[count++] = 64 - i;
         }
     }
     [[maybe_unused]] auto bench = [rng = Rng()](bool (*func)(std::uint64_t)) mutable {
-        std::uint32_t k = weighted[rng.bounded(2080)];
+        std::uint32_t k = weighted[rng.bounded(89440)];
         std::uint64_t n = (rng() >> k) | 1;
         constexpr std::uint32_t iters = 80;
         bool is_prime = func(n);
