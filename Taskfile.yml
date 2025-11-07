@@ -1,0 +1,111 @@
+version: "3"
+
+tasks:
+  configure:gcc:
+    desc: Configure GCC build (Ninja)
+    cmds:
+      - cmake -S . -B build-gcc -G "Ninja" -DLIBCPPRIME_COMPILER=gcc
+
+  configure:clang:
+    desc: Configure Clang build (Ninja)
+    cmds:
+      - cmake -S . -B build-clang -G "Ninja" -DLIBCPPRIME_COMPILER=clang
+
+  configure:msvc:
+    desc: Configure MSVC build (Visual Studio 17 2022)
+    cmds:
+      - cmake -S . -B build-msvc -G "Visual Studio 17 2022" -DLIBCPPRIME_COMPILER=msvc
+
+  clean:gcc:
+    desc: Clean GCC build directory
+    cmds:
+      - rm -rf build-gcc
+
+  clean:clang:
+    desc: Clean Clang build directory
+    cmds:
+      - rm -rf build-clang
+
+  clean:msvc:
+    desc: Clean MSVC build directory
+    cmds:
+      - rm -rf build-msvc
+
+  test:gcc:
+    desc: Build and run tests (GCC)
+    deps: [configure:gcc]
+    cmds:
+      - cmake --build build-gcc --parallel --config Release --target libcpprime_tests
+      - ctest --test-dir build-gcc -C Release
+
+  test:clang:
+    desc: Build and run tests (Clang)
+    deps: [configure:clang]
+    cmds:
+      - cmake --build build-clang --parallel --config Release --target libcpprime_tests
+      - ctest --test-dir build-clang -C Release
+
+  test:msvc:
+    desc: Build and run tests (MSVC)
+    deps: [configure:msvc]
+    cmds:
+      - cmake --build build-msvc --parallel --config Release --target libcpprime_tests
+      - ctest --test-dir build-msvc -C Release
+
+  bench:gcc:
+    desc: Build and run benchmark, then plot (GCC)
+    deps: [configure:gcc]
+    cmds:
+      - cmake --build build-gcc --parallel --config Release --target benchmark_isprime
+      - ./build-gcc/benchmark_isprime
+      - uv run benchmarks/plot_isprime.py
+
+  bench:clang:
+    desc: Build and run benchmark, then plot (Clang)
+    deps: [configure:clang]
+    cmds:
+      - cmake --build build-clang --parallel --config Release --target benchmark_isprime
+      - ./build-clang/benchmark_isprime
+      - uv run benchmarks/plot_isprime.py
+
+  bench:msvc:
+    desc: Build and run benchmark, then plot (MSVC)
+    deps: [configure:msvc]
+    cmds:
+      - cmake --build build-msvc --parallel --config Release --target benchmark_isprime
+      - ./build-msvc/Release/benchmark_isprime.exe
+      - uv run benchmarks/plot_isprime.py
+
+  # Convenience aggregates
+  configure:
+    desc: Configure builds for GCC, Clang, and MSVC
+    cmds:
+      - task: configure:gcc
+      - task: configure:clang
+      - task: configure:msvc
+
+  clean:
+    desc: Clean build directories for GCC, Clang, and MSVC
+    cmds:
+      - task: clean:gcc
+      - task: clean:clang
+      - task: clean:msvc
+
+  test:
+    desc: Run tests for GCC, Clang, and MSVC
+    cmds:
+      - task: test:gcc
+      - task: test:clang
+      - task: test:msvc
+
+  bench:
+    desc: Run benchmarks for GCC, Clang, and MSVC
+    cmds:
+      - task: bench:gcc
+      - task: bench:clang
+      - task: bench:msvc
+
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
