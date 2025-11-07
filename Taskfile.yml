@@ -16,8 +16,7 @@ tasks:
   configure:msvc:
     desc: Configure MSVC build (Visual Studio 17 2022)
     cmds:
-      - cmake -S . -B build-msvc -G "Visual Studio 17 2022" -DLIBCPPRIME_COMPILER=msvc -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      - cp build-msvc/compile_commands.json .
+      - cmake -S . -B build-msvc -G "Visual Studio 17 2022" -DLIBCPPRIME_COMPILER=msvc
 
   clean:gcc:
     desc: Clean GCC build directory

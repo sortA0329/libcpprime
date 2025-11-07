@@ -114,24 +114,16 @@ endif()
 # Benchmarks
 if(LIBCPPRIME_BUILD_BENCHMARKS)
 	include(FetchContent)
-	# nanobench is a single-header library; we fetch and expose as an INTERFACE target
 	FetchContent_Declare(
 		nanobench
 		GIT_REPOSITORY https://github.com/martinus/nanobench.git
 		GIT_TAG v4.3.11
 	)
-	FetchContent_GetProperties(nanobench)
-	if(NOT nanobench_POPULATED)
-		FetchContent_Populate(nanobench)
-		add_library(nanobench INTERFACE)
-		target_include_directories(nanobench INTERFACE
-			${nanobench_SOURCE_DIR}/src/include
-			${nanobench_SOURCE_DIR}/include
-		)
-	endif()
+	# Creates targets `nanobench` and alias `nanobench::nanobench`
+	FetchContent_MakeAvailable(nanobench)
 
 	add_executable(benchmark_isprime benchmarks/isprime_bench.cpp)
-	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench)
+	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench::nanobench)
 	if(LIBCPPRIME_WARNINGS)
 		if(MSVC)
 			target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)
