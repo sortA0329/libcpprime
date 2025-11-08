@@ -29,7 +29,8 @@
     "files.trimTrailingWhitespace": true,
     "files.associations": {
         ".clang-format": "yaml",
-        ".clangd": "yaml"
+        ".clangd": "yaml",
+        "**/bundled/*.hpp": "plaintext"
     },
     "files.exclude": {
         "build": true,

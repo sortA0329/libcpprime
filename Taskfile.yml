@@ -107,6 +107,11 @@ tasks:
       - task: bench:clang
       - task: bench:msvc
 
+  bundle:
+    desc: Create bundled distribution
+    cmds:
+      - uv run bundled/create_bundled.py
+
   default:
     desc: List available tasks
     cmds:
