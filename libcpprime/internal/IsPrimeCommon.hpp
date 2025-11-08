@@ -60,7 +60,7 @@ namespace cppr {
 namespace internal {
 
 #if defined(__SIZEOF_INT128__)
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 using UInt128 = unsigned __int128;
