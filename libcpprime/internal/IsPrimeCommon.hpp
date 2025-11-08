@@ -189,16 +189,16 @@ LIBCPPRIME_CONSTEXPR inline std::uint64_t Mulu128High(std::uint64_t muler, std::
     return Mulu128(muler, mulnd).high;
 #endif
 }
-LIBCPPRIME_CONSTEXPR inline Int64Pair Divu128(std::uint64_t high, std::uint64_t low, std::uint64_t div) noexcept {
+LIBCPPRIME_CONSTEXPR inline std::uint64_t Modu128(std::uint64_t high, std::uint64_t low, std::uint64_t div) noexcept {
 #if (defined(__GNUC__) || defined(__ICC)) && defined(__x86_64__)
     if LIBCPPRIME_IF_CONSTEXPR (sizeof(void*) == 8) {
 #ifdef __cpp_lib_is_constant_evaluated
         if (!std::is_constant_evaluated())
 #endif
         {
-            std::uint64_t res = 0, rem = 0;
-            __asm__("divq %[v]" : "=a"(res), "=d"(rem) : [v] "r"(div), "a"(low), "d"(high));
-            return {res, rem};
+            std::uint64_t quot = 0, rem = 0;
+            __asm__("divq %[v]" : "=a"(quot), "=d"(rem) : [v] "r"(div), "a"(low), "d"(high));
+            return rem;
         }
     }
 #elif defined(_MSC_VER) && _MSC_VER >= 1900
@@ -207,14 +207,14 @@ LIBCPPRIME_CONSTEXPR inline Int64Pair Divu128(std::uint64_t high, std::uint64_t 
 #endif
     {
         std::uint64_t rem = 0;
-        std::uint64_t res = _udiv128(high, low, div, &rem);
-        return {res, rem};
+        _udiv128(high, low, div, &rem);
+        return rem;
     }
 #endif
 #if defined(__SIZEOF_INT128__)
     UInt128 n = (static_cast<UInt128>(high) << 64 | low);
-    std::uint64_t res = static_cast<std::uint64_t>(n / div);
-    return {res, low - res * div};
+    std::uint64_t quot = static_cast<std::uint64_t>(n / div);
+    return low - quot * div;
 #else
     std::uint64_t res = 0;
     std::uint64_t cur = high;
@@ -226,7 +226,7 @@ LIBCPPRIME_CONSTEXPR inline Int64Pair Divu128(std::uint64_t high, std::uint64_t 
         res = res << 1 | large;
         cur -= div & (0 - large);
     }
-    return {res, cur};
+    return cur;
 #endif
 }
 template <class T>
@@ -284,7 +284,7 @@ class MontgomeryModint64Impl {
     LIBCPPRIME_CONSTEXPR MontgomeryModint64Impl(std::uint64_t n) noexcept {
         Assume(n > 2 && n % 2 != 0);
         mod_ = n;
-        rs = Divu128(0xffffffffffffffff % n, 0 - n, n).low;
+        rs = Modu128(0xffffffffffffffff % n, 0 - n, n);
         nr = n;
         for (std::uint32_t i = 0; i != 5; ++i) nr *= 2 - n * nr;
         np = reduce(rs);
@@ -376,13 +376,13 @@ constexpr std::uint16_t Bases32[256] = {
 };
 LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
     if (x < 85849) {
-        const std::uint32_t a = static_cast<std::uint32_t>(Divu128(272518712866683587ull % x, 10755835586592736005ull, x).low);
+        const std::uint32_t a = static_cast<std::uint32_t>(Modu128(272518712866683587ull % x, 10755835586592736005ull, x));
         if (a == 0) return false;
         if (x < 11881) return GCD(a, x) == 1;
-        const std::uint32_t b = static_cast<std::uint32_t>(Divu128(827936745744686818ull % x, 10132550402535125089ull, x).low);
+        const std::uint32_t b = static_cast<std::uint32_t>(Modu128(827936745744686818ull % x, 10132550402535125089ull, x));
         if (b == 0) return false;
         if (x < 39601) return GCD((a * b) % x, x) == 1;
-        const std::uint32_t c = static_cast<std::uint32_t>(Divu128(9647383993136055606ull % x, 17068348107132031867ull, x).low * a * b % x);
+        const std::uint32_t c = static_cast<std::uint32_t>(Modu128(9647383993136055606ull % x, 17068348107132031867ull, x) * a * b % x);
         if (c == 0) return false;
         return GCD(c, x) == 1;
     }

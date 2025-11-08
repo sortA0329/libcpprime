@@ -38,21 +38,21 @@ tasks:
     deps: [configure:gcc]
     cmds:
       - cmake --build build-gcc --parallel --config Release --target libcpprime_tests
-      - ctest --test-dir build-gcc -C Release --output-on-failure
+      - ctest --test-dir build-gcc -C Release --output-on-failure --stop-on-failure
 
   test:clang:
     desc: Build and run tests (Clang)
     deps: [configure:clang]
     cmds:
       - cmake --build build-clang --parallel --config Release --target libcpprime_tests
-      - ctest --test-dir build-clang -C Release --output-on-failure
+      - ctest --test-dir build-clang -C Release --output-on-failure --stop-on-failure
 
   test:msvc:
     desc: Build and run tests (MSVC)
     deps: [configure:msvc]
     cmds:
       - cmake --build build-msvc --parallel --config Release --target libcpprime_tests
-      - ctest --test-dir build-msvc -C Release --output-on-failure
+      - ctest --test-dir build-msvc -C Release --output-on-failure --stop-on-failure
 
   bench:gcc:
     desc: Build and run benchmark, then plot (GCC)

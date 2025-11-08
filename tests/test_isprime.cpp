@@ -42,8 +42,8 @@ TEST_F(IsPrimeTest, DatafilePrimes) {
         GTEST_SKIP() << "Primes.txt is empty, skipping datafile test";
     }
     for (const auto& prime : primes) {
-        EXPECT_TRUE(cppr::IsPrime(prime)) << "Failed for prime: " << prime;
-        EXPECT_TRUE(cppr::IsPrimeNoTable(prime)) << "Failed for prime: " << prime;
+        ASSERT_TRUE(cppr::IsPrime(prime)) << "Failed for prime: " << prime;
+        ASSERT_TRUE(cppr::IsPrimeNoTable(prime)) << "Failed for prime: " << prime;
     }
 }
 
@@ -52,7 +52,7 @@ TEST_F(IsPrimeTest, DatafileComposites) {
         GTEST_SKIP() << "Composites.txt is empty, skipping datafile test";
     }
     for (const auto& composite : composites) {
-        EXPECT_FALSE(cppr::IsPrime(composite)) << "Failed for composite: " << composite;
-        EXPECT_FALSE(cppr::IsPrimeNoTable(composite)) << "Failed for composite: " << composite;
+        ASSERT_FALSE(cppr::IsPrime(composite)) << "Failed for composite: " << composite;
+        ASSERT_FALSE(cppr::IsPrimeNoTable(composite)) << "Failed for composite: " << composite;
     }
 }

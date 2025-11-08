@@ -24,7 +24,7 @@ int main() {
             weighted[count++] = 64 - i;
         }
     }
-    [[maybe_unused]] auto bench = [rng = Rng()](bool (*func)(std::uint64_t)) mutable {
+    auto bench = [rng = Rng(42)](bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[rng.bounded(89440)];
         std::uint64_t n = (rng() >> k) | 1;
         constexpr std::uint32_t iters = 80;

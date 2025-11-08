@@ -272,7 +272,6 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64BailliePSW(const std::uint64_t x) noex
     if (mint.is_zero(u) || mint.is_zero(v)) return true;
     std::uint64_t f = (x + 1) & ~x;
     for (f >>= 1; f; f >>= 1) {
-        u = mint.mul(u, v);
         v = mint.sub(mint.mul(v, v), mint.add(Qn, Qn));
         if (mint.is_zero(v)) return true;
         Qn = mint.mul(Qn, Qn);
