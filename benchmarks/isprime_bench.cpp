@@ -1,5 +1,6 @@
 #include <nanobench.h>
 
+#include <bit>
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
@@ -57,6 +58,15 @@ int main() {
         f << "n\tis_prime\ttime_ns\n";
     }
 
+    double time_prime_sum[65] = {};
+    std::int32_t count_prime[65] = {};
+    double time_composite_sum[65] = {};
+    std::int32_t count_composite[65] = {};
+    double time_prime_sum_NoTable[65] = {};
+    std::int32_t count_prime_NoTable[65] = {};
+    double time_composite_sum_NoTable[65] = {};
+    std::int32_t count_composite_NoTable[65] = {};
+
     // Emit results for cppr::IsPrime
     {
         for (std::uint32_t i = 0; i < 4096; ++i) bench(&cppr::IsPrime);  // warmup
@@ -67,6 +77,14 @@ int main() {
             char buf[96];
             int len = std::snprintf(buf, sizeof(buf), "%llu\t%d\t%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
+            std::int32_t bitlen = std::bit_width(n);
+            if (isp) {
+                time_prime_sum[bitlen] += t;
+                count_prime[bitlen] += 1;
+            } else {
+                time_composite_sum[bitlen] += t;
+                count_composite[bitlen] += 1;
+            }
         }
     }
 
@@ -74,13 +92,34 @@ int main() {
     {
         for (std::uint32_t i = 0; i < 512; ++i) bench(&cppr::IsPrimeNoTable);  // warmup
         std::ofstream f(out_notable, std::ios::binary | std::ios::app);
-        f.setf(std::ios::fmtflags(0), std::ios::floatfield);
+        f.setf(std::ios::fmtflags(0), std::ios::floatfield);  // default
         for (int i = 0; i < samples; ++i) {
             auto [n, isp, t] = bench(&cppr::IsPrimeNoTable);
             char buf[96];
             int len = std::snprintf(buf, sizeof(buf), "%llu\t%d\t%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
+            std::int32_t bitlen = std::bit_width(n);
+            if (isp) {
+                time_prime_sum_NoTable[bitlen] += t;
+                count_prime_NoTable[bitlen] += 1;
+            } else {
+                time_composite_sum_NoTable[bitlen] += t;
+                count_composite_NoTable[bitlen] += 1;
+            }
         }
+    }
+
+    // Output summary
+    std::ofstream f_summary("benchmarks/bench_summary.tsv", std::ios::binary);
+    f_summary << "BitLength\tIsPrime_Prime_ns\tIsPrimeNoTable_Prime_ns\tIsPrime_Composite_ns\tIsPrimeNoTable_Composite_ns\n";
+    f_summary.setf(std::ios::fmtflags(0), std::ios::floatfield);  // default
+    f_summary.precision(5);
+    for (std::int32_t i = 1; i <= 64; ++i) {
+        double avg_prime = count_prime[i] ? (time_prime_sum[i] / count_prime[i]) : 0.0;
+        double avg_prime_NoTable = count_prime_NoTable[i] ? (time_prime_sum_NoTable[i] / count_prime_NoTable[i]) : 0.0;
+        double avg_composite = count_composite[i] ? (time_composite_sum[i] / count_composite[i]) : 0.0;
+        double avg_composite_NoTable = count_composite_NoTable[i] ? (time_composite_sum_NoTable[i] / count_composite_NoTable[i]) : 0.0;
+        f_summary << i << "\t" << avg_prime << "\t" << avg_prime_NoTable << "\t" << avg_composite << "\t" << avg_composite_NoTable << "\n";
     }
 
     std::cout << "Benchmarking completed.\n";
