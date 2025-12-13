@@ -8,6 +8,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 import numpy as np
 
 file_type = "jpg"
@@ -29,7 +30,7 @@ def read_tsv_fast(path: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     return n, is_prime, t
 
 
-def save_scatter_loglog(
+def save_scatter(
     n: np.ndarray,
     p: np.ndarray,
     t: np.ndarray,
@@ -46,6 +47,26 @@ def save_scatter_loglog(
 
     cmap = matplotlib.colors.ListedColormap(["#379777", "#F4CE14"])
     ax.scatter(x, y, s=4, c=p, cmap=cmap, vmin=0, vmax=1, alpha=0.6, linewidths=0)
+
+    prime_patch = mlines.Line2D(
+        [],
+        [],
+        color="#F4CE14",
+        marker="o",
+        linestyle="None",
+        markersize=6,
+        label="Prime",
+    )
+    composite_patch = mlines.Line2D(
+        [],
+        [],
+        color="#379777",
+        marker="o",
+        linestyle="None",
+        markersize=6,
+        label="Composite",
+    )
+    ax.legend(handles=[prime_patch, composite_patch], loc="best")
 
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -78,14 +99,14 @@ def main() -> int:
     n1, p1, t1 = read_tsv_fast(p_prime)
     n2, p2, t2 = read_tsv_fast(p_notable)
 
-    save_scatter_loglog(
+    save_scatter(
         n1,
         p1,
         t1,
         os.path.join(cwd, "benchmarks/bench_IsPrime"),
         title="cppr::IsPrime",
     )
-    save_scatter_loglog(
+    save_scatter(
         n2,
         p2,
         t2,
