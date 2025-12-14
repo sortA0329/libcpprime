@@ -6,6 +6,7 @@
 #include <libcpprime/IsPrime.hpp>
 #include <libcpprime/IsPrimeNoTable.hpp>
 #include <primesieve/iterator.hpp>
+#include <random>
 #include <set>
 #include <string>
 
@@ -35,7 +36,7 @@ TYPED_TEST_SUITE(IsPrimeTest, IsPrimeImplementations, IsPrimeImplName);
 TYPED_TEST(IsPrimeTest, Zero) { ASSERT_FALSE(TypeParam::IsPrime(0)); }
 TYPED_TEST(IsPrimeTest, One) { ASSERT_FALSE(TypeParam::IsPrime(1)); }
 
-TYPED_TEST(IsPrimeTest, Small) {
+TYPED_TEST(IsPrimeTest, 24bit) {
     primesieve::iterator it;
     uint64_t prev = 2;
     uint64_t prime = it.next_prime();
@@ -49,15 +50,22 @@ TYPED_TEST(IsPrimeTest, Small) {
     }
 }
 
-TYPED_TEST(IsPrimeTest, Primes32bit) {
+TYPED_TEST(IsPrimeTest, 32bit) {
     primesieve::iterator it(1u << 24, UINT32_MAX);
     uint32_t count = 0;
+    uint64_t prev = 1u << 24;
+    std::mt19937_64 rng;
     while (true) {
         uint64_t prime = it.next_prime();
         if (count % 128 == 0) {
             ASSERT_TRUE(TypeParam::IsPrime(prime)) << "Failed for prime = " << prime;
         }
+        if (count % 4 == 0) {
+            uint64_t n = prev + rng() % (prime - prev);
+            ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
+        }
         count++;
+        prev = prime + 1;
         if (prime == 4294967291u) break;  // last 32-bit prime
     }
 }
@@ -98,7 +106,11 @@ void RunTestsFromFile(const std::string& filename, bool expected_result) {
     }
 }
 
-TYPED_TEST(IsPrimeTest, SPRP_2_32bit) { RunTestsFromFile<TypeParam>("2_SPRP_32bit.txt", false); }
+TYPED_TEST(IsPrimeTest, 2_SPRP_32bit) { RunTestsFromFile<TypeParam>("2_SPRP_32bit.txt", false); }
+TYPED_TEST(IsPrimeTest, 2_SPRP_62bit) { RunTestsFromFile<TypeParam>("2_SPRP_62bit.txt", false); }
+TYPED_TEST(IsPrimeTest, 2_SPRP_64bit) { RunTestsFromFile<TypeParam>("2_SPRP_64bit.txt", false); }
+TYPED_TEST(IsPrimeTest, carmichael) { RunTestsFromFile<TypeParam>("carmichael.txt", false); }
+TYPED_TEST(IsPrimeTest, carmichael_strong_pseudoprimes) { RunTestsFromFile<TypeParam>("carmichael_strong_pseudoprimes.txt", false); }
 TYPED_TEST(IsPrimeTest, hack_7_bases) { RunTestsFromFile<TypeParam>("hack_7_bases.txt", false); }
 TYPED_TEST(IsPrimeTest, hack_8_prime_bases) { RunTestsFromFile<TypeParam>("hack_8_prime_bases.txt", false); }
 TYPED_TEST(IsPrimeTest, hack_base_2_to_10) { RunTestsFromFile<TypeParam>("hack_base_2_to_10.txt", false); }
