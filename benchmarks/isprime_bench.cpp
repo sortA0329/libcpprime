@@ -15,6 +15,8 @@
 int main() {
     using namespace ankerl::nanobench;
 
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     const char* out_prime = "benchmarks/bench_IsPrime.tsv";
     const char* out_notable = "benchmarks/bench_IsPrimeNoTable.tsv";
     const int samples = 32000;
@@ -28,10 +30,10 @@ int main() {
     auto bench = [rng = Rng(42)](bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[rng.bounded(89440)];
         std::uint64_t n = (rng() >> k) | 1;
-        constexpr std::uint32_t iters = 80;
+        constexpr std::uint32_t iters = 250;
         bool is_prime = func(n);
         auto min_time = std::numeric_limits<double>::max();
-        for (std::uint32_t trial = 0; trial < 8; ++trial) {
+        for (std::uint32_t trial = 0; trial < 16; ++trial) {
             auto start = Clock::now();
             for (std::uint32_t i = 0; i != iters; ++i) {
                 doNotOptimizeAway(func(n));
@@ -122,7 +124,8 @@ int main() {
         f_summary << i << "\t" << avg_prime << "\t" << avg_prime_NoTable << "\t" << avg_composite << "\t" << avg_composite_NoTable << "\n";
     }
 
-    std::cout << "Benchmarking completed.\n";
+    std::cout << "Benchmarking completed\n";
+    std::cout << "Total time: " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start_time).count() << " seconds\n";
 
     return 0;
 }
