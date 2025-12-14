@@ -48,9 +48,10 @@
     "python.analysis.ignore": [
         "*"
     ],
-    "cmake.generator": "Ninja",
-    "cmake.buildBeforeRun": false,
     "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
+    "cmake.buildBeforeRun": false,
+    "cmake.autoSelectActiveFolder": false,
     "github.copilot.enable": {
         "*": true,
         "*.txt": false,

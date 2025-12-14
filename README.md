@@ -103,3 +103,8 @@ g++ -I ./libcpprime -O3 Main.cpp
     -   Add `cppr::IsPrime` with a table
 -   2024/12/18 ver 1.0.0
     -   Add `cppr::IsPrime`
+
+# References
+
+https://miller-rabin.appspot.com/
+https://zenn.dev/mizar/articles/791698ea860581

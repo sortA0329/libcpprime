@@ -82,18 +82,27 @@ endif()
 if(LIBCPPRIME_BUILD_TESTS)
 	include(CTest)
 	if(BUILD_TESTING)
+		add_executable(libcpprime_tests tests/test_isprime.cpp)
+
 		include(FetchContent)
 		set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 		set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 		FetchContent_Declare(
 			googletest
 			GIT_REPOSITORY https://github.com/google/googletest.git
-			GIT_TAG v1.14.0
+			GIT_TAG v1.17.0
 		)
+		set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 		FetchContent_MakeAvailable(googletest)
-
-		add_executable(libcpprime_tests tests/test_isprime.cpp)
 		target_link_libraries(libcpprime_tests PRIVATE libcpprime GTest::gtest_main)
+
+		FetchContent_Declare(
+    		primesieve
+    		GIT_REPOSITORY https://github.com/kimwalisch/primesieve.git
+    		GIT_TAG v12.10
+		)
+		FetchContent_MakeAvailable(primesieve)
+		target_link_libraries(libcpprime_tests PRIVATE primesieve::primesieve)
 
 		if(LIBCPPRIME_WARNINGS)
 			if(MSVC)
@@ -107,7 +116,6 @@ if(LIBCPPRIME_BUILD_TESTS)
 		endif()
 		# Use generator expression to ensure correct config-specific path for multi-config generators
 		add_test(NAME libcpprime_tests COMMAND $<TARGET_FILE:libcpprime_tests>)
-		set_tests_properties(libcpprime_tests PROPERTIES WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 	endif()
 endif()
 
@@ -141,11 +149,3 @@ install(EXPORT libcpprimeTargets
 	NAMESPACE libcpprime::
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/libcpprime
 )
-
-# Usage examples (configure in a fresh build dir):
-#   GCC:   cmake -S . -B build-gcc   -G "Ninja" -DLIBCPPRIME_COMPILER=gcc
-#   Clang: cmake -S . -B build-clang -G "Ninja" -DLIBCPPRIME_COMPILER=clang
-#   MSVC:  cmake -S . -B build-msvc  -G "Visual Studio 17 2022" -DLIBCPPRIME_COMPILER=msvc
-# Build (multi-config VS): cmake --build build-msvc --config Release
-# Run tests (multi-config VS): ctest --test-dir build-msvc -C Release
-# Single-config generators:    ctest --test-dir build-gcc
