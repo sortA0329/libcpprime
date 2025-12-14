@@ -57,7 +57,7 @@ TYPED_TEST(IsPrimeTest, 32bit) {
     std::mt19937_64 rng;
     while (true) {
         uint64_t prime = it.next_prime();
-        if (count % 128 == 0) {
+        if (count % 32 == 0) {
             ASSERT_TRUE(TypeParam::IsPrime(prime)) << "Failed for prime = " << prime;
         }
         if (count % 4 == 0) {
@@ -116,3 +116,11 @@ TYPED_TEST(IsPrimeTest, hack_8_prime_bases) { RunTestsFromFile<TypeParam>("hack_
 TYPED_TEST(IsPrimeTest, hack_base_2_to_10) { RunTestsFromFile<TypeParam>("hack_base_2_to_10.txt", false); }
 TYPED_TEST(IsPrimeTest, hack_known_bases) { RunTestsFromFile<TypeParam>("hack_known_bases.txt", false); }
 TYPED_TEST(IsPrimeTest, strong_lucas_pseudoprimes) { RunTestsFromFile<TypeParam>("strong_lucas_pseudoprimes.txt", false); }
+
+TEST(IsPrimeTest, CompareImplementations) {
+    std::mt19937_64 rng;
+    for (uint64_t i = 0; i <= 20000000; i++) {
+        uint64_t n = rng() >> (rng() % 32);
+        ASSERT_EQ(cppr::IsPrime(n), cppr::IsPrimeNoTable(n)) << "Mismatch for n = " << n;
+    }
+}
