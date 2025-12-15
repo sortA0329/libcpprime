@@ -6,12 +6,21 @@
 #include <fstream>
 #include <libcpprime/IsPrime.hpp>
 #include <libcpprime/IsPrimeNoTable.hpp>
-#include <primesieve.hpp>
-#include <primesieve/iterator.hpp>
 #include <random>
 #include <set>
+#include <span>
 #include <string>
 #include <vector>
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
+#include <primesieve.hpp>
+#include <primesieve/iterator.hpp>
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 struct IsPrimeImpl {
     static bool IsPrime(uint64_t n) { return cppr::IsPrime(n); }
@@ -36,16 +45,21 @@ struct IsPrimeImplName {
 };
 TYPED_TEST_SUITE(IsPrimeTest, IsPrimeImplementations, IsPrimeImplName);
 
-std::vector<uint32_t> primes = []() {
-    std::vector<uint32_t> primes;
-    primesieve::generate_primes((1ull << 32) - 1, &primes);
-    return primes;
-}();
+auto GetPrimes() {
+    static std::vector<uint32_t> primes;
+    static bool initialized = false;
+    if (!initialized) {
+        primesieve::generate_primes(4294967295u, &primes);
+        initialized = true;
+    }
+    return std::span(primes.begin(), primes.end());
+}
 
 TYPED_TEST(IsPrimeTest, Zero) { ASSERT_FALSE(TypeParam::IsPrime(0)); }
 TYPED_TEST(IsPrimeTest, One) { ASSERT_FALSE(TypeParam::IsPrime(1)); }
 
 TYPED_TEST(IsPrimeTest, 24bit) {
+    auto primes = GetPrimes();
     uint64_t next_index = 0;
     for (uint32_t n = 2; n < (1u << 24); n++) {
         if (n == primes[next_index]) {
@@ -58,6 +72,7 @@ TYPED_TEST(IsPrimeTest, 24bit) {
 }
 
 TYPED_TEST(IsPrimeTest, 32bit) {
+    auto primes = GetPrimes();
     std::mt19937_64 rng;
     uint32_t start_index = static_cast<uint32_t>(std::lower_bound(primes.begin(), primes.end(), (1ull << 24)) - primes.begin());
     for (uint32_t i = start_index; i < primes.size(); i++) {
@@ -81,10 +96,10 @@ TYPED_TEST(IsPrimeTest, Pow2) {
 }
 
 TYPED_TEST(IsPrimeTest, Mersenne) {
-    std::set<uint64_t> primes = {3, 7, 31, 127, 8191, 131071, 524287, 2147483647, 2305843009213693951};
+    std::set<uint64_t> mersenne_primes = {3, 7, 31, 127, 8191, 131071, 524287, 2147483647, 2305843009213693951};
     for (uint32_t exp = 1; exp <= 63; exp++) {
         uint64_t n = (2ull << exp) - 1;
-        if (primes.contains(n)) {
+        if (mersenne_primes.contains(n)) {
             ASSERT_TRUE(TypeParam::IsPrime(n)) << "Failed for prime = " << n;
         } else {
             ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
@@ -93,6 +108,7 @@ TYPED_TEST(IsPrimeTest, Mersenne) {
 }
 
 TYPED_TEST(IsPrimeTest, ProdTwoPrime) {
+    auto primes = GetPrimes();
     std::mt19937_64 rng;
     uint32_t start_index = static_cast<uint32_t>(std::lower_bound(primes.begin(), primes.end(), (1ull << 16)) - primes.begin());
     for (int i = 0; i < 6000000; ++i) {

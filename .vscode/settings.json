@@ -45,6 +45,7 @@
         ".venv": true
     },
     "ruff.enable": true,
+    "python.terminal.activateEnvironment": true,
     "python.analysis.ignore": [
         "*"
     ],
