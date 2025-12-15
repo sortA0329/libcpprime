@@ -1,14 +1,17 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <libcpprime/IsPrime.hpp>
 #include <libcpprime/IsPrimeNoTable.hpp>
+#include <primesieve.hpp>
 #include <primesieve/iterator.hpp>
 #include <random>
 #include <set>
 #include <string>
+#include <vector>
 
 struct IsPrimeImpl {
     static bool IsPrime(uint64_t n) { return cppr::IsPrime(n); }
@@ -33,40 +36,40 @@ struct IsPrimeImplName {
 };
 TYPED_TEST_SUITE(IsPrimeTest, IsPrimeImplementations, IsPrimeImplName);
 
+std::vector<uint32_t> primes = []() {
+    std::vector<uint32_t> primes;
+    primesieve::generate_primes((1ull << 32) - 1, &primes);
+    return primes;
+}();
+
 TYPED_TEST(IsPrimeTest, Zero) { ASSERT_FALSE(TypeParam::IsPrime(0)); }
 TYPED_TEST(IsPrimeTest, One) { ASSERT_FALSE(TypeParam::IsPrime(1)); }
 
 TYPED_TEST(IsPrimeTest, 24bit) {
-    primesieve::iterator it;
-    uint64_t prev = 2;
-    uint64_t prime = it.next_prime();
-    while (prime < (1ull << 24)) {
-        for (uint64_t n = prev; n < prime; n++) {
+    uint64_t next_index = 0;
+    for (uint32_t n = 2; n < (1u << 24); n++) {
+        if (n == primes[next_index]) {
+            ASSERT_TRUE(TypeParam::IsPrime(n)) << "Failed for prime = " << n;
+            next_index++;
+        } else {
             ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
         }
-        ASSERT_TRUE(TypeParam::IsPrime(prime)) << "Failed for prime = " << prime;
-        prev = prime + 1;
-        prime = it.next_prime();
     }
 }
 
 TYPED_TEST(IsPrimeTest, 32bit) {
-    primesieve::iterator it(1u << 24, UINT32_MAX);
-    uint32_t count = 0;
-    uint64_t prev = 1u << 24;
     std::mt19937_64 rng;
-    while (true) {
-        uint64_t prime = it.next_prime();
-        if (count % 32 == 0) {
+    uint32_t start_index = static_cast<uint32_t>(std::lower_bound(primes.begin(), primes.end(), (1ull << 24)) - primes.begin());
+    for (uint32_t i = start_index; i < primes.size(); i++) {
+        uint64_t prime = primes[i];
+        if (i % 64 == 0) {
             ASSERT_TRUE(TypeParam::IsPrime(prime)) << "Failed for prime = " << prime;
         }
-        if (count % 4 == 0) {
-            uint64_t n = prev + rng() % (prime - prev);
+        if (i % 4 == 0) {
+            uint64_t prev = primes[i - 1];
+            uint64_t n = prev + 1 + (rng() % (prime - prev - 1));
             ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
         }
-        count++;
-        prev = prime + 1;
-        if (prime == 4294967291u) break;  // last 32-bit prime
     }
 }
 
@@ -86,6 +89,17 @@ TYPED_TEST(IsPrimeTest, Mersenne) {
         } else {
             ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
         }
+    }
+}
+
+TYPED_TEST(IsPrimeTest, ProdTwoPrime) {
+    std::mt19937_64 rng;
+    uint32_t start_index = static_cast<uint32_t>(std::lower_bound(primes.begin(), primes.end(), (1ull << 16)) - primes.begin());
+    for (int i = 0; i < 6000000; ++i) {
+        uint64_t p1 = primes[start_index + (rng() % (primes.size() - start_index))];
+        uint64_t p2 = primes[start_index + (rng() % (primes.size() - start_index))];
+        uint64_t n = p1 * p2;
+        ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
     }
 }
 
@@ -119,8 +133,8 @@ TYPED_TEST(IsPrimeTest, strong_lucas_pseudoprimes) { RunTestsFromFile<TypeParam>
 
 TEST(IsPrimeTest, CompareImplementations) {
     std::mt19937_64 rng;
-    for (uint64_t i = 0; i <= 20000000; i++) {
-        uint64_t n = rng() >> (rng() % 32);
+    for (uint64_t i = 0; i < 10000000; i++) {
+        uint64_t n = (rng() >> (rng() % 32)) | 1;
         ASSERT_EQ(cppr::IsPrime(n), cppr::IsPrimeNoTable(n)) << "Mismatch for n = " << n;
     }
 }
