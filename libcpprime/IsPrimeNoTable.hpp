@@ -284,11 +284,13 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64BailliePSW(const std::uint64_t x) noex
 LIBCPPRIME_CONSTEXPR inline bool IsPrimeNoTable(std::uint64_t n) noexcept {
     if (n < 1024) {
         return internal::IsPrime10(n);
+    } else if (n <= 0xffffffff) {
+        return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
-        if (internal::TrialDivision(n)) return false;
-        if (n <= 0xffffffff) {
-            return internal::IsPrime32(static_cast<std::uint32_t>(n));
-        } else if (n < (std::uint64_t(1) << 62)) {
+        if (internal::TrialDivision64(n)) {
+            return false;
+        }
+        if (n < (std::uint64_t(1) << 62)) {
             return internal::IsPrime64MillerRabin(n);
         } else {
             return internal::IsPrime64BailliePSW(n);

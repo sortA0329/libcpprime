@@ -371,10 +371,16 @@ class MontgomeryModint64Impl {
     }
 };
 
+LIBCPPRIME_CONSTEXPR inline bool TrialDivision32(const std::uint32_t n) noexcept {
+    return (n & 1) == 0 || 1431655766u > -1431655765u * n || 858993460u > -858993459u * n || 613566757u > -1227133513u * n || 390451573u > -1171354717u * n || 330382100u > -991146299u * n ||
+           252645136u > -252645135u * n || 226050911u > 678152731u * n || 186737709u > -373475417u * n;
+}
+
 constexpr std::uint16_t Bases32[256] = {
 #include "./IsPrimeBases32.txt"
 };
 LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
+    if (TrialDivision32(x)) return false;
     if (x < 85849) {
         const std::uint32_t a = static_cast<std::uint32_t>(Modu128(272518712866683587ull % x, 10755835586592736005ull, x));
         if (a == 0) return false;
@@ -438,7 +444,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime32(const std::uint32_t x) noexcept {
     }
 }
 
-LIBCPPRIME_CONSTEXPR inline bool TrialDivision(const std::uint64_t n) noexcept {
+LIBCPPRIME_CONSTEXPR inline bool TrialDivision64(const std::uint64_t n) noexcept {
     return (n & 1) == 0 || 6148914691236517205u >= 12297829382473034411u * n || 3689348814741910323u >= 14757395258967641293u * n || 2635249153387078802u >= 7905747460161236407u * n ||
            1676976733973595601u >= 3353953467947191203u * n || 1418980313362273201u >= 5675921253449092805u * n || 1085102592571150095u >= 17361641481138401521u * n;
 }

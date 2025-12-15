@@ -143,13 +143,13 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64(const std::uint64_t x) noexcept {
 LIBCPPRIME_CONSTEXPR inline bool IsPrime(std::uint64_t n) noexcept {
     if (n < 65536) {
         return internal::IsPrime16(n);
+    } else if (n <= 0xffffffff) {
+        return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
-        if (internal::TrialDivision(n)) {
+        if (internal::TrialDivision64(n)) {
             return false;
         }
-        if (n <= 0xffffffff) {
-            return internal::IsPrime32(static_cast<std::uint32_t>(n));
-        } else if (n < (std::uint64_t(1) << 49)) {
+        if (n < (std::uint64_t(1) << 49)) {
             return internal::IsPrime49(n);
         } else if (n < (std::uint64_t(1) << 62)) {
             return internal::IsPrime64<false>(n);
