@@ -78,6 +78,30 @@ tasks:
       - ./build-msvc/Release/benchmark_isprime.exe
       - uv run benchmarks/plot_isprime.py
 
+  bench-heavy:gcc:
+    desc: Build and run benchmark, then plot (GCC)
+    deps: [configure:gcc]
+    cmds:
+      - cmake --build build-gcc --parallel --config Release --target benchmark_isprime
+      - ./build-gcc/benchmark_isprime --heavy
+      - uv run benchmarks/plot_isprime.py
+
+  bench-heavy:clang:
+    desc: Build and run benchmark, then plot (Clang)
+    deps: [configure:clang]
+    cmds:
+      - cmake --build build-clang --parallel --config Release --target benchmark_isprime
+      - ./build-clang/benchmark_isprime --heavy
+      - uv run benchmarks/plot_isprime.py
+
+  bench-heavy:msvc:
+    desc: Build and run benchmark, then plot (MSVC)
+    deps: [configure:msvc]
+    cmds:
+      - cmake --build build-msvc --parallel --config Release --target benchmark_isprime
+      - ./build-msvc/Release/benchmark_isprime.exe --heavy
+      - uv run benchmarks/plot_isprime.py
+
   # Convenience aggregates
   configure:
     desc: Configure builds for GCC, Clang, and MSVC

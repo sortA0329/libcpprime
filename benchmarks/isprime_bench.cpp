@@ -16,14 +16,16 @@
 #include <string>
 #include <tuple>
 
-int main() {
+int main(int argc, char** argv) {
+    bool heavy = (argc > 1 && std::string(argv[1]) == "--heavy");
+
     using namespace ankerl::nanobench;
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
     const char* out_prime = "benchmarks/bench_IsPrime.csv";
     const char* out_notable = "benchmarks/bench_IsPrimeNoTable.csv";
-    const int samples = 32000;
+    const int samples = heavy ? 64000 : 32000;
 
     static std::uint32_t weighted[89440];
     for (std::uint32_t i = 1, count = 0; i <= 64; ++i) {
@@ -31,13 +33,13 @@ int main() {
             weighted[count++] = 64 - i;
         }
     }
-    auto bench = [rng = Rng(42)](bool (*func)(std::uint64_t)) mutable {
+    auto bench = [rng = Rng(42), heavy](bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[rng.bounded(89440)];
         std::uint64_t n = (rng() >> k) | 1;
-        constexpr std::uint32_t iters = 250;
+        std::uint32_t iters = (heavy ? 300 : 250);
         bool is_prime = func(n);
         auto min_time = std::numeric_limits<double>::max();
-        for (std::uint32_t trial = 0; trial < 16; ++trial) {
+        for (std::uint32_t trial = 0; trial < (heavy ? 24 : 16); ++trial) {
             auto start = Clock::now();
             for (std::uint32_t i = 0; i != iters; ++i) {
                 doNotOptimizeAway(func(n));
