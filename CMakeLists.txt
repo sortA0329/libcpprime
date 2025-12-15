@@ -59,7 +59,7 @@ option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks" ON)
 # Header-only library target
 add_library(libcpprime INTERFACE)
 target_include_directories(libcpprime INTERFACE
-	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 )
 target_compile_features(libcpprime INTERFACE cxx_std_23)
