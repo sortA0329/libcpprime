@@ -2,14 +2,18 @@
 
 #include <bit>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <ios>
 #include <iostream>
 #include <libcpprime/IsPrime.hpp>
 #include <libcpprime/IsPrimeNoTable.hpp>
 #include <limits>
+#include <string>
 #include <tuple>
 
 int main() {
@@ -17,8 +21,8 @@ int main() {
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    const char* out_prime = "benchmarks/bench_IsPrime.tsv";
-    const char* out_notable = "benchmarks/bench_IsPrimeNoTable.tsv";
+    const char* out_prime = "benchmarks/bench_IsPrime.csv";
+    const char* out_notable = "benchmarks/bench_IsPrimeNoTable.csv";
     const int samples = 32000;
 
     static std::uint32_t weighted[89440];
@@ -53,11 +57,11 @@ int main() {
     // Write headers
     {
         std::ofstream f(out_prime, std::ios::binary);
-        f << "n\tis_prime\ttime_ns\n";
+        f << "n is_prime time_ns\n";
     }
     {
         std::ofstream f(out_notable, std::ios::binary);
-        f << "n\tis_prime\ttime_ns\n";
+        f << "n is_prime time_ns\n";
     }
 
     double time_prime_sum[65] = {};
@@ -77,7 +81,7 @@ int main() {
         for (int i = 0; i < samples; ++i) {
             auto [n, isp, t] = bench(&cppr::IsPrime);
             char buf[96];
-            int len = std::snprintf(buf, sizeof(buf), "%llu\t%d\t%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
+            int len = std::snprintf(buf, sizeof(buf), "%llu %d %.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
             std::int32_t bitlen = std::bit_width(n);
             if (isp) {
@@ -98,7 +102,7 @@ int main() {
         for (int i = 0; i < samples; ++i) {
             auto [n, isp, t] = bench(&cppr::IsPrimeNoTable);
             char buf[96];
-            int len = std::snprintf(buf, sizeof(buf), "%llu\t%d\t%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
+            int len = std::snprintf(buf, sizeof(buf), "%llu %d %.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
             std::int32_t bitlen = std::bit_width(n);
             if (isp) {
@@ -112,17 +116,28 @@ int main() {
     }
 
     // Output summary
-    std::ofstream f_summary("benchmarks/bench_summary.tsv", std::ios::binary);
-    f_summary << "BitLength\tIsPrime_Prime_ns\tIsPrimeNoTable_Prime_ns\tIsPrime_Composite_ns\tIsPrimeNoTable_Composite_ns\n";
-    f_summary.setf(std::ios::fmtflags(0), std::ios::floatfield);  // default
-    f_summary.precision(5);
-    for (std::int32_t i = 1; i <= 64; ++i) {
-        double avg_prime = count_prime[i] ? (time_prime_sum[i] / count_prime[i]) : 0.0;
-        double avg_prime_NoTable = count_prime_NoTable[i] ? (time_prime_sum_NoTable[i] / count_prime_NoTable[i]) : 0.0;
-        double avg_composite = count_composite[i] ? (time_composite_sum[i] / count_composite[i]) : 0.0;
-        double avg_composite_NoTable = count_composite_NoTable[i] ? (time_composite_sum_NoTable[i] / count_composite_NoTable[i]) : 0.0;
-        f_summary << i << "\t" << avg_prime << "\t" << avg_prime_NoTable << "\t" << avg_composite << "\t" << avg_composite_NoTable << "\n";
+    if (std::filesystem::exists("benchmarks/bench_summary.md")) {
+        std::filesystem::copy_file("benchmarks/bench_summary.md", "benchmarks/bench_summary_prev.md", std::filesystem::copy_options::overwrite_existing);
     }
+    std::ofstream f_summary("benchmarks/bench_summary.csv", std::ios::trunc);
+    std::ofstream f_summary_md("benchmarks/bench_summary.md", std::ios::trunc);
+    f_summary << std::fixed << std::setprecision(6);
+    f_summary << "avg_time_prime_IsPrime,avg_time_prime_IsPrimeNoTable,avg_time_composite_IsPrime,avg_time_composite_IsPrimeNoTable\n";
+    f_summary_md << std::fixed << std::setprecision(3);
+    f_summary_md << "| Bit Width | IsPrime Avg Time (ns) | IsPrimeNoTable Avg Time (ns) | IsPrime Avg Time (ns) | IsPrimeNoTable Avg Time (ns) |\n";
+    f_summary_md << "|-----------|-----------------------|------------------------------|-----------------------|------------------------------|\n";
+    for (std::int32_t i = 1; i <= 64; ++i) {
+        double avg_prime = count_prime[i] ? (time_prime_sum[i] / count_prime[i]) : NAN;
+        double avg_prime_NoTable = count_prime_NoTable[i] ? (time_prime_sum_NoTable[i] / count_prime_NoTable[i]) : NAN;
+        double avg_composite = count_composite[i] ? (time_composite_sum[i] / count_composite[i]) : NAN;
+        double avg_composite_NoTable = count_composite_NoTable[i] ? (time_composite_sum_NoTable[i] / count_composite_NoTable[i]) : NAN;
+        f_summary << avg_prime << " " << avg_prime_NoTable << " " << avg_composite << " " << avg_composite_NoTable << "\n";
+        f_summary_md << "| " << i << " | " << (std::isnan(avg_prime) ? "N/A" : std::to_string(avg_prime)) << " | " << (std::isnan(avg_prime_NoTable) ? "N/A" : std::to_string(avg_prime_NoTable))
+                     << " | " << (std::isnan(avg_composite) ? "N/A" : std::to_string(avg_composite)) << " | " << (std::isnan(avg_composite_NoTable) ? "N/A" : std::to_string(avg_composite_NoTable))
+                     << " |\n";
+    }
+    f_summary << std::flush;
+    f_summary_md << std::flush;
 
     std::cout << "Benchmarking completed\n";
     std::cout << "Total time: " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start_time).count() << " seconds\n";
