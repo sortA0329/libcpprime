@@ -62,7 +62,7 @@ target_include_directories(libcpprime INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 )
-target_compile_features(libcpprime INTERFACE cxx_std_23)
+target_compile_features(libcpprime INTERFACE cxx_std_20)
 
 # Examples
 if(LIBCPPRIME_BUILD_EXAMPLES)

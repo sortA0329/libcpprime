@@ -55,8 +55,8 @@ int main() {
 
 # Requirements
 
--   C++11
--   Any compiler that supports C++11
+-   C++20
+-   Any compiler that supports C++20
 
 # Compilation
 

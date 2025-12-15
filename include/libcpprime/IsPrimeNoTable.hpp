@@ -19,9 +19,9 @@ namespace internal {
 constexpr std::uint32_t FlagTable10[32] = {
 #include "./internal/IsPrimeTable10.txt"
 };
-LIBCPPRIME_CONSTEXPR inline bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
+constexpr bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
-LIBCPPRIME_CONSTEXPR inline std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
+constexpr std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
     std::uint64_t tmp = x % 5;
     if (tmp == 2 || tmp == 3) {
         return 5;
@@ -72,7 +72,7 @@ LIBCPPRIME_CONSTEXPR inline std::uint64_t GetLucasBase(const std::uint64_t x) no
     return Z;
 }
 
-LIBCPPRIME_CONSTEXPR inline bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
+constexpr bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -219,7 +219,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64MillerRabin(const std::uint64_t x) noe
     }
 }
 
-LIBCPPRIME_CONSTEXPR inline bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
+constexpr bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<true> mint(x);
     const auto one = mint.one();
     const auto mone = mint.neg(one);
@@ -281,7 +281,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64BailliePSW(const std::uint64_t x) noex
 
 }  // namespace internal
 
-LIBCPPRIME_CONSTEXPR inline bool IsPrimeNoTable(std::uint64_t n) noexcept {
+constexpr bool IsPrimeNoTable(std::uint64_t n) noexcept {
     if (n < 1024) {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {

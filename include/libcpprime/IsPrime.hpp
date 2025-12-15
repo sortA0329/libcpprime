@@ -38,13 +38,13 @@ namespace internal {
 constexpr std::uint64_t FlagTable16[512] = {
 #include "./internal/IsPrimeTable16.txt"
 };
-LIBCPPRIME_CONSTEXPR inline bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
+constexpr bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
 #include "./internal/IsPrimeBases64.txt"
 };
-LIBCPPRIME_CONSTEXPR inline std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
-LIBCPPRIME_CONSTEXPR inline bool IsPrime49(const std::uint64_t x) noexcept {
+constexpr std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
+constexpr bool IsPrime49(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -85,7 +85,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime49(const std::uint64_t x) noexcept {
     return res1 && res2;
 }
 template <bool Strict>
-LIBCPPRIME_CONSTEXPR inline bool IsPrime64(const std::uint64_t x) noexcept {
+constexpr bool IsPrime64(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -140,7 +140,7 @@ LIBCPPRIME_CONSTEXPR inline bool IsPrime64(const std::uint64_t x) noexcept {
 
 }  // namespace internal
 
-LIBCPPRIME_CONSTEXPR inline bool IsPrime(std::uint64_t n) noexcept {
+constexpr bool IsPrime(std::uint64_t n) noexcept {
     if (n < 65536) {
         return internal::IsPrime16(n);
     } else if (n <= 0xffffffff) {

@@ -1,7 +1,7 @@
 ---
 IndentWidth: 4
 Language: Cpp
-Standard: Latest
+Standard: c++20
 UseCRLF: false
 UseTab: Never
 BasedOnStyle: Google
