@@ -109,9 +109,17 @@ if(LIBCPPRIME_BUILD_TESTS)
 				target_compile_options(libcpprime_tests PRIVATE
 					$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:/Ox>
 					/W4 /permissive- /Zc:__cplusplus
+					/constexpr:steps1000000000 /constexpr:depth2048
 				)
 			else()
-				target_compile_options(libcpprime_tests PRIVATE -O3 -march=native -Wall -Wextra -Wpedantic -Wconversion)
+				target_compile_options(libcpprime_tests PRIVATE
+				    -O3 -march=native -Wall -Wextra -Wpedantic -Wconversion
+				)
+				if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+					target_compile_options(libcpprime_tests PRIVATE -fconstexpr-ops-limit=100000000 -fconstexpr-depth=2048)
+				elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+					target_compile_options(libcpprime_tests PRIVATE -fconstexpr-steps=100000000 -fconstexpr-depth=2048)
+				endif()
 			endif()
 		endif()
 		# Use generator expression to ensure correct config-specific path for multi-config generators

@@ -10,6 +10,7 @@
 #include <set>
 #include <span>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #ifdef __GNUC__
@@ -23,10 +24,10 @@
 #endif
 
 struct IsPrimeImpl {
-    static bool IsPrime(uint64_t n) { return cppr::IsPrime(n); }
+    constexpr static bool IsPrime(uint64_t n) { return cppr::IsPrime(n); }
 };
 struct IsPrimeNoTableImpl {
-    static bool IsPrime(uint64_t n) { return cppr::IsPrimeNoTable(n); }
+    constexpr static bool IsPrime(uint64_t n) { return cppr::IsPrimeNoTable(n); }
 };
 template <class Impl>
 class IsPrimeTest : public ::testing::Test {};
@@ -89,7 +90,7 @@ TYPED_TEST(IsPrimeTest, 32bit) {
 }
 
 TYPED_TEST(IsPrimeTest, Pow2) {
-    for (uint32_t exp = 2; exp <= 63; exp++) {
+    for (int exp = 2; exp <= 63; exp++) {
         uint64_t n = 1ull << exp;
         ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
     }
@@ -97,9 +98,21 @@ TYPED_TEST(IsPrimeTest, Pow2) {
 
 TYPED_TEST(IsPrimeTest, Mersenne) {
     std::set<uint64_t> mersenne_primes = {3, 7, 31, 127, 8191, 131071, 524287, 2147483647, 2305843009213693951};
-    for (uint32_t exp = 1; exp <= 63; exp++) {
+    for (int exp = 1; exp <= 63; exp++) {
         uint64_t n = (2ull << exp) - 1;
         if (mersenne_primes.contains(n)) {
+            ASSERT_TRUE(TypeParam::IsPrime(n)) << "Failed for prime = " << n;
+        } else {
+            ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
+        }
+    }
+}
+
+TYPED_TEST(IsPrimeTest, Fermat) {
+    std::set<uint64_t> fermat_primes = {3, 5, 17, 257, 65537};
+    for (int exp = 1; exp <= 63; exp++) {
+        uint64_t n = (1ull << exp) + 1;
+        if (fermat_primes.contains(n)) {
             ASSERT_TRUE(TypeParam::IsPrime(n)) << "Failed for prime = " << n;
         } else {
             ASSERT_FALSE(TypeParam::IsPrime(n)) << "Failed for composite = " << n;
@@ -146,6 +159,7 @@ TYPED_TEST(IsPrimeTest, hack_8_prime_bases) { RunTestsFromFile<TypeParam>("hack_
 TYPED_TEST(IsPrimeTest, hack_base_2_to_10) { RunTestsFromFile<TypeParam>("hack_base_2_to_10.txt", false); }
 TYPED_TEST(IsPrimeTest, hack_known_bases) { RunTestsFromFile<TypeParam>("hack_known_bases.txt", false); }
 TYPED_TEST(IsPrimeTest, strong_lucas_pseudoprimes) { RunTestsFromFile<TypeParam>("strong_lucas_pseudoprimes.txt", false); }
+TYPED_TEST(IsPrimeTest, primes_64bit) { RunTestsFromFile<TypeParam>("primes_64bit.txt", true); }
 
 TEST(IsPrimeTest, CompareImplementations) {
     std::mt19937_64 rng;
@@ -153,4 +167,42 @@ TEST(IsPrimeTest, CompareImplementations) {
         uint64_t n = (rng() >> (rng() % 32)) | 1;
         ASSERT_EQ(cppr::IsPrime(n), cppr::IsPrimeNoTable(n)) << "Mismatch for n = " << n;
     }
+}
+
+constexpr static std::uint64_t Primes[] = {
+#include "./primes/constexpr.txt"
+};
+constexpr static std::uint64_t Composites[] = {
+#include "./composites/constexpr.txt"
+};
+struct ConstexprTestResult {
+    bool success;
+    std::uint64_t value;
+};
+template <ConstexprTestResult T, bool Prime>
+struct ConstexprTestMessage {
+    static_assert(!Prime || T.success, "Constexpr prime test failed");
+    static_assert(Prime || T.success, "Constexpr composite test failed");
+};
+TYPED_TEST(IsPrimeTest, ConstexprTest) {
+    auto check_primes = []() {
+        for (std::uint64_t prime : Primes) {
+            if (!TypeParam::IsPrime(prime)) {
+                return ConstexprTestResult{false, prime};
+            }
+        }
+        return ConstexprTestResult{true, 0ull};
+    };
+    constexpr auto result_primes = check_primes();
+    (void)ConstexprTestMessage<result_primes, true>{};
+    auto check_composites = []() {
+        for (std::uint64_t composite : Composites) {
+            if (TypeParam::IsPrime(composite)) {
+                return ConstexprTestResult{false, composite};
+            }
+        }
+        return ConstexprTestResult{true, 0ull};
+    };
+    constexpr auto result_composites = check_composites();
+    (void)ConstexprTestMessage<result_composites, false>{};
 }
