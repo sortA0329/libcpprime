@@ -56,7 +56,7 @@ int main() {
 # Requirements
 
 -   C++20
--   Any compiler that supports C++20
+-   GCC, Clang, GCC (MinGW), Clang (MinGW), MSVC, clang-cl
 
 # Compilation
 

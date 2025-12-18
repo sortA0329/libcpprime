@@ -13,6 +13,11 @@ tasks:
       - cmake -S . -B build-clang -G "Ninja" -DLIBCPPRIME_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
       - cp build-clang/compile_commands.json .
 
+  configure:clang-cl:
+    desc: Configure clang-cl build (Ninja)
+    cmds:
+      - cmake -S . -B build-clang-cl -G "Ninja" -DLIBCPPRIME_COMPILER=clang-cl
+
   configure:msvc:
     desc: Configure MSVC build (Visual Studio 17 2022)
     cmds:
@@ -27,6 +32,11 @@ tasks:
     desc: Clean Clang build directory
     cmds:
       - rm -rf build-clang
+
+  clean:clang-cl:
+    desc: Clean clang-cl build directory
+    cmds:
+      - rm -rf build-clang-cl
 
   clean:msvc:
     desc: Clean MSVC build directory
@@ -46,6 +56,13 @@ tasks:
     cmds:
       - cmake --build build-clang --parallel --config Release --target libcpprime_tests
       - ctest --test-dir build-clang -C Release --output-on-failure --stop-on-failure
+
+  test:clang-cl:
+    desc: Build and run tests (clang-cl)
+    deps: [configure:clang-cl]
+    cmds:
+      - cmake --build build-clang-cl --parallel --config Release --target libcpprime_tests
+      - ctest --test-dir build-clang-cl -C Release --output-on-failure --stop-on-failure
 
   test:msvc:
     desc: Build and run tests (MSVC)
@@ -68,6 +85,14 @@ tasks:
     cmds:
       - cmake --build build-clang --parallel --config Release --target benchmark_isprime
       - ./build-clang/benchmark_isprime
+      - uv run benchmarks/plot_isprime.py
+
+  bench:clang-cl:
+    desc: Build and run benchmark, then plot (clang-cl)
+    deps: [configure:clang-cl]
+    cmds:
+      - cmake --build build-clang-cl --parallel --config Release --target benchmark_isprime
+      - ./build-clang-cl/benchmark_isprime
       - uv run benchmarks/plot_isprime.py
 
   bench:msvc:
@@ -94,6 +119,14 @@ tasks:
       - ./build-clang/benchmark_isprime --heavy
       - uv run benchmarks/plot_isprime.py
 
+  bench-heavy:clang-cl:
+    desc: Build and run benchmark, then plot (clang-cl)
+    deps: [configure:clang-cl]
+    cmds:
+      - cmake --build build-clang-cl --parallel --config Release --target benchmark_isprime
+      - ./build-clang-cl/benchmark_isprime --heavy
+      - uv run benchmarks/plot_isprime.py
+
   bench-heavy:msvc:
     desc: Build and run benchmark, then plot (MSVC)
     deps: [configure:msvc]
@@ -108,6 +141,7 @@ tasks:
     cmds:
       - task: configure:gcc
       - task: configure:clang
+      - task: configure:clang-cl
       - task: configure:msvc
 
   clean:
@@ -115,20 +149,23 @@ tasks:
     cmds:
       - task: clean:gcc
       - task: clean:clang
+      - task: clean:clang-cl
       - task: clean:msvc
 
   test:
-    desc: Run tests for GCC, Clang, and MSVC
+    desc: Run tests for GCC, Clang, clang-cl, and MSVC
     cmds:
       - task: test:gcc
       - task: test:clang
+      - task: test:clang-cl
       - task: test:msvc
 
   bench:
-    desc: Run benchmarks for GCC, Clang, and MSVC
+    desc: Run benchmarks for GCC, Clang, clang-cl, and MSVC
     cmds:
       - task: bench:gcc
       - task: bench:clang
+      - task: bench:clang-cl
       - task: bench:msvc
 
   bundle:

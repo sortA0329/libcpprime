@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
 
-# Compiler selection (default/gcc/clang/msvc). Effective only at first configure.
-set(LIBCPPRIME_COMPILER "default" CACHE STRING "Select C++ compiler: default/gcc/clang/msvc")
-set_property(CACHE LIBCPPRIME_COMPILER PROPERTY STRINGS default gcc clang msvc)
+# Compiler selection (default/gcc/clang/clang-cl/msvc). Effective only at first configure.
+set(LIBCPPRIME_COMPILER "default" CACHE STRING "Select C++ compiler: default/gcc/clang/clang-cl/msvc")
+set_property(CACHE LIBCPPRIME_COMPILER PROPERTY STRINGS default gcc clang clang-cl msvc)
 
 # Generator compatibility check (gcc/clang cannot be used with Visual Studio generator)
-if(LIBCPPRIME_COMPILER MATCHES "gcc|clang" AND CMAKE_GENERATOR MATCHES "Visual Studio")
+if(LIBCPPRIME_COMPILER MATCHES "^(gcc|clang)$" AND CMAKE_GENERATOR MATCHES "Visual Studio")
 	message(FATAL_ERROR
 		"LIBCPPRIME_COMPILER=${LIBCPPRIME_COMPILER} but generator '${CMAKE_GENERATOR}' enforces MSVC.\n"
 		"Use a Makefile/Ninja generator instead, e.g.:\n"
@@ -33,6 +33,23 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
 			message(STATUS "Using clang++ (${_CLANGXX}). Recommended generator: Ninja")
 		endif()
 		set(CMAKE_CXX_COMPILER "${_CLANGXX}" CACHE FILEPATH "" FORCE)
+	elseif(LIBCPPRIME_COMPILER STREQUAL "clang-cl")
+		if(NOT WIN32)
+			message(FATAL_ERROR "clang-cl is only supported on Windows")
+		endif()
+		find_program(_CLANGCL NAMES clang-cl)
+		if(NOT _CLANGCL)
+			message(FATAL_ERROR "clang-cl not found in PATH")
+		endif()
+		# For Visual Studio generators, prefer selecting the ClangCL toolset.
+		if(CMAKE_GENERATOR MATCHES "Visual Studio")
+			set(CMAKE_GENERATOR_TOOLSET "ClangCL" CACHE STRING "" FORCE)
+			message(STATUS "Using clang-cl via Visual Studio toolset ClangCL")
+		else()
+			message(STATUS "Using clang-cl (${_CLANGCL}). Recommended generator: Ninja")
+			set(CMAKE_C_COMPILER "${_CLANGCL}" CACHE FILEPATH "" FORCE)
+			set(CMAKE_CXX_COMPILER "${_CLANGCL}" CACHE FILEPATH "" FORCE)
+		endif()
 	elseif(LIBCPPRIME_COMPILER STREQUAL "msvc")
 		if(NOT WIN32)
 			message(FATAL_ERROR "msvc is only supported on Windows")
@@ -49,6 +66,17 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
 endif()
 
 project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
+
+# clang-cl is Clang, but MSVC-like.
+set(LIBCPPRIME_CLANG_CL FALSE)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+	set(LIBCPPRIME_CLANG_CL TRUE)
+endif()
+
+set(LIBCPPRIME_MSVC_LIKE FALSE)
+if(MSVC OR LIBCPPRIME_CLANG_CL)
+	set(LIBCPPRIME_MSVC_LIKE TRUE)
+endif()
 
 # Options
 option(LIBCPPRIME_BUILD_EXAMPLES "Build examples" ON)
@@ -70,7 +98,7 @@ if(LIBCPPRIME_BUILD_EXAMPLES)
 	target_link_libraries(example_basic PRIVATE libcpprime)
 
 	if(LIBCPPRIME_WARNINGS)
-		if(MSVC)
+		if(LIBCPPRIME_MSVC_LIKE)
 			target_compile_options(example_basic PRIVATE /W4 /permissive- /Zc:__cplusplus)
 		else()
 			target_compile_options(example_basic PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
@@ -105,7 +133,13 @@ if(LIBCPPRIME_BUILD_TESTS)
 		target_link_libraries(libcpprime_tests PRIVATE primesieve::primesieve)
 
 		if(LIBCPPRIME_WARNINGS)
-			if(MSVC)
+			if(LIBCPPRIME_CLANG_CL)
+				target_compile_options(libcpprime_tests PRIVATE
+					$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:/Ox>
+					/W4 /permissive- /Zc:__cplusplus
+					/clang:-fconstexpr-steps=100000000 /clang:-fconstexpr-depth=2048
+				)
+			elseif(MSVC)
 				target_compile_options(libcpprime_tests PRIVATE
 					$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:/Ox>
 					/W4 /permissive- /Zc:__cplusplus
@@ -139,7 +173,7 @@ if(LIBCPPRIME_BUILD_BENCHMARKS)
 	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench::nanobench)
 
 	if(LIBCPPRIME_WARNINGS)
-		if(MSVC)
+		if(LIBCPPRIME_MSVC_LIKE)
 			target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)
 		else()
 			target_compile_options(benchmark_isprime PRIVATE -O3 -Wall -Wextra -Wpedantic -Wconversion)
