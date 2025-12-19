@@ -69,8 +69,8 @@ LIBCPPRIME_CONSTEXPR std::uint64_t GetLucasBase(const std::uint64_t x) noexcept 
         while (a != 0) {
             std::int32_t s = CountrZero(a);
             a >>= s;
-            res ^= ((s & 1) & ((n & 0b111) == 3 || (n & 0b111) == 5));
-            res ^= ((a & 0b11) == 3 && (n & 0b11) == 3);
+            res ^= ((s & 1) & ((n & 7) == 3 || (n & 7) == 5));
+            res ^= ((a & 3) == 3 && (n & 3) == 3);
             std::uint64_t t = n;
             n = a;
             a = t % n;

@@ -150,7 +150,7 @@ LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountrZero(std::uint64_t n) 
     if (!IsConstantEvaluated()) return static_cast<std::int32_t>(__builtin_ctzll(n));
 #elif defined(_MSC_VER)
     if (!IsConstantEvaluated()) {
-        std::uint64_t r;
+        unsigned long r;
         _BitScanForward64(&r, n);
         return static_cast<std::int32_t>(r);
     }
@@ -192,8 +192,8 @@ LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountlZero(std::uint64_t n) 
     if (!IsConstantEvaluated()) return static_cast<std::int32_t>(__builtin_clzll(n));
 #elif defined(_MSC_VER)
     if (!IsConstantEvaluated()) {
-        std::uint64_t r;
-        _BitScanReverse64(&r, x);
+        unsigned long r;
+        _BitScanReverse64(&r, n);
         return static_cast<std::int32_t>(r ^ 63);
     }
 #endif
