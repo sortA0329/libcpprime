@@ -40,11 +40,13 @@ namespace internal {
 constexpr std::uint64_t FlagTable16[512] = {
 #include "./internal/IsPrimeTable16.txt"
 };
+// Bitset for odd numbers < 2^16 (2 is handled explicitly).
 constexpr bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
 #include "./internal/IsPrimeBases64.txt"
 };
+// Deterministic base selection via a multiplicative hash (fast table lookup).
 constexpr std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
 constexpr bool IsPrime49(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
@@ -76,6 +78,8 @@ constexpr bool IsPrime49(const std::uint64_t x) noexcept {
     b = mint.mul(b, d);
     bool res1 = mint.same(a, one) || mint.same(a, mone);
     bool res2 = mint.same(b, one) || mint.same(b, mone);
+    // For x % 4 == 1 we may need the full Miller-Rabin squaring chain;
+    // for x % 4 == 3 the initial check is sufficient with the selected bases.
     if (x % 4 == 1 && !(res1 && res2)) {
         for (std::int32_t i = 0; i != S - 1; ++i) {
             a = mint.mul(a, a);
@@ -94,6 +98,7 @@ constexpr bool IsPrime64(const std::uint64_t x) noexcept {
     const auto one = mint.one();
     const auto mone = mint.neg(one);
     const std::uint32_t base = GetBase(x);
+    // Third base is packed as a small lookup indexed by the high bits of `base`.
     const std::uint64_t base_mask = 15ull | (135ull << 8) | (13ull << 16) | (60ull << 24) | (15ull << 32) | (117ull << 40) | (65ull << 48) | (29ull << 56);
     auto d = mint.raw(2);
     auto e = mint.raw(base);
@@ -127,6 +132,7 @@ constexpr bool IsPrime64(const std::uint64_t x) noexcept {
     bool res1 = mint.same(a, one) || mint.same(a, mone);
     bool res2 = mint.same(b, one) || mint.same(b, mone);
     bool res3 = mint.same(c, one) || mint.same(c, mone);
+    // Same idea as IsPrime49: only run the MR squaring chain when needed.
     if (x % 4 == 1 && !(res1 && res2 && res3)) {
         for (std::int32_t i = 0; i != S - 1; ++i) {
             a = mint.mul(a, a);
@@ -148,6 +154,7 @@ constexpr bool IsPrime(std::uint64_t n) noexcept {
     } else if (n <= 0xffffffff) {
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
+        // Cheap small-prime screening before the heavier probable-prime tests.
         if (internal::TrialDivision64(n)) {
             return false;
         }
@@ -156,6 +163,7 @@ constexpr bool IsPrime(std::uint64_t n) noexcept {
         } else if (n < (std::uint64_t(1) << 62)) {
             return internal::IsPrime64<false>(n);
         } else {
+            // Strict variant keeps Montgomery values within [0, mod) for the largest inputs.
             return internal::IsPrime64<true>(n);
         }
     }

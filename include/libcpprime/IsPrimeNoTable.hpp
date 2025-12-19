@@ -22,9 +22,15 @@ namespace internal {
 constexpr std::uint32_t FlagTable10[32] = {
 #include "./internal/IsPrimeTable10.txt"
 };
+// Bitset for small n < 1024.
 constexpr bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
 constexpr std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
+    // Chooses a Lucas parameter D for the strong Lucas probable prime test.
+    // Returns:
+    // - 0: definitely composite (quick checks found a factor or perfect square)
+    // - 1: no suitable D found in the search range (treated as pass by caller)
+    // - otherwise: selected D
     std::uint64_t tmp = x % 5;
     if (tmp == 2 || tmp == 3) {
         return 5;
@@ -47,6 +53,7 @@ constexpr std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
         return 29;
     }
     if (0x02030213u >> (x & 31) & 1) {
+        // Fast perfect-square check for candidates in specific residue classes.
         std::int32_t k = 32 - (CountlZero(x - 1) >> 1);
         std::uint64_t s = 1ull << k, t = (s + (x >> k)) >> 1;
         while (t < s) {
@@ -82,6 +89,7 @@ constexpr bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
     const auto one = mint.one();
     const auto mone = mint.neg(one);
     auto test2 = [=](std::uint64_t base1, std::uint64_t base2) -> bool {
+        // Two-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
         auto c = mint.build(base1);
@@ -114,6 +122,7 @@ constexpr bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
         return true;
     };
     auto test3 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3) -> bool {
+        // Three-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
         auto c = one;
@@ -155,6 +164,7 @@ constexpr bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
         return true;
     };
     auto test4 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3, std::uint64_t base4) -> bool {
+        // Four-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
         auto c = one;
@@ -227,6 +237,7 @@ constexpr bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const auto one = mint.one();
     const auto mone = mint.neg(one);
     auto miller_rabin_test = [&]() -> bool {
+        // Baillie-PSW starts with a base-2 Miller-Rabin test.
         const std::int32_t S = CountrZero(x - 1);
         const std::uint64_t D = (x - 1) >> S;
         auto a = one;
@@ -251,10 +262,12 @@ constexpr bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     if (!miller_rabin_test()) return false;
     std::uint64_t D = GetLucasBase(x);
     if (D <= 1) return D == 1;
+    // Strong Lucas probable prime test (implemented via Lucas sequences in Montgomery domain).
     const std::uint64_t Q = mint.raw(x - (D - 1) / 4);
     std::uint64_t u = one;
     std::uint64_t v = one;
     std::uint64_t Qn = Q;
+    // Iterate Lucas sequences according to bits of (x + 1).
     std::uint64_t k = (x + 1) << CountlZero(x + 1);
     D = mint.raw(D);
     std::uint64_t t = (x >> 1) + 1;
@@ -273,6 +286,7 @@ constexpr bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
         }
     }
     if (mint.is_zero(u) || mint.is_zero(v)) return true;
+    // Extra check over factors of (x + 1) as required by the strong Lucas condition.
     std::uint64_t f = (x + 1) & ~x;
     for (f >>= 1; f; f >>= 1) {
         v = mint.sub(mint.mul(v, v), mint.add(Qn, Qn));

@@ -41,6 +41,7 @@ class MontgomeryModint64Impl {
     std::uint64_t mod_ = 0, rs = 0, nr = 0, np = 0;
 
     constexpr std::uint64_t reduce(const std::uint64_t n) const noexcept {
+        // Montgomery reduction of a 128-bit value with implicit low half `n`.
         std::uint64_t q = n * nr;
         if constexpr (Strict) {
             std::uint64_t m = Mulu128High(q, mod_);
@@ -51,6 +52,7 @@ class MontgomeryModint64Impl {
         }
     }
     constexpr std::uint64_t reduce(const std::uint64_t a, const std::uint64_t b) const noexcept {
+        // Montgomery reduction of the product a*b.
         auto tmp = Mulu128(a, b);
         std::uint64_t d = tmp.high;
         std::uint64_t c = tmp.low;
@@ -67,6 +69,11 @@ class MontgomeryModint64Impl {
 
    public:
     constexpr MontgomeryModint64Impl(std::uint64_t n) noexcept {
+        // Precondition: n is an odd modulus > 2.
+        // Internals:
+        // - rs: R^2 mod n (with R = 2^64) for Montgomery domain conversion
+        // - nr: -n^{-1} mod R (Newton iteration)
+        // - np: representation of 1 in Montgomery domain
         Assume(n > 2 && n % 2 != 0);
         mod_ = n;
         rs = Modu128(0xffffffffffffffff % n, 0 - n, n);
@@ -81,6 +88,8 @@ class MontgomeryModint64Impl {
         return reduce(x, rs);
     }
     constexpr std::uint64_t val(std::uint64_t x) const noexcept {
+        // Converts from Montgomery domain back to the standard residue.
+        // Non-strict mode permits values in [0, 2*mod) for faster operations.
         if constexpr (Strict) {
             Assume(x < mod_);
             return reduce(x);
@@ -118,6 +127,7 @@ class MontgomeryModint64Impl {
         }
     }
     constexpr bool same(std::uint64_t x, std::uint64_t y) const noexcept {
+        // Equality check that tolerates the relaxed range in non-strict mode.
         if constexpr (Strict) {
             Assume(x < mod_ && y < mod_);
             return x == y;
@@ -157,6 +167,7 @@ class MontgomeryModint64Impl {
 };
 
 constexpr bool TrialDivision32(const std::uint32_t n) noexcept {
+    // Branchless screening against a fixed set of small primes.
     return (n & 1) == 0 || 1431655766u > (0u - 1431655765u) * n || 858993460u > (0u - 858993459u) * n || 613566757u > (0u - 1227133513u) * n || 390451573u > (0u - 1171354717u) * n ||
            330382100u > (0u - 991146299u) * n || 252645136u > (0u - 252645135u) * n || 226050911u > 678152731u * n || 186737709u > (0u - 373475417u) * n;
 }
@@ -167,6 +178,7 @@ constexpr std::uint16_t Bases32[256] = {
 constexpr bool IsPrime32(const std::uint32_t x) noexcept {
     if (TrialDivision32(x)) return false;
     if (x < 85849) {
+        // Very small range: fast GCD-based filters with precomputed constants.
         const std::uint32_t a = static_cast<std::uint32_t>(Modu128(272518712866683587ull % x, 10755835586592736005ull, x));
         if (a == 0) return false;
         if (x < 11881) return GCD(a, x) == 1;
@@ -230,6 +242,7 @@ constexpr bool IsPrime32(const std::uint32_t x) noexcept {
 }
 
 constexpr bool TrialDivision64(const std::uint64_t n) noexcept {
+    // Branchless screening against a fixed set of small primes.
     return (n & 1) == 0 || 6148914691236517205u >= 12297829382473034411u * n || 3689348814741910323u >= 14757395258967641293u * n || 2635249153387078802u >= 7905747460161236407u * n ||
            1676976733973595601u >= 3353953467947191203u * n || 1418980313362273201u >= 5675921253449092805u * n || 1085102592571150095u >= 17361641481138401521u * n;
 }
