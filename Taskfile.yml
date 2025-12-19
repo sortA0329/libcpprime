@@ -154,20 +154,6 @@ tasks:
       - task: clean:clang-cl
       - task: clean:msvc
 
-  test:
-    cmds:
-      - task: test:gcc
-      - task: test:clang
-      - task: test:clang-cl
-      - task: test:msvc
-
-  bench:
-    cmds:
-      - task: bench:gcc
-      - task: bench:clang
-      - task: bench:clang-cl
-      - task: bench:msvc
-
   bundle:
     cmds:
       - uv run bundled/create_bundled.py
