@@ -1,75 +1,76 @@
 cmake_minimum_required(VERSION 3.20)
 
-# Compiler selection (default/gcc/clang/clang-cl/msvc). Effective only at first configure.
+# ================================
+# Project
+# ================================
+project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
+
+# ================================
+# Build type handling
+# ================================
+# Single-config generators (Ninja, Makefiles): default to Release
+if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+# ================================
+# Compiler selection
+# ================================
 set(LIBCPPRIME_COMPILER "default" CACHE STRING "Select C++ compiler: default/gcc/clang/clang-cl/msvc")
 set_property(CACHE LIBCPPRIME_COMPILER PROPERTY STRINGS default gcc clang clang-cl msvc)
 
-# Generator compatibility check (gcc/clang cannot be used with Visual Studio generator)
+# gcc / clang cannot be used with Visual Studio generator
 if(LIBCPPRIME_COMPILER MATCHES "^(gcc|clang)$" AND CMAKE_GENERATOR MATCHES "Visual Studio")
 	message(FATAL_ERROR
-		"LIBCPPRIME_COMPILER=${LIBCPPRIME_COMPILER} but generator '${CMAKE_GENERATOR}' enforces MSVC.\n"
-		"Use a Makefile/Ninja generator instead, e.g.:\n"
-		"  Ninja: cmake -S . -B build-gcc -G \"Ninja\" -DLIBCPPRIME_COMPILER=gcc\n"
-		"  MinGW: cmake -S . -B build-gcc -G \"MinGW Makefiles\" -DLIBCPPRIME_COMPILER=gcc"
+		"gcc/clang cannot be used with Visual Studio generator.\n"
+		"Use Ninja or Makefiles instead."
 	)
 endif()
 
 if(NOT DEFINED CMAKE_CXX_COMPILER)
 	if(LIBCPPRIME_COMPILER STREQUAL "gcc")
-		find_program(_GXX NAMES g++)
+		find_program(_GXX g++)
 		if(NOT _GXX)
-			message(FATAL_ERROR "g++ not found in PATH")
-		endif()
-		if(WIN32)
-			message(STATUS "Using g++ (${_GXX}). Recommended generators: Ninja or MinGW Makefiles")
+			message(FATAL_ERROR "g++ not found")
 		endif()
 		set(CMAKE_CXX_COMPILER "${_GXX}" CACHE FILEPATH "" FORCE)
+
 	elseif(LIBCPPRIME_COMPILER STREQUAL "clang")
-		find_program(_CLANGXX NAMES clang++)
+		find_program(_CLANGXX clang++)
 		if(NOT _CLANGXX)
-			message(FATAL_ERROR "clang++ not found in PATH")
-		endif()
-		if(WIN32)
-			message(STATUS "Using clang++ (${_CLANGXX}). Recommended generator: Ninja")
+			message(FATAL_ERROR "clang++ not found")
 		endif()
 		set(CMAKE_CXX_COMPILER "${_CLANGXX}" CACHE FILEPATH "" FORCE)
+
 	elseif(LIBCPPRIME_COMPILER STREQUAL "clang-cl")
 		if(NOT WIN32)
-			message(FATAL_ERROR "clang-cl is only supported on Windows")
+			message(FATAL_ERROR "clang-cl is Windows only")
 		endif()
-		find_program(_CLANGCL NAMES clang-cl)
+		find_program(_CLANGCL clang-cl)
 		if(NOT _CLANGCL)
-			message(FATAL_ERROR "clang-cl not found in PATH")
+			message(FATAL_ERROR "clang-cl not found")
 		endif()
-		# For Visual Studio generators, prefer selecting the ClangCL toolset.
+
 		if(CMAKE_GENERATOR MATCHES "Visual Studio")
 			set(CMAKE_GENERATOR_TOOLSET "ClangCL" CACHE STRING "" FORCE)
-			message(STATUS "Using clang-cl via Visual Studio toolset ClangCL")
 		else()
-			message(STATUS "Using clang-cl (${_CLANGCL}). Recommended generator: Ninja")
 			set(CMAKE_C_COMPILER "${_CLANGCL}" CACHE FILEPATH "" FORCE)
 			set(CMAKE_CXX_COMPILER "${_CLANGCL}" CACHE FILEPATH "" FORCE)
 		endif()
+
 	elseif(LIBCPPRIME_COMPILER STREQUAL "msvc")
 		if(NOT WIN32)
-			message(FATAL_ERROR "msvc is only supported on Windows")
-		endif()
-		if(NOT CMAKE_GENERATOR MATCHES "Visual Studio")
-			find_program(_CL NAMES cl)
-			if(_CL)
-				set(CMAKE_CXX_COMPILER "${_CL}" CACHE FILEPATH "" FORCE)
-			else()
-				message(WARNING "MSVC 'cl' not found in PATH. Use a Visual Studio generator or Developer Command Prompt. Falling back to default.")
-			endif()
+			message(FATAL_ERROR "msvc is Windows only")
 		endif()
 	endif()
 endif()
 
-project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
-
-# clang-cl is Clang, but MSVC-like.
+# ================================
+# Compiler kind detection
+# ================================
 set(LIBCPPRIME_CLANG_CL FALSE)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+	AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
 	set(LIBCPPRIME_CLANG_CL TRUE)
 endif()
 
@@ -78,13 +79,25 @@ if(MSVC OR LIBCPPRIME_CLANG_CL)
 	set(LIBCPPRIME_MSVC_LIKE TRUE)
 endif()
 
-# Options
-option(LIBCPPRIME_BUILD_EXAMPLES "Build examples" ON)
-option(LIBCPPRIME_BUILD_TESTS "Build tests" ON)
-option(LIBCPPRIME_WARNINGS "Enable strict warnings for local targets" ON)
-option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks" ON)
+# ================================
+# MSVC / clang-cl runtime
+# ================================
+if(LIBCPPRIME_MSVC_LIKE)
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+	set(CMAKE_MSVC_RUNTIME_LIBRARY_DEBUG "MultiThreadedDLLDebug")
+endif()
 
-# Header-only library target
+# ================================
+# Options
+# ================================
+option(LIBCPPRIME_BUILD_EXAMPLES   "Build examples"   ON)
+option(LIBCPPRIME_BUILD_TESTS      "Build tests"      ON)
+option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks" ON)
+option(LIBCPPRIME_WARNINGS         "Enable warnings"  ON)
+
+# ================================
+# Header-only library
+# ================================
 add_library(libcpprime INTERFACE)
 target_include_directories(libcpprime INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -92,7 +105,9 @@ target_include_directories(libcpprime INTERFACE
 )
 target_compile_features(libcpprime INTERFACE cxx_std_20)
 
+# ================================
 # Examples
+# ================================
 if(LIBCPPRIME_BUILD_EXAMPLES)
 	add_executable(example_basic examples/basic.cpp)
 	target_link_libraries(example_basic PRIVATE libcpprime)
@@ -106,13 +121,17 @@ if(LIBCPPRIME_BUILD_EXAMPLES)
 	endif()
 endif()
 
+# ================================
 # Tests
+# ================================
 if(LIBCPPRIME_BUILD_TESTS)
 	include(CTest)
 	if(BUILD_TESTING)
 		add_executable(libcpprime_tests tests/test_isprime.cpp)
+		target_link_libraries(libcpprime_tests PRIVATE libcpprime)
 
 		include(FetchContent)
+
 		set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 		set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 		FetchContent_Declare(
@@ -120,14 +139,15 @@ if(LIBCPPRIME_BUILD_TESTS)
 			GIT_REPOSITORY https://github.com/google/googletest.git
 			GIT_TAG v1.17.0
 		)
+
 		set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 		FetchContent_MakeAvailable(googletest)
-		target_link_libraries(libcpprime_tests PRIVATE libcpprime GTest::gtest_main)
+		target_link_libraries(libcpprime_tests PRIVATE GTest::gtest_main)
 
 		FetchContent_Declare(
-    		primesieve
-    		GIT_REPOSITORY https://github.com/kimwalisch/primesieve.git
-    		GIT_TAG v12.10
+			primesieve
+			GIT_REPOSITORY https://github.com/kimwalisch/primesieve.git
+			GIT_TAG v12.10
 		)
 		FetchContent_MakeAvailable(primesieve)
 		target_link_libraries(libcpprime_tests PRIVATE primesieve::primesieve)
@@ -135,31 +155,34 @@ if(LIBCPPRIME_BUILD_TESTS)
 		if(LIBCPPRIME_WARNINGS)
 			if(LIBCPPRIME_CLANG_CL)
 				target_compile_options(libcpprime_tests PRIVATE
-					$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:/Ox>
 					/W4 /permissive- /Zc:__cplusplus
 					/clang:-fconstexpr-steps=100000000 /clang:-fconstexpr-depth=2048
 				)
 			elseif(MSVC)
 				target_compile_options(libcpprime_tests PRIVATE
-					$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:/Ox>
 					/W4 /permissive- /Zc:__cplusplus
 					/constexpr:steps10000000 /constexpr:depth2048
 				)
+			elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+				target_compile_options(libcpprime_tests PRIVATE
+					-Wall -Wextra -Wpedantic -Wconversion
+					-fconstexpr-steps=100000000 -fconstexpr-depth=2048
+				)
 			else()
 				target_compile_options(libcpprime_tests PRIVATE
-				    -O3 -march=native -Wall -Wextra -Wpedantic -Wconversion
+					-Wall -Wextra -Wpedantic -Wconversion
+					-fconstexpr-ops-limit=100000000 -fconstexpr-depth=2048
 				)
-				if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-					target_compile_options(libcpprime_tests PRIVATE -fconstexpr-steps=100000000 -fconstexpr-depth=2048)
-				endif()
 			endif()
 		endif()
-		# Use generator expression to ensure correct config-specific path for multi-config generators
+
 		add_test(NAME libcpprime_tests COMMAND $<TARGET_FILE:libcpprime_tests>)
 	endif()
 endif()
 
+# ================================
 # Benchmarks
+# ================================
 if(LIBCPPRIME_BUILD_BENCHMARKS)
 	add_executable(benchmark_isprime benchmarks/isprime_bench.cpp)
 
@@ -170,18 +193,21 @@ if(LIBCPPRIME_BUILD_BENCHMARKS)
 		GIT_TAG v4.3.11
 	)
 	FetchContent_MakeAvailable(nanobench)
+
 	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench::nanobench)
 
 	if(LIBCPPRIME_WARNINGS)
 		if(LIBCPPRIME_MSVC_LIKE)
 			target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)
 		else()
-			target_compile_options(benchmark_isprime PRIVATE -O3 -Wall -Wextra -Wpedantic -Wconversion)
+			target_compile_options(benchmark_isprime PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
 		endif()
 	endif()
 endif()
 
-# Install (headers only)
+# ================================
+# Install
+# ================================
 include(GNUInstallDirs)
 install(DIRECTORY libcpprime/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libcpprime)
 install(TARGETS libcpprime EXPORT libcpprimeTargets)
