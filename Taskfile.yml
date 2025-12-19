@@ -154,10 +154,6 @@ tasks:
       - task: clean:clang-cl
       - task: clean:msvc
 
-  bundle:
-    cmds:
-      - uv run bundled/create_bundled.py
-
   default:
     cmds:
       - task --list
