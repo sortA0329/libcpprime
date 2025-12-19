@@ -1,16 +1,19 @@
 /**
+ *
  * libcpprime https://github.com/Rac75116/libcpprime
  *
  * Copyright (c) 2025 Rac75116
  * SPDX-License-Identifier: MIT
  *
  **/
+
 #ifndef LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
 #define LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
 
 #include <cstdint>
 
-#include "./internal/IsPrimeCommon.hpp"
+#include "internal/IsPrimeCommon.hpp"
+#include "internal/Utils.hpp"
 
 namespace cppr {
 

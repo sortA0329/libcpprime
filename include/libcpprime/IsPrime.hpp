@@ -1,4 +1,5 @@
 /**
+ *
  * libcpprime https://github.com/Rac75116/libcpprime
  *
  * Copyright (c) 2025 Rac75116
@@ -29,7 +30,8 @@
 
 #include <cstdint>
 
-#include "./internal/IsPrimeCommon.hpp"
+#include "internal/IsPrimeCommon.hpp"
+#include "internal/Utils.hpp"
 
 namespace cppr {
 

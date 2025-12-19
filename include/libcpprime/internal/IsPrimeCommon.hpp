@@ -1,4 +1,5 @@
 /**
+ *
  * libcpprime https://github.com/Rac75116/libcpprime
  *
  * Copyright (c) 2025 Rac75116
@@ -23,149 +24,17 @@
  * Primality testing using a hash table of bases originated with Steven Worley.
  *
  **/
+
 #ifndef LIBCPPRIME_INCLUDED_IS_PRIME_COMMON
 #define LIBCPPRIME_INCLUDED_IS_PRIME_COMMON
 
-#include <bit>
 #include <cstdint>
-#include <type_traits>
-#ifdef _MSC_VER
-#include <immintrin.h>
-#include <intrin.h>
-#pragma intrinsic(_umul128, __umulh, _udiv128)
-#endif
+
+#include "Utils.hpp"
 
 namespace cppr {
 
 namespace internal {
-
-#if defined(__SIZEOF_INT128__)
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-using UInt128 = unsigned __int128;
-#pragma GCC diagnostic pop
-#else
-using UInt128 = unsigned __int128;
-#endif
-#endif
-
-struct Int64Pair {
-    std::uint64_t high, low;
-};
-constexpr void Assume(const bool f) noexcept {
-    if (std::is_constant_evaluated()) return;
-#if defined(__clang__)
-#if __has_builtin(__builtin_assume)
-    __builtin_assume(f);
-#endif
-#elif defined(__GNUC__)
-    if (!f) __builtin_unreachable();
-#elif defined(_MSC_VER)
-    __assume(f);
-#endif
-}
-constexpr std::int32_t CountrZero(std::uint64_t n) noexcept {
-    Assume(n != 0);
-    return std::countr_zero(n);
-}
-constexpr std::int32_t CountlZero(std::uint64_t n) noexcept {
-    Assume(n != 0);
-    return std::countl_zero(n);
-}
-constexpr Int64Pair Mulu128(std::uint64_t muler, std::uint64_t mulnd) noexcept {
-#if defined(__SIZEOF_INT128__)
-    UInt128 tmp = static_cast<UInt128>(muler) * mulnd;
-    return {static_cast<std::uint64_t>(tmp >> 64), static_cast<std::uint64_t>(tmp)};
-#else
-#if defined(_MSC_VER)
-    if (!std::is_constant_evaluated()) {
-        std::uint64_t high;
-        std::uint64_t low = _umul128(muler, mulnd, &high);
-        return {high, low};
-    }
-#endif
-    std::uint64_t lhigh = muler >> 32;
-    std::uint64_t llow = muler & 0xffffffff;
-    std::uint64_t rhigh = mulnd >> 32;
-    std::uint64_t rlow = mulnd & 0xffffffff;
-    std::uint64_t mhh = lhigh * rhigh;
-    std::uint64_t mll = llow * rlow;
-    std::uint64_t mlh = llow * rhigh;
-    std::uint64_t mhl = lhigh * rlow;
-    std::uint64_t ma = mlh + mhl;
-    mhh += ma >> 32;
-    std::uint64_t rl = mll + (ma << 32);
-    mhh += std::uint64_t(ma < mlh) << 32;
-    mhh += rl < mll;
-    return {mhh, rl};
-#endif
-}
-constexpr std::uint64_t Mulu128High(std::uint64_t muler, std::uint64_t mulnd) noexcept {
-#if defined(__SIZEOF_INT128__)
-    return static_cast<std::uint64_t>((static_cast<UInt128>(muler) * mulnd) >> 64);
-#else
-#if defined(_MSC_VER)
-    if (!std::is_constant_evaluated()) return __umulh(muler, mulnd);
-#endif
-    return Mulu128(muler, mulnd).high;
-#endif
-}
-constexpr std::uint64_t Modu128(std::uint64_t high, std::uint64_t low, std::uint64_t div) noexcept {
-#if (defined(__GNUC__) || defined(__ICC)) && defined(__x86_64__)
-    if constexpr (sizeof(void*) == 8) {
-        if (!std::is_constant_evaluated()) {
-            std::uint64_t quot = 0, rem = 0;
-            __asm__("divq %[v]" : "=a"(quot), "=d"(rem) : [v] "r"(div), "a"(low), "d"(high));
-            return rem;
-        }
-    }
-#elif defined(_MSC_VER)
-    if (!std::is_constant_evaluated()) {
-        std::uint64_t rem = 0;
-        _udiv128(high, low, div, &rem);
-        return rem;
-    }
-#endif
-#if defined(__SIZEOF_INT128__)
-    UInt128 n = (static_cast<UInt128>(high) << 64 | low);
-    std::uint64_t quot = static_cast<std::uint64_t>(n / div);
-    return low - quot * div;
-#else
-    std::uint64_t res = 0;
-    std::uint64_t cur = high;
-    for (std::uint64_t i = 0; i != 64; ++i) {
-        std::uint64_t large = cur >> 63;
-        cur = cur << 1 | (low >> 63);
-        low <<= 1;
-        large |= (cur >= div);
-        res = res << 1 | large;
-        cur -= div & (0 - large);
-    }
-    return cur;
-#endif
-}
-template <class T>
-constexpr T GCD(T x, T y) noexcept {
-    if (x == 0) return 0;
-    const std::int32_t n = CountrZero(x);
-    const std::int32_t m = CountrZero(y);
-    const std::int32_t l = n < m ? n : m;
-    x >>= n;
-    y >>= m;
-    while (x != y) {
-        const T a = y - x;
-        const T b = x - y;
-        const std::int32_t p = CountrZero(a);
-        const std::int32_t q = CountrZero(b);
-        Assume(p == q);
-        const T s = y < x ? b : a;
-        const T t = x < y ? x : y;
-        x = s >> p;
-        y = t;
-    }
-    return x << l;
-}
 
 template <bool Strict = false>
 class MontgomeryModint64Impl {
