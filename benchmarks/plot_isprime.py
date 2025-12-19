@@ -20,7 +20,7 @@ COLOR_2 = "#F4CE14"
 def read_csv_fast(path: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     # Columns: n, is_prime, time_ns
     # Use numpy.loadtxt with converters to avoid Python-level loops
-    data = np.loadtxt(path, delimiter=" ", skiprows=1, dtype=np.float64)
+    data = np.loadtxt(path, delimiter=",", skiprows=1, dtype=np.float64)
     if data.ndim == 1:
         data = data.reshape(1, -1)
     n = data[:, 0]
@@ -35,7 +35,7 @@ def read_summary_fast(path: str) -> np.ndarray:
     # Rows: bitlen=1..64
     # Cols: avg_time_prime_IsPrime, avg_time_prime_IsPrimeNoTable,
     #       avg_time_composite_IsPrime, avg_time_composite_IsPrimeNoTable
-    data = np.loadtxt(path, skiprows=1, dtype=np.float64)
+    data = np.loadtxt(path, delimiter=",", skiprows=1, dtype=np.float64)
     if data.ndim == 1:
         data = data.reshape(1, -1)
     return data
