@@ -41,14 +41,14 @@ constexpr std::uint64_t FlagTable16[512] = {
 #include "./internal/IsPrimeTable16.txt"
 };
 // Bitset for odd numbers < 2^16 (2 is handled explicitly).
-constexpr bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
+LIBCPPRIME_CONSTEXPR bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
 #include "./internal/IsPrimeBases64.txt"
 };
 // Deterministic base selection via a multiplicative hash (fast table lookup).
-constexpr std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
-constexpr bool IsPrime49(const std::uint64_t x) noexcept {
+LIBCPPRIME_CONSTEXPR std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
+LIBCPPRIME_CONSTEXPR bool IsPrime49(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -91,7 +91,7 @@ constexpr bool IsPrime49(const std::uint64_t x) noexcept {
     return res1 && res2;
 }
 template <bool Strict>
-constexpr bool IsPrime64(const std::uint64_t x) noexcept {
+LIBCPPRIME_CONSTEXPR bool IsPrime64(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -99,7 +99,7 @@ constexpr bool IsPrime64(const std::uint64_t x) noexcept {
     const auto mone = mint.neg(one);
     const std::uint32_t base = GetBase(x);
     // Third base is packed as a small lookup indexed by the high bits of `base`.
-    const std::uint64_t base_mask = 15ull | (135ull << 8) | (13ull << 16) | (60ull << 24) | (15ull << 32) | (117ull << 40) | (65ull << 48) | (29ull << 56);
+    const std::uint64_t base_mask = static_cast<std::uint64_t>(15ull | (135ull << 8) | (13ull << 16) | (60ull << 24) | (15ull << 32) | (117ull << 40) | (65ull << 48) | (29ull << 56));
     auto d = mint.raw(2);
     auto e = mint.raw(base);
     auto f = mint.raw((base_mask >> (8 * (base >> 13))) & 0xff);
@@ -148,7 +148,7 @@ constexpr bool IsPrime64(const std::uint64_t x) noexcept {
 
 }  // namespace internal
 
-constexpr bool IsPrime(std::uint64_t n) noexcept {
+LIBCPPRIME_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
     if (n < 65536) {
         return internal::IsPrime16(n);
     } else if (n <= 0xffffffff) {

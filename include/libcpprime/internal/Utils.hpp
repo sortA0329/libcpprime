@@ -25,9 +25,33 @@
 #ifndef LIBCPPRIME_INCLUDED_INTERNAL_UTILS
 #define LIBCPPRIME_INCLUDED_INTERNAL_UTILS
 
-#include <bit>
 #include <cstdint>
 #include <type_traits>
+
+#ifdef __has_include
+#if __has_include(<bit>)
+#include <bit>
+#endif
+#endif
+
+#if defined(__cpp_lib_is_constant_evaluated) && defined(__cpp_constexpr) && __cpp_constexpr >= 201907L
+#define LIBCPPRIME_CONSTEXPR_ENABLED
+#define LIBCPPRIME_CONSTEXPR constexpr
+#else
+#define LIBCPPRIME_CONSTEXPR inline
+#endif
+
+#ifdef __cpp_if_constexpr
+#define LIBCPPRIME_IF_CONSTEXPR constexpr
+#else
+#define LIBCPPRIME_IF_CONSTEXPR
+#endif
+
+#ifdef __has_builtin
+#define LIBCPPRIME_HAS_BUILTIN(x) __has_builtin(x)
+#else
+#define LIBCPPRIME_HAS_BUILTIN(x) 0
+#endif
 
 #if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || defined(_M_ARM64EC))
 #if !defined(__clang__) || _MSC_VER > 1930
@@ -43,10 +67,10 @@
 #endif
 #endif
 
-#ifdef __has_builtin
-#define LIBCPPRIME_HAS_BUILTIN(x) __has_builtin(x)
-#else
-#define LIBCPPRIME_HAS_BUILTIN(x) 0
+#if !defined(__cpp_lib_bitops) && defined(_MSC_VER) && !(LIBCPPRIME_HAS_BUILTIN(__builtin_ctzll) && LIBCPPRIME_HAS_BUILTIN(__builtin_clzll))
+#include <intrin.h>
+#pragma intrinsic(_BitScanForward64)
+#pragma intrinsic(_BitScanReverse64)
 #endif
 
 #ifdef __SIZEOF_INT128__
@@ -81,6 +105,12 @@ namespace cppr {
 
 namespace internal {
 
+#ifdef LIBCPPRIME_CONSTEXPR_ENABLED
+constexpr bool IsConstantEvaluated() noexcept { return std::is_constant_evaluated(); }
+#else
+constexpr bool IsConstantEvaluated() noexcept { return std::false_type::value; }
+#endif
+
 #if defined(LIBCPPRIME_HAS_INT128_T)
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
@@ -96,37 +126,113 @@ struct Int64Pair {
     std::uint64_t high, low;
 };
 
-constexpr LIBCPPRIME_INLINE void Assume([[maybe_unused]] const bool f) noexcept {
+LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE void Assume(const bool cond) noexcept {
     // Hint for the optimizer; ignored during constant evaluation.
-    if (std::is_constant_evaluated()) return;
+    if (IsConstantEvaluated()) return;
 #if LIBCPPRIME_HAS_BUILTIN(__builtin_assume)
-    __builtin_assume(f);
+    __builtin_assume(cond);
 #elif LIBCPPRIME_HAS_BUILTIN(__builtin_unreachable)
-    if (!f) __builtin_unreachable();
+    if (!cond) __builtin_unreachable();
 #elif defined(_MSC_VER)
-    __assume(f);
+    __assume(cond);
+#else
+    (void)cond;
 #endif
 }
 
-constexpr LIBCPPRIME_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept {
+LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept {
     // Precondition: n != 0 (matches std::countr_zero requirements).
     Assume(n != 0);
+#ifdef __cpp_lib_bitops
     return std::countr_zero(n);
+#else
+#if LIBCPPRIME_HAS_BUILTIN(__builtin_ctzll)
+    if (!IsConstantEvaluated()) return static_cast<std::int32_t>(__builtin_ctzll(n));
+#elif defined(_MSC_VER)
+    if (!IsConstantEvaluated()) {
+        std::uint64_t r;
+        _BitScanForward64(&r, n);
+        return static_cast<std::int32_t>(r);
+    }
+#endif
+    std::int32_t count = 0;
+    if ((n << 32) == 0) {
+        count += 32;
+        n >>= 32;
+    }
+    if ((n << 48) == 0) {
+        count += 16;
+        n >>= 16;
+    }
+    if ((n << 56) == 0) {
+        count += 8;
+        n >>= 8;
+    }
+    if ((n << 60) == 0) {
+        count += 4;
+        n >>= 4;
+    }
+    if ((n << 62) == 0) {
+        count += 2;
+        n >>= 2;
+    }
+    if ((n << 63) == 0) {
+        ++count;
+    }
+    return count;
+#endif
 }
-constexpr LIBCPPRIME_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept {
+LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept {
     // Precondition: n != 0 (matches std::countl_zero requirements).
     Assume(n != 0);
+#ifdef __cpp_lib_bitops
     return std::countl_zero(n);
+#else
+#if LIBCPPRIME_HAS_BUILTIN(__builtin_clzll)
+    if (!IsConstantEvaluated()) return static_cast<std::int32_t>(__builtin_clzll(n));
+#elif defined(_MSC_VER)
+    if (!IsConstantEvaluated()) {
+        std::uint64_t r;
+        _BitScanReverse64(&r, x);
+        return static_cast<std::int32_t>(r ^ 63);
+    }
+#endif
+    std::int32_t count = 0;
+    if ((n >> 32) == 0) {
+        count += 32;
+        n <<= 32;
+    }
+    if ((n >> 48) == 0) {
+        count += 16;
+        n <<= 16;
+    }
+    if ((n >> 56) == 0) {
+        count += 8;
+        n <<= 8;
+    }
+    if ((n >> 60) == 0) {
+        count += 4;
+        n <<= 4;
+    }
+    if ((n >> 62) == 0) {
+        count += 2;
+        n <<= 2;
+    }
+    if ((n >> 63) == 0) {
+        ++count;
+    }
+    return count;
+#endif
 }
 
-constexpr LIBCPPRIME_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint64_t mulnd) noexcept {
+LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint64_t mulnd) noexcept {
     // Full 128-bit product split into {high, low}.
 #if defined(LIBCPPRIME_HAS_INT128_T)
     UInt128 tmp = static_cast<UInt128>(muler) * mulnd;
     return {static_cast<std::uint64_t>(tmp >> 64), static_cast<std::uint64_t>(tmp)};
 #else
 #if defined(LIBCPPRIME_VC_MUL_INTRINSICS)
-    if (!std::is_constant_evaluated()) {
+    if (!IsConstantEvaluated()) {
         std::uint64_t high;
         std::uint64_t low = _umul128(muler, mulnd, &high);
         return {high, low};
@@ -148,32 +254,32 @@ constexpr LIBCPPRIME_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint64_t
 #endif
 }
 
-constexpr LIBCPPRIME_INLINE std::uint64_t Mulu128High(std::uint64_t muler, std::uint64_t mulnd) noexcept {
+LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::uint64_t Mulu128High(std::uint64_t muler, std::uint64_t mulnd) noexcept {
     // High 64 bits of the 128-bit product.
 #if defined(LIBCPPRIME_HAS_INT128_T)
     return static_cast<std::uint64_t>((static_cast<UInt128>(muler) * mulnd) >> 64);
 #else
 #if defined(LIBCPPRIME_VC_MUL_INTRINSICS)
-    if (!std::is_constant_evaluated()) return __umulh(muler, mulnd);
+    if (!IsConstantEvaluated()) return __umulh(muler, mulnd);
 #endif
     return Mulu128(muler, mulnd).high;
 #endif
 }
 
-constexpr std::uint64_t Modu128(std::uint64_t numhi, std::uint64_t numlo, std::uint64_t den) {
+LIBCPPRIME_CONSTEXPR std::uint64_t Modu128(std::uint64_t numhi, std::uint64_t numlo, std::uint64_t den) {
     // Computes ((numhi << 64) | numlo) % den.
     // Preconditions: den != 0 and numhi < den (so the quotient fits in 64 bits).
     Assume(den != 0);
     Assume(numhi < den);
 
 #if defined(LIBCPPRIME_X86_64) && defined(LIBCPPRIME_GCC_STYLE_ASM)
-    if (!std::is_constant_evaluated()) {
+    if (!IsConstantEvaluated()) {
         std::uint64_t quot, rem;
         __asm__("div %[v]" : "=a"(quot), "=d"(rem) : [v] "r"(den), "a"(numlo), "d"(numhi));
         return rem;
     }
 #elif defined(LIBCPPRIME_VC_DIV_INTRINSICS)
-    if (!std::is_constant_evaluated()) {
+    if (!IsConstantEvaluated()) {
         std::uint64_t rem = 0;
         _udiv128(numhi, numlo, den, &rem);
         return rem;
@@ -184,7 +290,7 @@ constexpr std::uint64_t Modu128(std::uint64_t numhi, std::uint64_t numlo, std::u
     return static_cast<std::uint64_t>(tmp % den);
 #else
 #if defined(LIBCPPRIME_HAS_INT128_T)
-    if (std::is_constant_evaluated()) {
+    if (IsConstantEvaluated()) {
         UInt128 tmp = (static_cast<UInt128>(numhi) << 64) | numlo;
         return static_cast<std::uint64_t>(tmp % den);
     }
@@ -221,7 +327,7 @@ constexpr std::uint64_t Modu128(std::uint64_t numhi, std::uint64_t numlo, std::u
 }
 
 template <class T>
-constexpr T GCD(T x, T y) noexcept {
+LIBCPPRIME_CONSTEXPR T GCD(T x, T y) noexcept {
     // Binary GCD (Stein's algorithm). Assumes y != 0 when x != 0.
     if (x == 0) return 0;
     Assume(y != 0);

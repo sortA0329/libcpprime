@@ -55,7 +55,7 @@ int main() {
 
 # Requirements
 
--   C++20
+-   C++11
 -   GCC, Clang, GCC (MinGW), Clang (MinGW), MSVC, clang-cl
 
 # Compilation

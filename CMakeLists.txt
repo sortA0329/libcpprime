@@ -156,22 +156,21 @@ if(LIBCPPRIME_BUILD_TESTS)
 			if(LIBCPPRIME_CLANG_CL)
 				target_compile_options(libcpprime_tests PRIVATE
 					/W4 /permissive- /Zc:__cplusplus
-					/clang:-fconstexpr-steps=100000000 /clang:-fconstexpr-depth=2048
+					/clang:-fconstexpr-steps=10000000
 				)
 			elseif(MSVC)
 				target_compile_options(libcpprime_tests PRIVATE
 					/W4 /permissive- /Zc:__cplusplus
-					/constexpr:steps10000000 /constexpr:depth2048
+					/constexpr:steps10000000
 				)
 			elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 				target_compile_options(libcpprime_tests PRIVATE
 					-Wall -Wextra -Wpedantic -Wconversion
-					-fconstexpr-steps=100000000 -fconstexpr-depth=2048
+					-fconstexpr-steps=10000000
 				)
 			else()
 				target_compile_options(libcpprime_tests PRIVATE
 					-Wall -Wextra -Wpedantic -Wconversion
-					-fconstexpr-ops-limit=100000000 -fconstexpr-depth=2048
 				)
 			endif()
 		endif()
