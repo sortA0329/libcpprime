@@ -103,7 +103,6 @@ target_include_directories(libcpprime INTERFACE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 )
-target_compile_features(libcpprime INTERFACE cxx_std_20)
 
 # ================================
 # Examples
@@ -111,6 +110,7 @@ target_compile_features(libcpprime INTERFACE cxx_std_20)
 if(LIBCPPRIME_BUILD_EXAMPLES)
 	add_executable(example_basic examples/basic.cpp)
 	target_link_libraries(example_basic PRIVATE libcpprime)
+	target_compile_features(example_basic PRIVATE cxx_std_23)
 
 	if(LIBCPPRIME_WARNINGS)
 		if(LIBCPPRIME_MSVC_LIKE)
@@ -127,9 +127,6 @@ endif()
 if(LIBCPPRIME_BUILD_TESTS)
 	include(CTest)
 	if(BUILD_TESTING)
-		add_executable(libcpprime_tests tests/test_isprime.cpp)
-		target_link_libraries(libcpprime_tests PRIVATE libcpprime)
-
 		include(FetchContent)
 
 		set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
@@ -137,45 +134,58 @@ if(LIBCPPRIME_BUILD_TESTS)
 		FetchContent_Declare(
 			googletest
 			GIT_REPOSITORY https://github.com/google/googletest.git
-			GIT_TAG v1.17.0
+			GIT_TAG release-1.12.1
 		)
 
 		set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 		FetchContent_MakeAvailable(googletest)
-		target_link_libraries(libcpprime_tests PRIVATE GTest::gtest_main)
 
-		FetchContent_Declare(
-			primesieve
-			GIT_REPOSITORY https://github.com/kimwalisch/primesieve.git
-			GIT_TAG v12.10
-		)
-		FetchContent_MakeAvailable(primesieve)
-		target_link_libraries(libcpprime_tests PRIVATE primesieve::primesieve)
-
-		if(LIBCPPRIME_WARNINGS)
-			if(LIBCPPRIME_CLANG_CL)
-				target_compile_options(libcpprime_tests PRIVATE
-					/W4 /permissive- /Zc:__cplusplus
-					/clang:-fconstexpr-steps=10000000
-				)
-			elseif(MSVC)
-				target_compile_options(libcpprime_tests PRIVATE
-					/W4 /permissive- /Zc:__cplusplus
-					/constexpr:steps10000000
-				)
-			elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-				target_compile_options(libcpprime_tests PRIVATE
-					-Wall -Wextra -Wpedantic -Wconversion
-					-fconstexpr-steps=10000000
-				)
-			else()
-				target_compile_options(libcpprime_tests PRIVATE
-					-Wall -Wextra -Wpedantic -Wconversion
-				)
+		function(libcpprime_apply_test_options target)
+			if(LIBCPPRIME_WARNINGS)
+				if(LIBCPPRIME_CLANG_CL)
+					target_compile_options(${target} PRIVATE
+						/W4 /permissive- /Zc:__cplusplus
+						/clang:-fconstexpr-steps=10000000
+					)
+				elseif(MSVC)
+					target_compile_options(${target} PRIVATE
+						/W4 /permissive- /Zc:__cplusplus
+						/constexpr:steps10000000
+					)
+				elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+					target_compile_options(${target} PRIVATE
+						-Wall -Wextra -Wpedantic -Wconversion
+						-fconstexpr-steps=10000000
+					)
+				else()
+					target_compile_options(${target} PRIVATE
+						-Wall -Wextra -Wpedantic -Wconversion
+					)
+				endif()
 			endif()
-		endif()
+		endfunction()
 
-		add_test(NAME libcpprime_tests COMMAND $<TARGET_FILE:libcpprime_tests>)
+		function(libcpprime_add_isprime_test target cxx_standard)
+			add_executable(${target} tests/isprime_tests.cpp)
+			target_link_libraries(${target} PRIVATE libcpprime GTest::gtest_main)
+
+			set_property(TARGET ${target} PROPERTY CXX_STANDARD ${cxx_standard})
+			set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
+			set_property(TARGET ${target} PROPERTY CXX_EXTENSIONS OFF)
+
+			libcpprime_apply_test_options(${target})
+			add_test(NAME ${target} COMMAND $<TARGET_FILE:${target}>)
+		endfunction()
+
+		set(_libcpprime_isprime_standards 23 20 17 14 11)
+		set(_libcpprime_isprime_targets "")
+		foreach(_std IN LISTS _libcpprime_isprime_standards)
+			set(_tgt "test_isprime_cxx${_std}")
+			libcpprime_add_isprime_test(${_tgt} ${_std})
+			list(APPEND _libcpprime_isprime_targets ${_tgt})
+		endforeach()
+
+		add_custom_target(test_isprime DEPENDS ${_libcpprime_isprime_targets})
 	endif()
 endif()
 
@@ -184,6 +194,7 @@ endif()
 # ================================
 if(LIBCPPRIME_BUILD_BENCHMARKS)
 	add_executable(benchmark_isprime benchmarks/isprime_bench.cpp)
+	target_compile_features(benchmark_isprime PRIVATE cxx_std_23)
 
 	include(FetchContent)
 	FetchContent_Declare(

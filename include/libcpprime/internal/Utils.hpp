@@ -28,10 +28,8 @@
 #include <cstdint>
 #include <type_traits>
 
-#ifdef __has_include
-#if __has_include(<bit>)
+#if defined(__has_include) && __has_include(<bit>) && (!defined(_MSVC_LANG) || _MSVC_LANG >= 202002L)
 #include <bit>
-#endif
 #endif
 
 #if defined(__cpp_lib_is_constant_evaluated) && defined(__cpp_constexpr) && __cpp_constexpr >= 201907L
@@ -90,14 +88,14 @@
 
 #ifdef __has_attribute
 #if __has_attribute(always_inline)
-#define LIBCPPRIME_INLINE __attribute__((always_inline)) inline
+#define LIBCPPRIME_CONSTEXPR_INLINE LIBCPPRIME_CONSTEXPR __attribute__((always_inline))
 #endif
 #endif
-#ifndef LIBCPPRIME_INLINE
+#ifndef LIBCPPRIME_CONSTEXPR_INLINE
 #ifdef _MSC_VER
-#define LIBCPPRIME_INLINE __forceinline
+#define LIBCPPRIME_CONSTEXPR_INLINE LIBCPPRIME_CONSTEXPR __forceinline
 #else
-#define LIBCPPRIME_INLINE inline
+#define LIBCPPRIME_CONSTEXPR_INLINE LIBCPPRIME_CONSTEXPR
 #endif
 #endif
 
@@ -126,7 +124,7 @@ struct Int64Pair {
     std::uint64_t high, low;
 };
 
-LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE void Assume(const bool cond) noexcept {
+LIBCPPRIME_CONSTEXPR_INLINE void Assume(const bool cond) noexcept {
     // Hint for the optimizer; ignored during constant evaluation.
     if (IsConstantEvaluated()) return;
 #if LIBCPPRIME_HAS_BUILTIN(__builtin_assume)
@@ -140,7 +138,7 @@ LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE void Assume(const bool cond) noexcept {
 #endif
 }
 
-LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept {
+LIBCPPRIME_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept {
     // Precondition: n != 0 (matches std::countr_zero requirements).
     Assume(n != 0);
 #ifdef __cpp_lib_bitops
@@ -182,7 +180,7 @@ LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountrZero(std::uint64_t n) 
     return count;
 #endif
 }
-LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept {
+LIBCPPRIME_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept {
     // Precondition: n != 0 (matches std::countl_zero requirements).
     Assume(n != 0);
 #ifdef __cpp_lib_bitops
@@ -225,7 +223,7 @@ LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::int32_t CountlZero(std::uint64_t n) 
 #endif
 }
 
-LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint64_t mulnd) noexcept {
+LIBCPPRIME_CONSTEXPR_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint64_t mulnd) noexcept {
     // Full 128-bit product split into {high, low}.
 #if defined(LIBCPPRIME_HAS_INT128_T)
     UInt128 tmp = static_cast<UInt128>(muler) * mulnd;
@@ -254,7 +252,7 @@ LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE Int64Pair Mulu128(std::uint64_t muler, st
 #endif
 }
 
-LIBCPPRIME_CONSTEXPR LIBCPPRIME_INLINE std::uint64_t Mulu128High(std::uint64_t muler, std::uint64_t mulnd) noexcept {
+LIBCPPRIME_CONSTEXPR_INLINE std::uint64_t Mulu128High(std::uint64_t muler, std::uint64_t mulnd) noexcept {
     // High 64 bits of the 128-bit product.
 #if defined(LIBCPPRIME_HAS_INT128_T)
     return static_cast<std::uint64_t>((static_cast<UInt128>(muler) * mulnd) >> 64);

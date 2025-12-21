@@ -57,26 +57,26 @@ tasks:
   test:gcc:
     deps: [configure:gcc]
     cmds:
-      - cmake --build build-gcc --parallel --target libcpprime_tests
-      - ctest --test-dir build-gcc --output-on-failure --stop-on-failure
+      - cmake --build build-gcc --parallel --target test_isprime
+      - ctest --test-dir build-gcc --output-on-failure --stop-on-failure --parallel
 
   test:clang:
     deps: [configure:clang]
     cmds:
-      - cmake --build build-clang --parallel --target libcpprime_tests
-      - ctest --test-dir build-clang --output-on-failure --stop-on-failure
+      - cmake --build build-clang --parallel --target test_isprime
+      - ctest --test-dir build-clang --output-on-failure --stop-on-failure --parallel
 
   test:clang-cl:
     deps: [configure:clang-cl]
     cmds:
-      - cmake --build build-clang-cl --parallel --target libcpprime_tests
-      - ctest --test-dir build-clang-cl --output-on-failure --stop-on-failure
+      - cmake --build build-clang-cl --parallel --target test_isprime
+      - ctest --test-dir build-clang-cl --output-on-failure --stop-on-failure --parallel
 
   test:msvc:
     deps: [configure:msvc]
     cmds:
-      - cmake --build build-msvc --parallel --config Release --target libcpprime_tests
-      - ctest --test-dir build-msvc -C Release --output-on-failure --stop-on-failure
+      - cmake --build build-msvc --parallel --config Release --target test_isprime
+      - ctest --test-dir build-msvc -C Release --output-on-failure --stop-on-failure --parallel
 
   # ============================
   # Benchmarks
