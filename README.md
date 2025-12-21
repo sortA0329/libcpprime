@@ -94,6 +94,54 @@ This library is header-only, so you only need to specify the include path.
 g++ -I ./libcpprime -O3 Main.cpp
 ```
 
+# Benchmarks
+
+Benchmarks are executed on GitHub Actions.
+
+- Workflow: https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml
+- Latest results (GitHub Pages): https://rac75116.github.io/libcpprime/benchmarks/latest/
+
+## Linux (gcc)
+
+- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.md
+
+<p>
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.jpg" width="500px" alt="Linux gcc summary" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrime.jpg" width="500px" alt="Linux gcc IsPrime" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.jpg" width="500px" alt="Linux gcc IsPrimeNoTable" />
+</p>
+
+## Linux (clang)
+
+- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.md
+
+<p>
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.jpg" width="500px" alt="Linux clang summary" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrime.jpg" width="500px" alt="Linux clang IsPrime" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.jpg" width="500px" alt="Linux clang IsPrimeNoTable" />
+</p>
+
+## Windows (msvc)
+
+- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.md
+
+<p>
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.jpg" width="500px" alt="Windows msvc summary" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrime.jpg" width="500px" alt="Windows msvc IsPrime" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.jpg" width="500px" alt="Windows msvc IsPrimeNoTable" />
+</p>
+
+## Windows (clang-cl)
+
+- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.md
+
+<p>
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.jpg" width="500px" alt="Windows clang-cl summary" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrime.jpg" width="500px" alt="Windows clang-cl IsPrime" />
+    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.jpg" width="500px" alt="Windows clang-cl IsPrimeNoTable" />
+</p>
+
+
 # Releases
 
 -   2025/12/21 ver 1.3.0
