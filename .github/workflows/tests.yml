@@ -16,8 +16,20 @@ concurrency:
 
 jobs:
     linux:
-        name: Linux (gcc & clang)
+        name: Linux (${{ matrix.compiler }})
         runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - compiler: gcc
+                      build_dir: build-gcc
+                      cc: gcc
+                      cxx: g++
+                    - compiler: clang
+                      build_dir: build-clang
+                      cc: clang
+                      cxx: clang++
         steps:
             - uses: actions/checkout@v4
             - run: |
@@ -27,30 +39,18 @@ jobs:
               uses: go-task/setup-task@v1
               with:
                   version: 3.x
-            - name: Cache deps (gcc)
+            - name: Cache build dir (${{ matrix.compiler }})
               uses: actions/cache@v4
               with:
-                  path: build-gcc/_deps
-                  key: ${{ runner.os }}-gcc-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  path: ${{ matrix.build_dir }}
+                  key: ${{ runner.os }}-${{ matrix.compiler }}-build-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
                   restore-keys: |
-                      ${{ runner.os }}-gcc-deps-
-            - name: Run tests (gcc)
+                      ${{ runner.os }}-${{ matrix.compiler }}-build-
+            - name: Run tests (${{ matrix.compiler }})
               env:
-                  CC: gcc
-                  CXX: g++
-              run: task test:gcc
-            - name: Cache deps (clang)
-              uses: actions/cache@v4
-              with:
-                  path: build-clang/_deps
-                  key: ${{ runner.os }}-clang-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
-                  restore-keys: |
-                      ${{ runner.os }}-clang-deps-
-            - name: Run tests (clang)
-              env:
-                  CC: clang
-                  CXX: clang++
-              run: task test:clang
+                  CC: ${{ matrix.cc }}
+                  CXX: ${{ matrix.cxx }}
+              run: task test:${{ matrix.compiler }}
 
     windows:
         name: Windows (${{ matrix.compiler }})
@@ -74,10 +74,10 @@ jobs:
 
             - uses: actions/cache@v4
               with:
-                  path: ${{ matrix.build_dir }}/_deps
-                  key: ${{ runner.os }}-${{ matrix.compiler }}-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  path: ${{ matrix.build_dir }}
+                  key: ${{ runner.os }}-${{ matrix.compiler }}-build-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
                   restore-keys: |
-                      ${{ runner.os }}-${{ matrix.compiler }}-deps-
+                      ${{ runner.os }}-${{ matrix.compiler }}-build-
 
             - name: Install Task
               uses: go-task/setup-task@v1
