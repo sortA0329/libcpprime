@@ -100,11 +100,6 @@ The benchmark is run on GitHub Actions' Linux with gcc with -O3 optimization ena
 
 You can find more detailed benchmark results by clicking [here](https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml?query=branch%3Amain+is%3Acompleted).
 
-
-![bench_IsPrime](bench_results/bench_IsPrime.jpg)
-![bench_IsPrimeNoTable](bench_results/bench_IsPrimeNoTable.jpg)
-![bench_summary](bench_results/bench_summary.jpg)
-
 # Releases
 
 -   2025/12/21 ver 1.3.0
