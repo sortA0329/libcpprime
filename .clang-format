@@ -1,0 +1,8 @@
+---
+IndentWidth: 4
+Language: Cpp
+Standard: Latest
+UseCRLF: false
+UseTab: Never
+BasedOnStyle: Google
+ColumnLimit: 200

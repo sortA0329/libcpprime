@@ -24,7 +24,7 @@ It returns true if the input value is a prime number; otherwise, it returns fals
 #include <cassert>
 int main() {
     assert(cppr::IsPrime(998244353) == true);
-    assert(cppr::IsPrime(999988224444335533) == false);
+    assert(cppr::IsPrime(13148563482635885461) == false);
 }
 ```
 
@@ -49,14 +49,40 @@ If you want to reduce the size of the executable file, use this function instead
 #include <cassert>
 int main() {
     assert(cppr::IsPrimeNoTable(998244353) == true);
-    assert(cppr::IsPrimeNoTable(999988224444335533) == false);
+    assert(cppr::IsPrimeNoTable(1314856348263588546) == false);
+}
+```
+
+## <libcpprime/FeatureTestMacros.hpp>
+
+### `CPPR_HAS_CONSTEXPR_IS_PRIME`
+
+```cpp
+#define CPPR_HAS_CONSTEXPR_IS_PRIME 1 // C++20
+```
+
+This is a feature test macro that determines whether `cppr::IsPrime` and `cppr::IsPrimeNoTable` are declared with `constexpr`.
+
+#### example
+
+```cpp
+#include <libcpprime/FeatureTestMacros.hpp>
+#include <libcpprime/IsPrime.hpp>
+#include <iostream>
+int main() {
+#ifdef CPPR_HAS_CONSTEXPR_IS_PRIME
+    constexpr bool x = cppr::IsPrime(1000000007);
+#else
+    const bool x = cppr::IsPrime(1000000007);
+#endif
+    std::cout << x << std::endl;
 }
 ```
 
 # Requirements
 
 -   C++11
--   Any compiler that supports C++11
+-   GCC, Clang, GCC (MinGW), Clang (MinGW), MSVC, clang-cl
 
 # Compilation
 
@@ -66,18 +92,13 @@ This library is header-only, so you only need to specify the include path.
 g++ -I ./libcpprime -O3 Main.cpp
 ```
 
-# Performance
-
-### `cppr::IsPrime`
-
-<img src="./README/IsPrime.png" width="400">
-
-### `cppr::IsPrimeNoTable`
-
-<img src="./README/IsPrimeNoTable.png" width="400">
-
 # Releases
 
+-   2025/12/21 ver 1.3.0
+    - Add `CPPR_HAS_CONSTEXPR_IS_PRIME`
+    - Support clang-cl
+    - Accelerating Compile-Time Computation
+    - Improved compatibility
 -   2025/03/10 ver 1.2.11
     -   Change the name on the license
     -   Change Multiprication Algorithm
@@ -113,3 +134,11 @@ g++ -I ./libcpprime -O3 Main.cpp
     -   Add `cppr::IsPrime` with a table
 -   2024/12/18 ver 1.0.0
     -   Add `cppr::IsPrime`
+
+# References
+
+- https://miller-rabin.appspot.com/
+- https://zenn.dev/mizar/articles/791698ea860581
+- https://www.techneon.com/download/is.prime.32.base.data
+- https://www.techneon.com/download/is.prime.64.base.data
+- https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/

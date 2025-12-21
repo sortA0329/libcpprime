@@ -1,0 +1,88 @@
+name: Tests
+
+on:
+    push:
+        branches: [main, developing]
+    pull_request:
+        branches: [main, developing]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    linux:
+        name: Linux (${{ matrix.compiler }})
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - compiler: gcc
+                      build_dir: build-gcc
+                      cc: gcc
+                      cxx: g++
+                    - compiler: clang
+                      build_dir: build-clang
+                      cc: clang
+                      cxx: clang++
+        steps:
+            - uses: actions/checkout@v4
+            - run: |
+                  sudo apt-get update -y
+                  sudo apt-get install -y ninja-build ccache
+            - name: Install Task
+              uses: go-task/setup-task@v1
+              with:
+                  version: 3.x
+            - name: Cache build dir (${{ matrix.compiler }})
+              uses: actions/cache@v4
+              with:
+                  path: ${{ matrix.build_dir }}
+                  key: ${{ runner.os }}-${{ matrix.compiler }}-build-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  restore-keys: |
+                      ${{ runner.os }}-${{ matrix.compiler }}-build-
+            - name: Run tests (${{ matrix.compiler }})
+              env:
+                  CC: ${{ matrix.cc }}
+                  CXX: ${{ matrix.cxx }}
+              run: task test:${{ matrix.compiler }}
+
+    windows:
+        name: Windows (${{ matrix.compiler }})
+        runs-on: windows-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - compiler: msvc
+                      build_dir: build-msvc
+                    - compiler: clang-cl
+                      build_dir: build-clang-cl
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install LLVM + Ninja (clang-cl)
+              if: matrix.compiler == 'clang-cl'
+              shell: pwsh
+              run: |
+                  choco install llvm ninja -y --no-progress
+
+            - uses: actions/cache@v4
+              with:
+                  path: ${{ matrix.build_dir }}
+                  key: ${{ runner.os }}-${{ matrix.compiler }}-build-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
+                  restore-keys: |
+                      ${{ runner.os }}-${{ matrix.compiler }}-build-
+
+            - name: Install Task
+              uses: go-task/setup-task@v1
+              with:
+                  version: 3.x
+
+            - name: Run tests (${{ matrix.compiler }})
+              run: task test:${{ matrix.compiler }}

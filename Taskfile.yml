@@ -1,0 +1,159 @@
+version: "3"
+
+tasks:
+  # ============================
+  # Configure
+  # ============================
+  configure:gcc:
+    desc: Configure GCC build (Ninja, Release)
+    cmds:
+      - cmake -S . -B build-gcc -G "Ninja"
+        -DLIBCPPRIME_COMPILER=gcc
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - cp build-gcc/compile_commands.json .
+
+  configure:clang:
+    desc: Configure Clang build (Ninja, Release)
+    cmds:
+      - cmake -S . -B build-clang -G "Ninja"
+        -DLIBCPPRIME_COMPILER=clang
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - cp build-clang/compile_commands.json .
+
+  configure:clang-cl:
+    desc: Configure clang-cl build (Ninja, Release)
+    cmds:
+      - cmake -S . -B build-clang-cl -G "Ninja"
+        -DLIBCPPRIME_COMPILER=clang-cl
+        -DCMAKE_BUILD_TYPE=Release
+
+  configure:msvc:
+    desc: Configure MSVC build (Visual Studio 17 2022)
+    cmds:
+      - cmake -S . -B build-msvc
+        -G "Visual Studio 17 2022"
+        -DLIBCPPRIME_COMPILER=msvc
+
+  # ============================
+  # Clean
+  # ============================
+  clean:gcc:
+    cmds: [rm -rf build-gcc]
+
+  clean:clang:
+    cmds: [rm -rf build-clang]
+
+  clean:clang-cl:
+    cmds: [rm -rf build-clang-cl]
+
+  clean:msvc:
+    cmds: [rm -rf build-msvc]
+
+  # ============================
+  # Tests
+  # ============================
+  test:gcc:
+    deps: [configure:gcc]
+    cmds:
+      - cmake --build build-gcc --parallel --target test_isprime
+      - ctest --test-dir build-gcc --output-on-failure --stop-on-failure --parallel
+
+  test:clang:
+    deps: [configure:clang]
+    cmds:
+      - cmake --build build-clang --parallel --target test_isprime
+      - ctest --test-dir build-clang --output-on-failure --stop-on-failure --parallel
+
+  test:clang-cl:
+    deps: [configure:clang-cl]
+    cmds:
+      - cmake --build build-clang-cl --parallel --target test_isprime
+      - ctest --test-dir build-clang-cl --output-on-failure --stop-on-failure --parallel
+
+  test:msvc:
+    deps: [configure:msvc]
+    cmds:
+      - cmake --build build-msvc --parallel --config Release --target test_isprime
+      - ctest --test-dir build-msvc -C Release --output-on-failure --stop-on-failure --parallel
+
+  # ============================
+  # Benchmarks
+  # ============================
+  bench:gcc:
+    deps: [configure:gcc]
+    cmds:
+      - cmake --build build-gcc --parallel --target benchmark_isprime
+      - ./build-gcc/benchmark_isprime
+      - uv run benchmarks/plot_isprime.py
+
+  bench:clang:
+    deps: [configure:clang]
+    cmds:
+      - cmake --build build-clang --parallel --target benchmark_isprime
+      - ./build-clang/benchmark_isprime
+      - uv run benchmarks/plot_isprime.py
+
+  bench:clang-cl:
+    deps: [configure:clang-cl]
+    cmds:
+      - cmake --build build-clang-cl --parallel --target benchmark_isprime
+      - ./build-clang-cl/benchmark_isprime
+      - uv run benchmarks/plot_isprime.py
+
+  bench:msvc:
+    deps: [configure:msvc]
+    cmds:
+      - cmake --build build-msvc --parallel --config Release --target benchmark_isprime
+      - ./build-msvc/Release/benchmark_isprime.exe
+      - uv run benchmarks/plot_isprime.py
+
+  bench-heavy:gcc:
+    deps: [configure:gcc]
+    cmds:
+      - cmake --build build-gcc --parallel --target benchmark_isprime
+      - ./build-gcc/benchmark_isprime --heavy
+      - uv run benchmarks/plot_isprime.py
+
+  bench-heavy:clang:
+    deps: [configure:clang]
+    cmds:
+      - cmake --build build-clang --parallel --target benchmark_isprime
+      - ./build-clang/benchmark_isprime --heavy
+      - uv run benchmarks/plot_isprime.py
+
+  bench-heavy:clang-cl:
+    deps: [configure:clang-cl]
+    cmds:
+      - cmake --build build-clang-cl --parallel --target benchmark_isprime
+      - ./build-clang-cl/benchmark_isprime --heavy
+      - uv run benchmarks/plot_isprime.py
+
+  bench-heavy:msvc:
+    deps: [configure:msvc]
+    cmds:
+      - cmake --build build-msvc --parallel --config Release --target benchmark_isprime
+      - ./build-msvc/Release/benchmark_isprime.exe --heavy
+      - uv run benchmarks/plot_isprime.py
+
+  # ============================
+  # Aggregates
+  # ============================
+  configure:
+    cmds:
+      - task: configure:gcc
+      - task: configure:clang
+      - task: configure:clang-cl
+      - task: configure:msvc
+
+  clean:
+    cmds:
+      - task: clean:gcc
+      - task: clean:clang
+      - task: clean:clang-cl
+      - task: clean:msvc
+
+  default:
+    cmds:
+      - task --list

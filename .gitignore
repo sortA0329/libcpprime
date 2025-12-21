@@ -1,6 +1,52 @@
-.vscode
-.clang-format
-Test
-**.exe
-**.pch
-**.out
+# Build directories
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+.cache/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+
+# IDE files
+.vscode/settings.local.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test outputs
+Testing/
+*.testlog
+
+# Executables
+*.exe
+*.pch
+*.out
+*.so
+*.a
+*.lib
+*.dll
+
+# Temporary files
+*.o
+*.obj
+*.d
+*.su
+*.gch
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+ENV/
+
+# CMake user preference file
+CMakeUserPresets.json
+
+/tmp
+compile_commands.json

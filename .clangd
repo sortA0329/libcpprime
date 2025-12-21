@@ -1,0 +1,13 @@
+CompileFlags:
+  Add:
+    - "-std=c++23"
+    - "-Wall"
+    - "-Wextra"
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+
+InlayHints:
+  ParameterNames: false
+  DeducedTypes: false
