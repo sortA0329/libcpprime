@@ -107,8 +107,8 @@ TYPED_TEST(IsPrimeTest, Fermat) {
 }
 
 std::vector<std::uint64_t> ReadFile(const std::string& filepath, bool expected_result) {
-    std::string currect_file = __FILE__;
-    std::string dir = currect_file.substr(0, currect_file.find_last_of("/\\"));
+    std::string current_file = __FILE__;
+    std::string dir = current_file.substr(0, current_file.find_last_of("/\\"));
     std::string full_path = dir + "/" + (expected_result ? "primes" : "composites") + "/" + filepath;
     std::vector<std::uint64_t> numbers;
     std::ifstream file(full_path);

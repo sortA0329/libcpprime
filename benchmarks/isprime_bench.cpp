@@ -122,8 +122,8 @@ int main(int argc, char** argv) {
     std::ofstream f_summary("benchmarks/bench_summary.csv", std::ios::trunc);
     std::ofstream f_summary_md("benchmarks/bench_summary.md", std::ios::trunc);
     f_summary << "avg_time_prime_IsPrime,avg_time_prime_IsPrimeNoTable,avg_time_composite_IsPrime,avg_time_composite_IsPrimeNoTable\n";
-    f_summary_md << "| Bit Width | IsPrime Avg Time (ns) | IsPrimeNoTable Avg Time (ns) | IsPrime Avg Time (ns) | IsPrimeNoTable Avg Time (ns) |\n";
-    f_summary_md << "|-----------|-----------------------|------------------------------|-----------------------|------------------------------|\n";
+    f_summary_md << "| Bit Width | IsPrime Avg Time (ns, prime) | IsPrimeNoTable Avg Time (ns, prime) | IsPrime Avg Time (ns, composite) | IsPrimeNoTable Avg Time (ns, composite) |\n";
+    f_summary_md << "|-----------|------------------------------|-------------------------------------|----------------------------------|-----------------------------------------|\n";
     for (std::int32_t i = 1; i <= 64; ++i) {
         std::string avg_prime = count_prime[i] ? std::to_string(time_prime_sum[i] / count_prime[i]) : "nan";
         std::string avg_prime_NoTable = count_prime_NoTable[i] ? std::to_string(time_prime_sum_NoTable[i] / count_prime_NoTable[i]) : "nan";
