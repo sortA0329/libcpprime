@@ -1,0 +1,10 @@
+{
+  "runId": 20411925005,
+  "runUrl": "https://github.com/Rac75116/libcpprime/actions/runs/20411925005",
+  "artifacts": [
+    "benchmark-Linux-clang",
+    "benchmark-Linux-gcc",
+    "benchmark-Windows-clang-cl",
+    "benchmark-Windows-msvc"
+  ]
+}
