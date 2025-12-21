@@ -99,7 +99,7 @@ g++ -I ./libcpprime -O3 Main.cpp
 Benchmarks are executed on GitHub Actions.
 
 - Workflow: https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml
-- Latest results (GitHub Pages): https://rac75116.github.io/libcpprime/benchmarks/latest/
+- Latest results: https://rac75116.github.io/libcpprime/benchmarks/latest.json
 
 ## Linux (gcc)
 
