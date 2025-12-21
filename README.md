@@ -1,8 +1,8 @@
 # libcpprime
 
-![](https://github.com/Rac75116/libcpprime/actions/workflows/tests.yml/badge.svg)
+![badge](https://github.com/Rac75116/libcpprime/actions/workflows/tests.yml/badge.svg)
 
-**libcpprime** is a efficient C++ implementation of a primality test optimized for 64-bit integers.
+**libcpprime** is an efficient C++ implementation of a primality test optimized for 64-bit integers.
 
 # Usage
 
