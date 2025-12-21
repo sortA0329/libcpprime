@@ -1,0 +1,7 @@
+name = "libcpprime-docs"
+compatibility_date = "2025-12-21"
+main = "docs/worker/index.ts"
+
+[assets]
+directory = "./docs/.vitepress/dist"
+binding = "ASSETS"
