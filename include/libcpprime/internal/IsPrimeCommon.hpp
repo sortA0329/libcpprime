@@ -173,7 +173,7 @@ LIBCPPRIME_CONSTEXPR bool TrialDivision32(const std::uint32_t n) noexcept {
 }
 
 constexpr std::uint16_t Bases32[256] = {
-#include "./IsPrimeBases32.txt"
+#include "IsPrimeBases32.txt"
 };
 LIBCPPRIME_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
     if (TrialDivision32(x)) return false;

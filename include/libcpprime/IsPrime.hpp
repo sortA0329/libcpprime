@@ -38,13 +38,13 @@ namespace cppr {
 namespace internal {
 
 constexpr std::uint64_t FlagTable16[512] = {
-#include "./internal/IsPrimeTable16.txt"
+#include "internal/IsPrimeTable16.txt"
 };
 // Bitset for odd numbers < 2^16 (2 is handled explicitly).
 LIBCPPRIME_CONSTEXPR bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
-#include "./internal/IsPrimeBases64.txt"
+#include "internal/IsPrimeBases64.txt"
 };
 // Deterministic base selection via a multiplicative hash (fast table lookup).
 LIBCPPRIME_CONSTEXPR std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }

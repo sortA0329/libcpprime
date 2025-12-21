@@ -20,7 +20,7 @@ namespace cppr {
 namespace internal {
 
 constexpr std::uint32_t FlagTable10[32] = {
-#include "./internal/IsPrimeTable10.txt"
+#include "internal/IsPrimeTable10.txt"
 };
 // Bitset for small n < 1024.
 LIBCPPRIME_CONSTEXPR bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
