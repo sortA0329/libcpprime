@@ -105,15 +105,29 @@ TYPED_TEST(IsPrimeTest, Fermat) {
     }
 }
 
-template <class Impl>
-void RunTestsFromFile(const std::string& filename, bool expected_result) {
-    auto filepath = std::string(__FILE__) + "/../" + (expected_result ? "primes" : "composites") + "/" + filename;
-    std::ifstream file(filepath);
-    ASSERT_TRUE(file.is_open()) << "Failed to open file: " << filepath;
+std::vector<std::uint64_t> ReadFile(const std::string& filepath, bool expected_result) {
+    std::string currect_file = __FILE__;
+    std::string dir = currect_file.substr(0, currect_file.find_last_of("/\\"));
+    std::string full_path = dir + "/" + (expected_result ? "primes" : "composites") + "/" + filepath;
+    std::vector<std::uint64_t> numbers;
+    std::ifstream file(full_path);
+    if (!file.is_open()) {
+        EXPECT_TRUE(file.is_open()) << "Failed to open file: " << full_path;
+        return numbers;
+    }
     std::string line;
     while (std::getline(file, line)) {
         if (line.empty() || line[0] == '#') continue;
         std::uint64_t n = std::stoull(line);
+        numbers.push_back(n);
+    }
+    return numbers;
+}
+
+template <class Impl>
+void RunTestsFromFile(const std::string& filename, bool expected_result) {
+    std::vector<std::uint64_t> numbers = ReadFile(filename, expected_result);
+    for (const auto n : numbers) {
         if (expected_result) {
             ASSERT_TRUE(Impl::IsPrime(n)) << "Failed for prime = " << n;
         } else {
@@ -157,16 +171,7 @@ TYPED_TEST(IsPrimeTest, ProdTwoPrimes48bit) {
 }
 
 TYPED_TEST(IsPrimeTest, ProdTwoPrimes64bit) {
-    std::string filepath = std::string(__FILE__) + "/../primes/primes_32bit.txt";
-    std::ifstream file(filepath);
-    ASSERT_TRUE(file.is_open()) << "Failed to open file: " << filepath;
-    std::vector<std::uint64_t> primes;
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#') continue;
-        std::uint64_t p = std::stoull(line);
-        primes.push_back(p);
-    }
+    auto primes = ReadFile("primes_32bit.txt", true);
     for (std::size_t i = 0; i < primes.size(); i++) {
         for (std::size_t j = i; j < primes.size(); j++) {
             std::uint64_t n = primes[i] * primes[j];
