@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: benchmark-pages
+  cancel-in-progress: false
 
 jobs:
   linux:
@@ -119,3 +119,67 @@ jobs:
             benchmarks/bench_IsPrime.jpg
             benchmarks/bench_IsPrimeNoTable.jpg
             benchmarks/bench_summary.jpg
+
+  publish-pages:
+    name: Publish benchmark results to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [linux, windows]
+    steps:
+      - name: Download benchmark artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: benchmark-*
+
+      - name: Prepare Pages content
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN_ID="${GITHUB_RUN_ID}"
+          OUT_DIR="site/benchmarks/runs/${RUN_ID}"
+
+          mkdir -p "${OUT_DIR}"
+
+          # Keep artifact directories separated to avoid collisions.
+          for d in artifacts/*; do
+            if [ -d "$d" ]; then
+              name="$(basename "$d")"
+              mkdir -p "${OUT_DIR}/${name}"
+              cp -R "$d"/* "${OUT_DIR}/${name}"/ || true
+            fi
+          done
+
+          # No Jekyll processing (serve files as-is)
+          touch site/.nojekyll
+
+          # Write pointer to the latest run.
+          python3 - <<'PY'
+          import json, os
+          repo = os.environ.get('GITHUB_REPOSITORY', '')
+          run_id = int(os.environ.get('GITHUB_RUN_ID', '0'))
+          run_url = f"https://github.com/{repo}/actions/runs/{run_id}" if repo and run_id else None
+          artifacts_dir = 'artifacts'
+          artifacts = []
+          if os.path.isdir(artifacts_dir):
+              for name in sorted(os.listdir(artifacts_dir)):
+                  full = os.path.join(artifacts_dir, name)
+                  if os.path.isdir(full) and name.startswith('benchmark-'):
+                      artifacts.append(name)
+          data = {
+              'runId': run_id,
+              'runUrl': run_url,
+              'artifacts': artifacts,
+          }
+          os.makedirs('site/benchmarks', exist_ok=True)
+          with open('site/benchmarks/latest.json', 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+          PY
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site
+          keep_files: true
+          commit_message: "chore(bench): publish run ${{ github.run_id }}"

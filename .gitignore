@@ -50,11 +50,3 @@ CMakeUserPresets.json
 
 /tmp
 compile_commands.json
-
-# Node / Bun / VitePress
-node_modules/
-docs/.vitepress/cache/
-docs/.vitepress/dist/
-
-# Cloudflare Wrangler
-.wrangler/
