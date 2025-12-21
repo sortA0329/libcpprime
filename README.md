@@ -94,12 +94,6 @@ This library is header-only, so you only need to specify the include path.
 g++ -I ./libcpprime -O3 Main.cpp
 ```
 
-# Benchmarks
-
-The benchmark is run on GitHub Actions' Linux with gcc with -O3 optimization enabled.
-
-You can find more detailed benchmark results by clicking [here](https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml?query=branch%3Amain+is%3Acompleted).
-
 # Releases
 
 -   2025/12/21 ver 1.3.0
