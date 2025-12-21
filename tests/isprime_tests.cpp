@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
+#include <libcpprime/FeatureTestMacros.hpp>
 #include <libcpprime/IsPrime.hpp>
 #include <libcpprime/IsPrimeNoTable.hpp>
 #include <random>
@@ -11,7 +12,7 @@
 #include <type_traits>
 #include <vector>
 
-#ifdef LIBCPPRIME_CONSTEXPR_ENABLED
+#ifdef CPPR_HAS_CONSTEXPR_IS_PRIME
 struct IsPrimeImpl {
     constexpr static bool IsPrime(std::uint64_t n) { return cppr::IsPrime(n); }
 };

@@ -7,8 +7,8 @@
  *
  **/
 
-#ifndef LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
-#define LIBCPPRIME_INCLUDED_IS_PRIME_NO_TABLE
+#ifndef CPPR_INTERNAL_INCLUDED_IS_PRIME_NO_TABLE
+#define CPPR_INTERNAL_INCLUDED_IS_PRIME_NO_TABLE
 
 #include <cstdint>
 
@@ -23,9 +23,9 @@ constexpr std::uint32_t FlagTable10[32] = {
 #include "internal/IsPrimeTable10.txt"
 };
 // Bitset for small n < 1024.
-LIBCPPRIME_CONSTEXPR bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
+CPPR_INTERNAL_CONSTEXPR bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
-LIBCPPRIME_CONSTEXPR std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
     // Chooses a Lucas parameter D for the strong Lucas probable prime test.
     // Returns:
     // - 0: definitely composite (quick checks found a factor or perfect square)
@@ -82,7 +82,7 @@ LIBCPPRIME_CONSTEXPR std::uint64_t GetLucasBase(const std::uint64_t x) noexcept 
     return Z;
 }
 
-LIBCPPRIME_CONSTEXPR bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -232,7 +232,7 @@ LIBCPPRIME_CONSTEXPR bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
     }
 }
 
-LIBCPPRIME_CONSTEXPR bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<true> mint(x);
     const auto one = mint.one();
     const auto mone = mint.neg(one);
@@ -298,7 +298,7 @@ LIBCPPRIME_CONSTEXPR bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
 
 }  // namespace internal
 
-LIBCPPRIME_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
+CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
     if (n < 1024) {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {

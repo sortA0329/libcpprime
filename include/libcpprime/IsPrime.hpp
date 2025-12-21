@@ -25,8 +25,8 @@
  *
  **/
 
-#ifndef LIBCPPRIME_INCLUDED_IS_PRIME
-#define LIBCPPRIME_INCLUDED_IS_PRIME
+#ifndef CPPR_INTERNAL_INCLUDED_IS_PRIME
+#define CPPR_INTERNAL_INCLUDED_IS_PRIME
 
 #include <cstdint>
 
@@ -41,14 +41,14 @@ constexpr std::uint64_t FlagTable16[512] = {
 #include "internal/IsPrimeTable16.txt"
 };
 // Bitset for odd numbers < 2^16 (2 is handled explicitly).
-LIBCPPRIME_CONSTEXPR bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
+CPPR_INTERNAL_CONSTEXPR bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
 #include "internal/IsPrimeBases64.txt"
 };
 // Deterministic base selection via a multiplicative hash (fast table lookup).
-LIBCPPRIME_CONSTEXPR std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
-LIBCPPRIME_CONSTEXPR bool IsPrime49(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
+CPPR_INTERNAL_CONSTEXPR bool IsPrime49(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -91,7 +91,7 @@ LIBCPPRIME_CONSTEXPR bool IsPrime49(const std::uint64_t x) noexcept {
     return res1 && res2;
 }
 template <bool Strict>
-LIBCPPRIME_CONSTEXPR bool IsPrime64(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR bool IsPrime64(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -148,7 +148,7 @@ LIBCPPRIME_CONSTEXPR bool IsPrime64(const std::uint64_t x) noexcept {
 
 }  // namespace internal
 
-LIBCPPRIME_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
+CPPR_INTERNAL_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
     if (n < 65536) {
         return internal::IsPrime16(n);
     } else if (n <= 0xffffffff) {
