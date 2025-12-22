@@ -42,7 +42,7 @@ namespace cppr {
 ```
 
 It returns true if the input value is a prime number; otherwise, it returns false.
-If you want to reduce the size of the executable file, use this function instead of `cppr::IsPrime` because `cppr::IsPrime` uses a 36KB table for performance optimization.
+If you want to reduce the size of the executable file, use this function instead of `cppr::IsPrime` because `cppr::IsPrime` uses a 40KB table for performance optimization.
 
 #### example
 
