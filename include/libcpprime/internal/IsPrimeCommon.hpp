@@ -166,7 +166,7 @@ class MontgomeryModint64Impl {
     }
 };
 
-CPPR_INTERNAL_CONSTEXPR bool TrialDivision32(const std::uint32_t n) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE bool TrialDivision32(const std::uint32_t n) noexcept {
     // Branchless screening against a fixed set of small primes.
     return (n & 1) == 0 || 1431655766u > (0u - 1431655765u) * n || 858993460u > (0u - 858993459u) * n || 613566757u > (0u - 1227133513u) * n || 390451573u > (0u - 1171354717u) * n ||
            330382100u > (0u - 991146299u) * n || 252645136u > (0u - 252645135u) * n || 226050911u > 678152731u * n || 186737709u > (0u - 373475417u) * n;
@@ -176,19 +176,6 @@ constexpr std::uint16_t Bases32[256] = {
 #include "IsPrimeBases32.txt"
 };
 CPPR_INTERNAL_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
-    if (TrialDivision32(x)) return false;
-    if (x < 85849) {
-        // Very small range: fast GCD-based filters with precomputed constants.
-        const std::uint32_t a = static_cast<std::uint32_t>(Modu128(272518712866683587u % x, 10755835586592736005u, x));
-        if (a == 0) return false;
-        if (x < 11881) return GCD(a, x) == 1;
-        const std::uint32_t b = static_cast<std::uint32_t>(Modu128(827936745744686818u % x, 10132550402535125089u, x));
-        if (b == 0) return false;
-        if (x < 39601) return GCD((a * b) % x, x) == 1;
-        const std::uint32_t c = static_cast<std::uint32_t>(Modu128(9647383993136055606u % x, 17068348107132031867u, x) * a * b % x);
-        if (c == 0) return false;
-        return GCD(c, x) == 1;
-    }
     const std::uint32_t h = x * 0xad625b89;
     std::uint32_t d = x - 1;
     std::uint32_t pw = static_cast<std::uint32_t>(Bases32[h >> 24]);
@@ -241,7 +228,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
     }
 }
 
-CPPR_INTERNAL_CONSTEXPR bool TrialDivision64(const std::uint64_t n) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE bool TrialDivision64(const std::uint64_t n) noexcept {
     // Branchless screening against a fixed set of small primes.
     return (n & 1) == 0 || 6148914691236517205u >= 12297829382473034411u * n || 3689348814741910323u >= 14757395258967641293u * n || 2635249153387078802u >= 7905747460161236407u * n ||
            1676976733973595601u >= 3353953467947191203u * n || 1418980313362273201u >= 5675921253449092805u * n || 1085102592571150095u >= 17361641481138401521u * n;

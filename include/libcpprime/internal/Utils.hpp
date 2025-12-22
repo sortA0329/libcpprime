@@ -138,6 +138,45 @@ CPPR_INTERNAL_CONSTEXPR_INLINE void Assume(const bool cond) noexcept {
 #endif
 }
 
+CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint32_t n) noexcept {
+    // Precondition: n != 0 (matches std::countr_zero requirements).
+    Assume(n != 0);
+#ifdef __cpp_lib_bitops
+    return std::countr_zero(n);
+#else
+#if CPPR_INTERNAL_HAS_BUILTIN(__builtin_ctz)
+    if (!IsConstantEvaluated()) return static_cast<std::int32_t>(__builtin_ctz(n));
+#elif defined(_MSC_VER)
+    if (!IsConstantEvaluated()) {
+        unsigned long r;
+        _BitScanForward(&r, n);
+        return static_cast<std::int32_t>(r);
+    }
+#endif
+    std::int32_t count = 0;
+    if ((n << 16) == 0) {
+        count += 16;
+        n >>= 16;
+    }
+    if ((n << 24) == 0) {
+        count += 8;
+        n >>= 8;
+    }
+    if ((n << 28) == 0) {
+        count += 4;
+        n >>= 4;
+    }
+    if ((n << 30) == 0) {
+        count += 2;
+        n >>= 2;
+    }
+    if ((n << 31) == 0) {
+        ++count;
+    }
+    return count;
+#endif
+}
+
 CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept {
     // Precondition: n != 0 (matches std::countr_zero requirements).
     Assume(n != 0);
@@ -153,33 +192,50 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept
         return static_cast<std::int32_t>(r);
     }
 #endif
+    bool f = (n & 0xffffffff) == 0;
+    return (f ? 32 : 0) + CountrZero(static_cast<std::uint32_t>(n >> (f ? 32 : 0)));
+#endif
+}
+
+CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint32_t n) noexcept {
+    // Precondition: n != 0 (matches std::countl_zero requirements).
+    Assume(n != 0);
+#ifdef __cpp_lib_bitops
+    return std::countl_zero(n);
+#else
+#if CPPR_INTERNAL_HAS_BUILTIN(__builtin_clz)
+    if (!IsConstantEvaluated()) return static_cast<std::int32_t>(__builtin_clz(n));
+#elif defined(_MSC_VER)
+    if (!IsConstantEvaluated()) {
+        unsigned long r;
+        _BitScanReverse(&r, n);
+        return static_cast<std::int32_t>(r ^ 31);
+    }
+#endif
     std::int32_t count = 0;
-    if ((n << 32) == 0) {
-        count += 32;
-        n >>= 32;
-    }
-    if ((n << 48) == 0) {
+    if ((n >> 16) == 0) {
         count += 16;
-        n >>= 16;
+        n <<= 16;
     }
-    if ((n << 56) == 0) {
+    if ((n >> 24) == 0) {
         count += 8;
-        n >>= 8;
+        n <<= 8;
     }
-    if ((n << 60) == 0) {
+    if ((n >> 28) == 0) {
         count += 4;
-        n >>= 4;
+        n <<= 4;
     }
-    if ((n << 62) == 0) {
+    if ((n >> 30) == 0) {
         count += 2;
-        n >>= 2;
+        n <<= 2;
     }
-    if ((n << 63) == 0) {
+    if ((n >> 31) == 0) {
         ++count;
     }
     return count;
 #endif
 }
+
 CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept {
     // Precondition: n != 0 (matches std::countl_zero requirements).
     Assume(n != 0);
@@ -195,31 +251,8 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept
         return static_cast<std::int32_t>(r ^ 63);
     }
 #endif
-    std::int32_t count = 0;
-    if ((n >> 32) == 0) {
-        count += 32;
-        n <<= 32;
-    }
-    if ((n >> 48) == 0) {
-        count += 16;
-        n <<= 16;
-    }
-    if ((n >> 56) == 0) {
-        count += 8;
-        n <<= 8;
-    }
-    if ((n >> 60) == 0) {
-        count += 4;
-        n <<= 4;
-    }
-    if ((n >> 62) == 0) {
-        count += 2;
-        n <<= 2;
-    }
-    if ((n >> 63) == 0) {
-        ++count;
-    }
-    return count;
+    bool f = (n >> 32) == 0;
+    return (f ? 32 : 0) + CountlZero(static_cast<std::uint32_t>(n >> (f ? 0 : 32)));
 #endif
 }
 
@@ -322,30 +355,6 @@ CPPR_INTERNAL_CONSTEXPR std::uint64_t Modu128(std::uint64_t numhi, std::uint64_t
     q0 = static_cast<std::uint32_t>(qhat);
     return (rem * b + num0 - q0 * den) >> shift;
 #endif
-}
-
-template <class T>
-CPPR_INTERNAL_CONSTEXPR T GCD(T x, T y) noexcept {
-    // Binary GCD (Stein's algorithm). Assumes y != 0 when x != 0.
-    if (x == 0) return 0;
-    Assume(y != 0);
-    const std::int32_t n = CountrZero(x);
-    const std::int32_t m = CountrZero(y);
-    const std::int32_t l = n < m ? n : m;
-    x >>= n;
-    y >>= m;
-    while (x != y) {
-        const T a = y - x;
-        const T b = x - y;
-        const std::int32_t p = CountrZero(a);
-        const std::int32_t q = CountrZero(b);
-        Assume(p == q);
-        const T s = y < x ? b : a;
-        const T t = x < y ? x : y;
-        x = s >> p;
-        y = t;
-    }
-    return x << l;
 }
 
 }  // namespace internal

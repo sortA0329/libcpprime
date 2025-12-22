@@ -25,6 +25,37 @@ constexpr std::uint32_t FlagTable10[32] = {
 // Bitset for small n < 1024.
 CPPR_INTERNAL_CONSTEXPR bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
+CPPR_INTERNAL_CONSTEXPR bool GCDFilter(const std::uint32_t n) noexcept {
+    auto GCD = [](std::uint32_t x, std::uint32_t y) -> std::uint32_t {
+        // Binary GCD (Stein's algorithm). Assumes y != 0 when x != 0.
+        if (x == 0) return 0;
+        Assume(y != 0);
+        const std::int32_t n = CountrZero(x);
+        const std::int32_t m = CountrZero(y);
+        const std::int32_t l = n < m ? n : m;
+        x >>= n;
+        y >>= m;
+        while (x != y) {
+            const std::uint32_t a = y - x;
+            const std::uint32_t b = x - y;
+            const std::int32_t p = CountrZero(a);
+            const std::int32_t q = CountrZero(b);
+            Assume(p == q);
+            const std::uint32_t s = y < x ? b : a;
+            const std::uint32_t t = x < y ? x : y;
+            x = s >> p;
+            y = t;
+        }
+        return x << l;
+    };
+
+    // Very small range: fast GCD-based filters with precomputed constants.
+    const std::uint32_t a = static_cast<std::uint32_t>(Modu128(272518712866683587u % n, 10755835586592736005u, n));
+    if (n < 11881) return GCD(a, n) == 1;
+    const std::uint32_t b = static_cast<std::uint32_t>(Modu128(827936745744686818u % n, 10132550402535125089u, n));
+    return GCD((a * b) % n, n) == 1;
+}
+
 CPPR_INTERNAL_CONSTEXPR std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
     // Chooses a Lucas parameter D for the strong Lucas probable prime test.
     // Returns:
@@ -302,6 +333,10 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
     if (n < 1024) {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
+        if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;
+        if (n < 39601) {
+            return internal::GCDFilter(static_cast<std::uint32_t>(n));
+        }
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
         if (internal::TrialDivision64(n)) {

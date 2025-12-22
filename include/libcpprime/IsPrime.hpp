@@ -37,11 +37,11 @@ namespace cppr {
 
 namespace internal {
 
-constexpr std::uint64_t FlagTable16[512] = {
-#include "internal/IsPrimeTable16.txt"
+constexpr std::uint64_t FlagTable17[1024] = {
+#include "internal/IsPrimeTable17.txt"
 };
-// Bitset for odd numbers < 2^16 (2 is handled explicitly).
-CPPR_INTERNAL_CONSTEXPR bool IsPrime16(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable16[n / 128] & (1ull << (n % 128 / 2)))); }
+// Bitset for odd numbers < 2^17 (2 is handled explicitly).
+CPPR_INTERNAL_CONSTEXPR bool IsPrime17(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable17[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
 #include "internal/IsPrimeBases64.txt"
@@ -149,9 +149,10 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime64(const std::uint64_t x) noexcept {
 }  // namespace internal
 
 CPPR_INTERNAL_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
-    if (n < 65536) {
-        return internal::IsPrime16(n);
+    if (n < 131072) {
+        return internal::IsPrime17(n);
     } else if (n <= 0xffffffff) {
+        if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
         // Cheap small-prime screening before the heavier probable-prime tests.
