@@ -10,8 +10,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
+from PIL import Image
 
-file_type = "jpg"
+file_type = "webp"
 
 COLOR_1 = "#379777"
 COLOR_2 = "#F4CE14"
@@ -53,7 +54,7 @@ def save_scatter(
     x = np.log2(n)
     y = t
 
-    fig = plt.figure(figsize=(12, 7), dpi=240)
+    fig = plt.figure(figsize=(12, 7), dpi=150)
     ax = fig.add_subplot(1, 1, 1)
 
     cmap = matplotlib.colors.ListedColormap([COLOR_1, COLOR_2])
@@ -102,7 +103,7 @@ def save_summary_plots(summary: np.ndarray, out_prefix: str) -> None:
     comp_notable = summary[:, 3]
 
     # Comparison plots (no log): keep readable via inset zoom panels.
-    fig = plt.figure(figsize=(12, 8), dpi=240)
+    fig = plt.figure(figsize=(12, 8), dpi=120)
     ax1 = fig.add_subplot(2, 1, 1)
     ax2 = fig.add_subplot(2, 1, 2, sharex=ax1)
 
@@ -194,6 +195,21 @@ def main() -> int:
     )
 
     save_summary_plots(summary, os.path.join(cwd, "benchmarks/bench_summary"))
+
+    # Remove CSV files after generating plots
+    os.remove(p_prime)
+    os.remove(p_notable)
+    os.remove(p_summary)
+
+    # Optimize generated images
+    for fname in [
+        "benchmarks/bench_IsPrime." + file_type,
+        "benchmarks/bench_IsPrimeNoTable." + file_type,
+        "benchmarks/bench_summary." + file_type,
+    ]:
+        with Image.open(fname) as img:
+            img.save(fname, optimize=True, quality=60)
+
     return 0
 
 

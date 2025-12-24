@@ -57,4 +57,6 @@
         "*": true,
         "*.txt": false,
     },
+    "liveServer.settings.root": "/site",
+    "liveServer.settings.file": "404.html"
 }

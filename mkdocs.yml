@@ -1,0 +1,39 @@
+site_name: libcpprime Documentation
+theme:
+  name: material
+  logo: assets/favicon.png
+  favicon: assets/favicon.png
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - toc.integrate
+    - content.code.copy
+  palette:
+    scheme: slate
+    primary: indigo
+    accent: indigo
+repo_url: https://github.com/Rac75116/libcpprime
+repo_name: Rac75116/libcpprime
+nav:
+  - libcpprime: index.md
+  - "GitHub Repository": https://github.com/Rac75116/libcpprime
+markdown_extensions:
+  - tables
+  - pymdownx.highlight:
+      use_pygments: true
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.magiclink
+plugins:
+  - search
+  - optimize
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+        remove_empty_space: true

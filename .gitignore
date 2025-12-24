@@ -50,3 +50,7 @@ CMakeUserPresets.json
 
 /tmp
 compile_commands.json
+
+# Documentation
+/docs/index.md
+/site

@@ -61,9 +61,9 @@ jobs:
           if-no-files-found: warn
           path: |
             benchmarks/bench_summary.md
-            benchmarks/bench_IsPrime.jpg
-            benchmarks/bench_IsPrimeNoTable.jpg
-            benchmarks/bench_summary.jpg
+            benchmarks/bench_IsPrime.webp
+            benchmarks/bench_IsPrimeNoTable.webp
+            benchmarks/bench_summary.webp
 
   windows:
     name: Windows (${{ matrix.compiler }})
@@ -116,9 +116,9 @@ jobs:
           if-no-files-found: warn
           path: |
             benchmarks/bench_summary.md
-            benchmarks/bench_IsPrime.jpg
-            benchmarks/bench_IsPrimeNoTable.jpg
-            benchmarks/bench_summary.jpg
+            benchmarks/bench_IsPrime.webp
+            benchmarks/bench_IsPrimeNoTable.webp
+            benchmarks/bench_summary.webp
 
   publish-pages:
     name: Publish benchmark results to GitHub Pages
