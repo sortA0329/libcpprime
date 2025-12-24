@@ -147,8 +147,10 @@ TYPED_TEST(IsPrimeTest, hack_8_prime_bases) { RunTestsFromFile<TypeParam>("hack_
 TYPED_TEST(IsPrimeTest, hack_base_2_to_10) { RunTestsFromFile<TypeParam>("hack_base_2_to_10.txt", false); }
 TYPED_TEST(IsPrimeTest, hack_known_bases) { RunTestsFromFile<TypeParam>("hack_known_bases.txt", false); }
 TYPED_TEST(IsPrimeTest, strong_lucas_pseudoprimes) { RunTestsFromFile<TypeParam>("strong_lucas_pseudoprimes.txt", false); }
+TYPED_TEST(IsPrimeTest, mult2power1_composites) { RunTestsFromFile<TypeParam>("mult2power1.txt", false); }
 TYPED_TEST(IsPrimeTest, primes_32bit) { RunTestsFromFile<TypeParam>("primes_32bit.txt", true); }
 TYPED_TEST(IsPrimeTest, primes_64bit) { RunTestsFromFile<TypeParam>("primes_64bit.txt", true); }
+TYPED_TEST(IsPrimeTest, mult2power1_primes) { RunTestsFromFile<TypeParam>("mult2power1.txt", true); }
 
 TEST(IsPrimeTest, CompareImplementations) {
     std::mt19937_64 rng;
@@ -199,7 +201,7 @@ TYPED_TEST(IsPrimeTest, Random) {
     ASSERT_EQ(count_primes, 460802) << "Mismatch in number of primes found";
 }
 
-#ifdef LIBCPPRIME_CONSTEXPR_ENABLED
+#ifdef CPPR_HAS_CONSTEXPR_IS_PRIME
 constexpr static std::uint64_t Primes[] = {
 #include "./primes/constexpr.txt"
 };

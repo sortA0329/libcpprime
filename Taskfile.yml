@@ -138,6 +138,15 @@ tasks:
       - uv run benchmarks/plot_isprime.py
 
   # ============================
+  # Documentation
+  # ============================
+  docs:
+    desc: Generate documentation
+    cmds:
+      - cp README.md docs/index.md
+      - uv run mkdocs build
+
+  # ============================
   # Aggregates
   # ============================
   configure:
