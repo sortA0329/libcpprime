@@ -144,6 +144,8 @@ Benchmarks are executed on GitHub Actions.
 
 ## Releases
 
+-   2025/12/24 ver 1.3.1
+    - Improve performance and reduce binary size for `cppr::IsPrime`
 -   2025/12/21 ver 1.3.0
     - Add `CPPR_HAS_CONSTEXPR_IS_PRIME`
     - Support clang-cl
