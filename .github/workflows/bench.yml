@@ -1,6 +1,14 @@
 name: Benchmark
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "include/**"
+      - "benchmarks/**"
+      - "CMakeLists.txt"
+      - "Taskfile.yml"
+      - ".github/workflows/bench.yml"
   workflow_dispatch:
 
 permissions:
@@ -124,6 +132,9 @@ jobs:
     name: Publish benchmark results to GitHub Pages
     runs-on: ubuntu-latest
     needs: [linux, windows]
+    concurrency:
+      group: gh-pages-deploy
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 

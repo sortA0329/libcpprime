@@ -3,6 +3,7 @@
     "editor.formatOnType": true,
     "editor.formatOnPaste": false,
     "editor.insertSpaces": true,
+    "editor.tabSize": 4,
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
@@ -10,7 +11,8 @@
         "editor.defaultFormatter": "vscode.json-language-features"
     },
     "[yaml]": {
-        "editor.defaultFormatter": "redhat.vscode-yaml"
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.tabSize": 2
     },
     "[cpp]": {
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
@@ -18,7 +20,6 @@
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "editor.tabSize": 4,
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "terminal.integrated.env.windows": {
         "PSExecutionPolicyPreference": "RemoteSigned"
