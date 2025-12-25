@@ -11,11 +11,6 @@ on:
       - ".github/workflows/tests.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "include/**"
-      - "tests/**"
-      - "CMakeLists.txt"
-      - ".github/workflows/tests.yml"
   workflow_dispatch:
 
 permissions:
