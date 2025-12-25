@@ -1,4 +1,5 @@
 site_name: libcpprime Documentation
+site_url: https://rac75116.github.io/libcpprime/
 theme:
   name: material
   logo: assets/favicon.png
@@ -16,6 +17,7 @@ theme:
     accent: indigo
 repo_url: https://github.com/Rac75116/libcpprime
 repo_name: Rac75116/libcpprime
+copyright: "Copyright © 2025 Rac75116"
 nav:
   - libcpprime: index.md
   - "GitHub Repository": https://github.com/Rac75116/libcpprime

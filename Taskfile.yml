@@ -146,6 +146,12 @@ tasks:
       - cp README.md docs/index.md
       - uv run mkdocs build
 
+  serve:
+    desc: Serve documentation locally
+    cmds:
+      - cp README.md docs/index.md
+      - uv run mkdocs serve
+
   # ============================
   # Aggregates
   # ============================
