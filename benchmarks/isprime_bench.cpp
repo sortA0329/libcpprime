@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <ios>
 #include <iostream>
 #include <libcpprime/IsPrime.hpp>
@@ -31,7 +32,7 @@ int main(int argc, char** argv) {
             weighted[count++] = 64 - i;
         }
     }
-    auto bench = [rng = Rng(42), heavy](bool (*func)(std::uint64_t)) mutable {
+    auto bench = [rng = Rng(), heavy](bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[rng.bounded(89440)];
         std::uint64_t n = (rng() >> k) | 1;
         int iters = (heavy ? 300 : 250);
@@ -124,13 +125,26 @@ int main(int argc, char** argv) {
     f_summary << "avg_time_prime_IsPrime,avg_time_prime_IsPrimeNoTable,avg_time_composite_IsPrime,avg_time_composite_IsPrimeNoTable\n";
     f_summary_md << "| Bit Width | IsPrime Avg Time (ns, prime) | IsPrimeNoTable Avg Time (ns, prime) | IsPrime Avg Time (ns, composite) | IsPrimeNoTable Avg Time (ns, composite) |\n";
     f_summary_md << "|-----------|------------------------------|-------------------------------------|----------------------------------|-----------------------------------------|\n";
+    f_summary << std::fixed << std::setprecision(6);
+    f_summary_md << std::fixed << std::setprecision(2);
     for (std::int32_t i = 1; i <= 64; ++i) {
-        std::string avg_prime = count_prime[i] ? std::to_string(time_prime_sum[i] / count_prime[i]) : "nan";
-        std::string avg_prime_NoTable = count_prime_NoTable[i] ? std::to_string(time_prime_sum_NoTable[i] / count_prime_NoTable[i]) : "nan";
-        std::string avg_composite = count_composite[i] ? std::to_string(time_composite_sum[i] / count_composite[i]) : "nan";
-        std::string avg_composite_NoTable = count_composite_NoTable[i] ? std::to_string(time_composite_sum_NoTable[i] / count_composite_NoTable[i]) : "nan";
-        f_summary << avg_prime << "," << avg_prime_NoTable << "," << avg_composite << "," << avg_composite_NoTable << "\n";
-        f_summary_md << "| " << i << " | " << avg_prime << " | " << avg_prime_NoTable << " | " << avg_composite << " | " << avg_composite_NoTable << " |\n";
+        auto print_result = [](std::ofstream& f, double val, std::int32_t count) -> std::ofstream& {
+            if (count) {
+                f << (val / count);
+            } else {
+                f << "nan";
+            }
+            return f;
+        };
+        print_result(f_summary, time_prime_sum[i], count_prime[i]) << ",";
+        print_result(f_summary, time_prime_sum_NoTable[i], count_prime_NoTable[i]) << ",";
+        print_result(f_summary, time_composite_sum[i], count_composite[i]) << ",";
+        print_result(f_summary, time_composite_sum_NoTable[i], count_composite_NoTable[i]) << "\n";
+        f_summary_md << "| " << i << " | ";
+        print_result(f_summary_md, time_prime_sum[i], count_prime[i]) << " | ";
+        print_result(f_summary_md, time_prime_sum_NoTable[i], count_prime_NoTable[i]) << " | ";
+        print_result(f_summary_md, time_composite_sum[i], count_composite[i]) << " | ";
+        print_result(f_summary_md, time_composite_sum_NoTable[i], count_composite_NoTable[i]) << " |\n";
     }
     f_summary << std::flush;
     f_summary_md << std::flush;
