@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
             weighted[count++] = 64 - i;
         }
     }
-    auto bench = [rng = Rng(), heavy](bool (*func)(std::uint64_t)) mutable {
+    auto bench = [rng = Rng(100), heavy](bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[rng.bounded(89440)];
         std::uint64_t n = (rng() >> k) | 1;
         int iters = (heavy ? 300 : 250);

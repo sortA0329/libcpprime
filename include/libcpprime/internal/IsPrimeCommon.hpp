@@ -40,7 +40,7 @@ template <bool Strict = false>
 class MontgomeryModint64Impl {
     std::uint64_t mod_ = 0, rs = 0, nr = 0, np = 0;
 
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t reduce(const std::uint64_t n) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t reduce(const std::uint64_t n) const noexcept {
         // Montgomery reduction of a 128-bit value with implicit low half `n`.
         std::uint64_t q = n * nr;
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
@@ -51,7 +51,7 @@ class MontgomeryModint64Impl {
             return mod_ - m;
         }
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t reduce(const std::uint64_t a, const std::uint64_t b) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t reduce(const std::uint64_t a, const std::uint64_t b) const noexcept {
         // Montgomery reduction of the product a*b.
         auto tmp = Mulu128(a, b);
         std::uint64_t d = tmp.high;
@@ -81,13 +81,13 @@ class MontgomeryModint64Impl {
         for (std::uint32_t i = 0; i != 5; ++i) nr *= 2 - n * nr;
         np = reduce(rs);
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t build(std::uint32_t x) const noexcept { return reduce(x % mod_, rs); }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t build(std::uint64_t x) const noexcept { return reduce(x % mod_, rs); }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t raw(std::uint64_t x) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t build(std::uint32_t x) const noexcept { return reduce(x % mod_, rs); }
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t build(std::uint64_t x) const noexcept { return reduce(x % mod_, rs); }
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t raw(std::uint64_t x) const noexcept {
         Assume(x < mod_);
         return reduce(x, rs);
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t val(std::uint64_t x) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t val(std::uint64_t x) const noexcept {
         // Converts from Montgomery domain back to the standard residue.
         // Non-strict mode permits values in [0, 2*mod) for faster operations.
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
@@ -99,7 +99,7 @@ class MontgomeryModint64Impl {
             return tmp - mod_ * (tmp >= mod_);
         }
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t one() const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t one() const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(np < mod_);
             return np;
@@ -108,7 +108,7 @@ class MontgomeryModint64Impl {
             return np;
         }
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t neg(std::uint64_t x) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t neg(std::uint64_t x) const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(x < mod_);
             return (mod_ - x) * (x != 0);
@@ -117,7 +117,7 @@ class MontgomeryModint64Impl {
             return (2 * mod_ - x) * (x != 0);
         }
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t mul(std::uint64_t x, std::uint64_t y) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t mul(std::uint64_t x, std::uint64_t y) const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(x < mod_ && y < mod_);
             return reduce(x, y);
@@ -126,7 +126,7 @@ class MontgomeryModint64Impl {
             return reduce(x, y);
         }
     }
-    CPPR_INTERNAL_CONSTEXPR bool same(std::uint64_t x, std::uint64_t y) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE bool same(std::uint64_t x, std::uint64_t y) const noexcept {
         // Equality check that tolerates the relaxed range in non-strict mode.
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(x < mod_ && y < mod_);
@@ -137,7 +137,7 @@ class MontgomeryModint64Impl {
             return (tmp == 0) || (tmp == mod_) || (tmp == 0 - mod_);
         }
     }
-    CPPR_INTERNAL_CONSTEXPR bool is_zero(std::uint64_t x) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE bool is_zero(std::uint64_t x) const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(x < mod_);
             return x == 0;
@@ -146,7 +146,7 @@ class MontgomeryModint64Impl {
             return x == 0 || x == mod_;
         }
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t add(std::uint64_t x, std::uint64_t y) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t add(std::uint64_t x, std::uint64_t y) const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(x < mod_ && y < mod_);
             return x + y - (x >= mod_ - y) * mod_;
@@ -155,7 +155,7 @@ class MontgomeryModint64Impl {
             return x + y - (x >= 2 * mod_ - y) * (2 * mod_);
         }
     }
-    CPPR_INTERNAL_CONSTEXPR std::uint64_t sub(std::uint64_t x, std::uint64_t y) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t sub(std::uint64_t x, std::uint64_t y) const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
             Assume(x < mod_ && y < mod_);
             return x - y + (x < y) * mod_;
