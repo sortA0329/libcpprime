@@ -144,6 +144,8 @@ Benchmarks are executed on GitHub Actions.
 
 ## Releases
 
+-   2026/01/04 ver 1.3.2
+    - Improve performance
 -   2025/12/24 ver 1.3.1
     - Improve performance and reduce binary size for `cppr::IsPrime`
 -   2025/12/21 ver 1.3.0

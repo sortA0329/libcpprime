@@ -41,14 +41,14 @@ constexpr std::uint64_t FlagTable17[1024] = {
 #include "internal/IsPrimeTable17.txt"
 };
 // Bitset for odd numbers < 2^17 (2 is handled explicitly).
-CPPR_INTERNAL_CONSTEXPR bool IsPrime17(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable17[n / 128] & (1ull << (n % 128 / 2)))); }
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime17(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable17[n / 128] & (1ull << (n % 128 / 2)))); }
 
 constexpr std::uint16_t Bases64[16384] = {
 #include "internal/IsPrimeBases64.txt"
 };
 // Deterministic base selection via a multiplicative hash (fast table lookup).
-CPPR_INTERNAL_CONSTEXPR std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
-CPPR_INTERNAL_CONSTEXPR bool IsPrime49(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE std::uint16_t GetBase(std::uint64_t x) noexcept { return Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 18]; }
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime49(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<false> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -91,7 +91,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime49(const std::uint64_t x) noexcept {
     return res1 && res2;
 }
 template <bool Strict>
-CPPR_INTERNAL_CONSTEXPR bool IsPrime64(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;

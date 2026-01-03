@@ -1,0 +1,50 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Test (gcc)",
+            "type": "shell",
+            "command": "task test:gcc",
+        },
+        {
+            "label": "Test (clang)",
+            "type": "shell",
+            "command": "task test:clang",
+        },
+        {
+            "label": "Test (msvc)",
+            "type": "shell",
+            "command": "task test:msvc",
+        },
+        {
+            "label": "Test (clang-cl)",
+            "type": "shell",
+            "command": "task test:clang-cl",
+        },
+        {
+            "label": "Benchmark (gcc)",
+            "type": "shell",
+            "command": "task bench:gcc",
+        },
+        {
+            "label": "Benchmark (clang)",
+            "type": "shell",
+            "command": "task bench:clang",
+        },
+        {
+            "label": "Benchmark (msvc)",
+            "type": "shell",
+            "command": "task bench:msvc",
+        },
+        {
+            "label": "Benchmark (clang-cl)",
+            "type": "shell",
+            "command": "task bench:all",
+        },
+        {
+            "label": "Generate Documentation",
+            "type": "shell",
+            "command": "task docs",
+        },
+    ]
+}
