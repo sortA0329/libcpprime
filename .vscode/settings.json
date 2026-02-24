@@ -13,13 +13,11 @@
         ".clangd": "yaml",
     },
     "files.exclude": {
-        "build": true,
         "build-*": true,
         ".cache": true,
         ".venv": true
     },
     "search.exclude": {
-        "build": true,
         "build-*": true,
         ".cache": true,
         ".venv": true
@@ -41,7 +39,8 @@
     "cmake.autoSelectActiveFolder": false,
     "github.copilot.enable": {
         "*": true,
-        "*.txt": false,
+        "plaintext": false,
+        "markdown": true,
     },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
