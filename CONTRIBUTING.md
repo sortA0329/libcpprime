@@ -23,6 +23,7 @@ Thanks for your interest in improving `libcpprime`.
 
 - Python >= 3.12
 - `uv`
+- pngquant
 
 Python dependencies are managed by `uv`.
 
