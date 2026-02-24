@@ -5,7 +5,7 @@ tasks:
   # Configure
   # ============================
   configure:gcc:
-    desc: Configure GCC build (Ninja, Release)
+    desc: Configure GCC build
     cmds:
       - cmake -S . -B build-gcc -G "Ninja"
         -DLIBCPPRIME_COMPILER=gcc
@@ -14,7 +14,7 @@ tasks:
       - cp build-gcc/compile_commands.json .
 
   configure:clang:
-    desc: Configure Clang build (Ninja, Release)
+    desc: Configure Clang build
     cmds:
       - cmake -S . -B build-clang -G "Ninja"
         -DLIBCPPRIME_COMPILER=clang
@@ -23,7 +23,7 @@ tasks:
       - cp build-clang/compile_commands.json .
 
   configure:clang-cl:
-    desc: Configure clang-cl build (Ninja, Release)
+    desc: Configure clang-cl build
     cmds:
       - cmake -S . -B build-clang-cl -G "Ninja"
         -DLIBCPPRIME_COMPILER=clang-cl
@@ -156,11 +156,19 @@ tasks:
   # Aggregates
   # ============================
   configure:
+    deps:
+      - configure:gcc
+      - configure:clang
+      - configure:clang-cl
+      - configure:msvc
+    cmd: cp build-clang/compile_commands.json .
+
+  test:
     cmds:
-      - task: configure:gcc
-      - task: configure:clang
-      - task: configure:clang-cl
-      - task: configure:msvc
+      - task: test:gcc
+      - task: test:clang
+      - task: test:clang-cl
+      - task: test:msvc
 
   clean:
     cmds:

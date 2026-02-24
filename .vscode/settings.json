@@ -4,6 +4,44 @@
     "editor.formatOnPaste": false,
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
+    "editor.semanticHighlighting.enabled": true,
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.associations": {
+        ".clang-format": "yaml",
+        ".clangd": "yaml",
+    },
+    "files.exclude": {
+        "build-*": true,
+        ".cache": true,
+        ".venv": true
+    },
+    "search.exclude": {
+        "build-*": true,
+        ".cache": true,
+        ".venv": true
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.env.windows": {
+        "PSExecutionPolicyPreference": "RemoteSigned"
+    },
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "clangd.enable": true,
+    "ruff.enable": true,
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.ignore": [
+        "*"
+    ],
+    "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
+    "cmake.buildBeforeRun": false,
+    "cmake.autoSelectActiveFolder": false,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+    },
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
@@ -20,44 +58,4 @@
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "terminal.integrated.defaultProfile.windows": "PowerShell",
-    "terminal.integrated.env.windows": {
-        "PSExecutionPolicyPreference": "RemoteSigned"
-    },
-    "terminal.integrated.defaultProfile.linux": "bash",
-    "files.eol": "\n",
-    "files.insertFinalNewline": true,
-    "files.trimTrailingWhitespace": true,
-    "files.associations": {
-        ".clang-format": "yaml",
-        ".clangd": "yaml",
-        "**/bundled/*.hpp": "plaintext"
-    },
-    "files.exclude": {
-        "build": true,
-        "build-*": true,
-        ".cache": true,
-        ".venv": true
-    },
-    "search.exclude": {
-        "build": true,
-        "build-*": true,
-        ".cache": true,
-        ".venv": true
-    },
-    "ruff.enable": true,
-    "python.terminal.activateEnvironment": true,
-    "python.analysis.ignore": [
-        "*"
-    ],
-    "cmake.configureOnOpen": false,
-    "cmake.configureOnEdit": false,
-    "cmake.buildBeforeRun": false,
-    "cmake.autoSelectActiveFolder": false,
-    "github.copilot.enable": {
-        "*": true,
-        "*.txt": false,
-    },
-    "liveServer.settings.root": "/site",
-    "liveServer.settings.file": "404.html"
 }

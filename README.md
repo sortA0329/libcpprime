@@ -98,12 +98,11 @@ g++ -I ./libcpprime -O3 Main.cpp
 
 Benchmarks are executed on GitHub Actions.
 
-- Workflow: https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml
-- Latest results: https://rac75116.github.io/libcpprime/benchmarks/latest.json
+Workflow: [bench.yml](https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml)
 
 ### Linux (gcc)
 
-- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.md
+[View Summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.md)
 
 <p>
     <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.webp" width="500px" alt="Linux gcc summary" />
@@ -113,7 +112,7 @@ Benchmarks are executed on GitHub Actions.
 
 ### Linux (clang)
 
-- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.md
+[View summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.md)
 
 <p>
     <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.webp" width="500px" alt="Linux clang summary" />
@@ -123,7 +122,7 @@ Benchmarks are executed on GitHub Actions.
 
 ### Windows (msvc)
 
-- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.md
+[View Summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.md)
 
 <p>
     <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.webp" width="500px" alt="Windows msvc summary" />
@@ -133,7 +132,7 @@ Benchmarks are executed on GitHub Actions.
 
 ### Windows (clang-cl)
 
-- summary.md: https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.md
+[View Summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.md)
 
 <p>
     <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.webp" width="500px" alt="Windows clang-cl summary" />
@@ -144,6 +143,9 @@ Benchmarks are executed on GitHub Actions.
 
 ## Releases
 
+-   2026/02/25 ver 1.3.3
+    - Update copyright year to 2026
+    - Add -O3 -march=native to the compilation flags during benchmarking and testing
 -   2026/01/04 ver 1.3.2
     - Improve performance
 -   2025/12/24 ver 1.3.1
