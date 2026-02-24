@@ -1,5 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/task/task/setup.deb.sh' | sudo -E bash
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     clang \
