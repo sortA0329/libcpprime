@@ -143,6 +143,9 @@ Workflow: [bench.yml](https://github.com/Rac75116/libcpprime/actions/workflows/b
 
 ## Releases
 
+-   2026/02/25 ver 1.3.3
+    - Update copyright year to 2026
+    - Add -O3 -march=native to the compilation flags during benchmarking and testing
 -   2026/01/04 ver 1.3.2
     - Improve performance
 -   2025/12/24 ver 1.3.1

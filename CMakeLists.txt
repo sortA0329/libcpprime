@@ -93,7 +93,6 @@ endif()
 option(LIBCPPRIME_BUILD_EXAMPLES   "Build examples"   ON)
 option(LIBCPPRIME_BUILD_TESTS      "Build tests"      ON)
 option(LIBCPPRIME_BUILD_BENCHMARKS "Build benchmarks" ON)
-option(LIBCPPRIME_WARNINGS         "Enable warnings"  ON)
 
 # ================================
 # Header-only library
@@ -105,6 +104,21 @@ target_include_directories(libcpprime INTERFACE
 )
 
 # ================================
+# Optimization flags
+# ================================
+function(libcpprime_apply_optimization target)
+	if(LIBCPPRIME_MSVC_LIKE)
+		target_compile_options(${target} PRIVATE
+			/Ox /arch:AVX2
+		)
+	elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+		target_compile_options(${target} PRIVATE
+			-O3 -march=native
+		)
+	endif()
+endfunction()
+
+# ================================
 # Examples
 # ================================
 if(LIBCPPRIME_BUILD_EXAMPLES)
@@ -112,12 +126,10 @@ if(LIBCPPRIME_BUILD_EXAMPLES)
 	target_link_libraries(example_basic PRIVATE libcpprime)
 	target_compile_features(example_basic PRIVATE cxx_std_23)
 
-	if(LIBCPPRIME_WARNINGS)
-		if(LIBCPPRIME_MSVC_LIKE)
-			target_compile_options(example_basic PRIVATE /W4 /permissive- /Zc:__cplusplus)
-		else()
-			target_compile_options(example_basic PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
-		endif()
+	if(LIBCPPRIME_MSVC_LIKE)
+		target_compile_options(example_basic PRIVATE /W4 /permissive- /Zc:__cplusplus)
+	else()
+		target_compile_options(example_basic PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
 	endif()
 endif()
 
@@ -141,28 +153,27 @@ if(LIBCPPRIME_BUILD_TESTS)
 		FetchContent_MakeAvailable(googletest)
 
 		function(libcpprime_apply_test_options target)
-			if(LIBCPPRIME_WARNINGS)
-				if(LIBCPPRIME_CLANG_CL)
-					target_compile_options(${target} PRIVATE
-						/W4 /permissive- /Zc:__cplusplus
-						/clang:-fconstexpr-steps=10000000
-					)
-				elseif(MSVC)
-					target_compile_options(${target} PRIVATE
-						/W4 /permissive- /Zc:__cplusplus
-						/constexpr:steps10000000
-					)
-				elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-					target_compile_options(${target} PRIVATE
-						-Wall -Wextra -Wpedantic -Wconversion
-						-fconstexpr-steps=10000000
-					)
-				else()
-					target_compile_options(${target} PRIVATE
-						-Wall -Wextra -Wpedantic -Wconversion
-					)
-				endif()
+			if(LIBCPPRIME_CLANG_CL)
+				target_compile_options(${target} PRIVATE
+					/W4 /permissive- /Zc:__cplusplus
+					/clang:-fconstexpr-steps=10000000
+				)
+			elseif(MSVC)
+				target_compile_options(${target} PRIVATE
+					/W4 /permissive- /Zc:__cplusplus
+					/constexpr:steps10000000
+				)
+			elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+				target_compile_options(${target} PRIVATE
+					-Wall -Wextra -Wpedantic -Wconversion
+					-fconstexpr-steps=10000000
+				)
+			else()
+				target_compile_options(${target} PRIVATE
+				-Wall -Wextra -Wpedantic -Wconversion
+				)
 			endif()
+			libcpprime_apply_optimization(${target})
 		endfunction()
 
 		function(libcpprime_add_isprime_test target cxx_standard)
@@ -206,13 +217,13 @@ if(LIBCPPRIME_BUILD_BENCHMARKS)
 
 	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench::nanobench)
 
-	if(LIBCPPRIME_WARNINGS)
-		if(LIBCPPRIME_MSVC_LIKE)
-			target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)
-		else()
-			target_compile_options(benchmark_isprime PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
-		endif()
+	if(LIBCPPRIME_MSVC_LIKE)
+		target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)
+	else()
+		target_compile_options(benchmark_isprime PRIVATE -Wall -Wextra -Wpedantic -Wconversion)
 	endif()
+
+	libcpprime_apply_optimization(benchmark_isprime)
 endif()
 
 # ================================
