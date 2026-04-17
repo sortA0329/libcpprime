@@ -123,28 +123,56 @@ int main(int argc, char** argv) {
     std::ofstream f_summary("benchmarks/bench_summary.csv", std::ios::trunc);
     std::ofstream f_summary_md("benchmarks/bench_summary.md", std::ios::trunc);
     f_summary << "avg_time_prime_IsPrime,avg_time_prime_IsPrimeNoTable,avg_time_composite_IsPrime,avg_time_composite_IsPrimeNoTable\n";
-    f_summary_md << "| Bit Width | IsPrime Avg Time (ns, prime) | IsPrimeNoTable Avg Time (ns, prime) | IsPrime Avg Time (ns, composite) | IsPrimeNoTable Avg Time (ns, composite) |\n";
-    f_summary_md << "|-----------|------------------------------|-------------------------------------|----------------------------------|-----------------------------------------|\n";
     f_summary << std::fixed << std::setprecision(6);
     f_summary_md << std::fixed << std::setprecision(2);
-    for (std::int32_t i = 1; i <= 64; ++i) {
-        auto print_result = [](std::ofstream& f, double val, std::int32_t count) -> std::ofstream& {
-            if (count) {
-                f << (val / count);
-            } else {
-                f << "nan";
+    auto print_result = [](std::ofstream& f, double val, std::int32_t count) -> std::ofstream& {
+        if (count) {
+            f << (val / count);
+        } else {
+            f << "nan";
+        }
+        return f;
+    };
+    auto average_or_nan = [](double sum, std::int32_t count) -> double {
+        if (count) {
+            return sum / count;
+        }
+        return std::numeric_limits<double>::quiet_NaN();
+    };
+    auto range_average = [&](std::int32_t begin, std::int32_t end, const double* sums, const std::int32_t* counts) -> double {
+        double total = 0.0;
+        std::int32_t used = 0;
+        for (std::int32_t i = begin; i <= end; ++i) {
+            double avg = average_or_nan(sums[i], counts[i]);
+            if (avg == avg) {
+                total += avg;
+                ++used;
             }
-            return f;
-        };
+        }
+        return used ? (total / used) : std::numeric_limits<double>::quiet_NaN();
+    };
+    for (std::int32_t i = 1; i <= 64; ++i) {
         print_result(f_summary, time_prime_sum[i], count_prime[i]) << ",";
         print_result(f_summary, time_prime_sum_NoTable[i], count_prime_NoTable[i]) << ",";
         print_result(f_summary, time_composite_sum[i], count_composite[i]) << ",";
         print_result(f_summary, time_composite_sum_NoTable[i], count_composite_NoTable[i]) << "\n";
-        f_summary_md << "| " << i << " | ";
-        print_result(f_summary_md, time_prime_sum[i], count_prime[i]) << " | ";
-        print_result(f_summary_md, time_prime_sum_NoTable[i], count_prime_NoTable[i]) << " | ";
-        print_result(f_summary_md, time_composite_sum[i], count_composite[i]) << " | ";
-        print_result(f_summary_md, time_composite_sum_NoTable[i], count_composite_NoTable[i]) << " |\n";
+    }
+    f_summary_md << "# Benchmark Summary\n\n";
+    f_summary_md << "## Overall summary\n\n";
+    f_summary_md << "- IsPrime averages " << range_average(1, 64, time_prime_sum, count_prime) << " ns on prime inputs and " << range_average(1, 64, time_composite_sum, count_composite)
+                 << " ns on composite inputs.\n";
+    f_summary_md << "- IsPrimeNoTable averages " << range_average(1, 64, time_prime_sum_NoTable, count_prime_NoTable) << " ns on prime inputs and "
+                 << range_average(1, 64, time_composite_sum_NoTable, count_composite_NoTable) << " ns on composite inputs.\n\n";
+    f_summary_md << "## Averages by 8-bit range\n\n";
+    f_summary_md << "| Bit range | IsPrime Avg Time (ns, prime) | IsPrimeNoTable Avg Time (ns, prime) | IsPrime Avg Time (ns, composite) | IsPrimeNoTable Avg Time (ns, composite) |\n";
+    f_summary_md << "|-----------|------------------------------|-------------------------------------|----------------------------------|-----------------------------------------|\n";
+    for (std::int32_t begin = 1; begin <= 64; begin += 8) {
+        std::int32_t end = begin + 7;
+        f_summary_md << "| " << begin << "-" << end << " | ";
+        f_summary_md << range_average(begin, end, time_prime_sum, count_prime) << " | ";
+        f_summary_md << range_average(begin, end, time_prime_sum_NoTable, count_prime_NoTable) << " | ";
+        f_summary_md << range_average(begin, end, time_composite_sum, count_composite) << " | ";
+        f_summary_md << range_average(begin, end, time_composite_sum_NoTable, count_composite_NoTable) << " |\n";
     }
     f_summary << std::flush;
     f_summary_md << std::flush;
