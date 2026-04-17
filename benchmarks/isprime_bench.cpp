@@ -14,6 +14,7 @@
 #include <limits>
 #include <string>
 #include <tuple>
+#include <utility>
 
 int main(int argc, char** argv) {
     bool heavy = (argc > 1 && std::string(argv[1]) == "--heavy");
@@ -166,8 +167,12 @@ int main(int argc, char** argv) {
     f_summary_md << "## Averages by 8-bit range\n\n";
     f_summary_md << "| Bit range | IsPrime Avg Time (ns, prime) | IsPrimeNoTable Avg Time (ns, prime) | IsPrime Avg Time (ns, composite) | IsPrimeNoTable Avg Time (ns, composite) |\n";
     f_summary_md << "|-----------|------------------------------|-------------------------------------|----------------------------------|-----------------------------------------|\n";
-    for (std::int32_t begin = 1; begin <= 64; begin += 8) {
-        std::int32_t end = begin + 7;
+    const std::pair<std::int32_t, std::int32_t> ranges[] = {
+        {1, 8}, {9, 16}, {17, 24}, {25, 32}, {33, 40}, {41, 48}, {49, 56}, {57, 62}, {63, 64},
+    };
+    for (std::size_t idx = 0; idx < sizeof(ranges) / sizeof(ranges[0]); ++idx) {
+        const std::int32_t begin = ranges[idx].first;
+        const std::int32_t end = ranges[idx].second;
         f_summary_md << "| " << begin << "-" << end << " | ";
         f_summary_md << range_average(begin, end, time_prime_sum, count_prime) << " | ";
         f_summary_md << range_average(begin, end, time_prime_sum_NoTable, count_prime_NoTable) << " | ";
