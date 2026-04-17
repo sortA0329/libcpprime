@@ -1,8 +1,8 @@
 /**
  *
- * libcpprime https://github.com/Rac75116/libcpprime
+ * libcpprime https://github.com/sortA0329/libcpprime
  *
- * Copyright (c) 2026 Rac75116
+ * Copyright (c) 2026 sortA
  * SPDX-License-Identifier: MIT
  *
  **/
