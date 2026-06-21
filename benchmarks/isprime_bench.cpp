@@ -43,8 +43,6 @@ int main(int argc, char** argv) {
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    const char* out_prime = "benchmarks/bench_IsPrime.csv";
-    const char* out_notable = "benchmarks/bench_IsPrimeNoTable.csv";
     const int samples = heavy ? 64000 : 32000;
 
     static std::uint32_t weighted[89440];
@@ -54,7 +52,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    auto bench = [rng = std::mt19937_64(100), uniform = std::uniform_int_distribution(0, 89439), heavy](bool (*func)(std::uint64_t)) mutable {
+    auto bench = [heavy](std::mt19937_64& rng, std::uniform_int_distribution<>& uniform, bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[uniform(rng)];
         std::uint64_t n = (rng() >> k) | 1;
         int iters = (heavy ? 300 : 250);
@@ -77,16 +75,6 @@ int main(int argc, char** argv) {
     // Fast I/O settings
     std::ios::sync_with_stdio(false);
 
-    // Write headers
-    {
-        std::ofstream f(out_prime, std::ios::binary);
-        f << "n,is_prime,time_ns\n";
-    }
-    {
-        std::ofstream f(out_notable, std::ios::binary);
-        f << "n,is_prime,time_ns\n";
-    }
-
     double time_prime_sum[65] = {};
     std::int32_t count_prime[65] = {};
     double time_composite_sum[65] = {};
@@ -98,11 +86,14 @@ int main(int argc, char** argv) {
 
     // Emit results for cppr::IsPrime
     {
-        for (std::uint32_t i = 0; i < 4096; ++i) bench(&cppr::IsPrime);  // warmup
-        std::ofstream f(out_prime, std::ios::binary | std::ios::app);
+        std::mt19937_64 rng(100);
+        std::uniform_int_distribution<> uniform(0, 89439);
+        for (std::uint32_t i = 0; i < 4096; ++i) bench(rng, uniform, &cppr::IsPrime);  // warmup
+        std::ofstream f("benchmarks/bench_IsPrime.csv", std::ios::trunc);
+        f << "n,is_prime,time_ns\n";
         f.setf(std::ios::fmtflags(0), std::ios::floatfield);  // default
         for (int i = 0; i < samples; ++i) {
-            auto [n, isp, t] = bench(&cppr::IsPrime);
+            auto [n, isp, t] = bench(rng, uniform, &cppr::IsPrime);
             char buf[96];
             int len = std::snprintf(buf, sizeof(buf), "%llu,%d,%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
@@ -115,15 +106,18 @@ int main(int argc, char** argv) {
                 count_composite[bitlen] += 1;
             }
         }
-    }
+    };
 
     // Emit results for cppr::IsPrimeNoTable
     {
-        for (std::uint32_t i = 0; i < 512; ++i) bench(&cppr::IsPrimeNoTable);  // warmup
-        std::ofstream f(out_notable, std::ios::binary | std::ios::app);
+        std::mt19937_64 rng(100);
+        std::uniform_int_distribution<> uniform(0, 89439);
+        for (std::uint32_t i = 0; i < 512; ++i) bench(rng, uniform, &cppr::IsPrimeNoTable);  // warmup
+        std::ofstream f("benchmarks/bench_IsPrimeNoTable.csv", std::ios::trunc);
+        f << "n,is_prime,time_ns\n";
         f.setf(std::ios::fmtflags(0), std::ios::floatfield);  // default
         for (int i = 0; i < samples; ++i) {
-            auto [n, isp, t] = bench(&cppr::IsPrimeNoTable);
+            auto [n, isp, t] = bench(rng, uniform, &cppr::IsPrimeNoTable);
             char buf[96];
             int len = std::snprintf(buf, sizeof(buf), "%llu,%d,%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
@@ -136,7 +130,7 @@ int main(int argc, char** argv) {
                 count_composite_NoTable[bitlen] += 1;
             }
         }
-    }
+    };
 
     // Output summary
     std::ofstream summary("benchmarks/bench_summary.csv", std::ios::trunc);
