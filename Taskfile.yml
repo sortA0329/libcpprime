@@ -30,7 +30,7 @@ tasks:
         -DCMAKE_BUILD_TYPE=Release
 
   configure:msvc:
-    desc: Configure MSVC build (Visual Studio 17 2022)
+    desc: Configure MSVC build
     cmds:
       - cmake -S . -B build-msvc
         -G "Visual Studio 17 2022"
