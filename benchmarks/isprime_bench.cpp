@@ -12,6 +12,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 
@@ -55,7 +56,7 @@ int main(int argc, char** argv) {
     auto bench = [heavy](std::mt19937_64& rng, std::uniform_int_distribution<>& uniform, bool (*func)(std::uint64_t)) mutable {
         std::uint32_t k = weighted[uniform(rng)];
         std::uint64_t n = (rng() >> k) | 1;
-        int iters = (heavy ? 300 : 250);
+        int iters = (heavy ? 300 : 100);
         bool is_prime = func(n);
         auto min_time = std::numeric_limits<double>::max();
         for (int trial = 0; trial < (heavy ? 24 : 16); ++trial) {
@@ -85,7 +86,7 @@ int main(int argc, char** argv) {
     std::int32_t count_composite_NoTable[65] = {};
 
     // Emit results for cppr::IsPrime
-    {
+    auto bench_IsPrime = [&] {
         std::mt19937_64 rng(100);
         std::uniform_int_distribution<> uniform(0, 89439);
         for (std::uint32_t i = 0; i < 4096; ++i) bench(rng, uniform, &cppr::IsPrime);  // warmup
@@ -109,7 +110,7 @@ int main(int argc, char** argv) {
     };
 
     // Emit results for cppr::IsPrimeNoTable
-    {
+    auto bench_IsPrimeNoTable = [&] {
         std::mt19937_64 rng(100);
         std::uniform_int_distribution<> uniform(0, 89439);
         for (std::uint32_t i = 0; i < 512; ++i) bench(rng, uniform, &cppr::IsPrimeNoTable);  // warmup
@@ -131,6 +132,16 @@ int main(int argc, char** argv) {
             }
         }
     };
+
+    if (heavy) {
+        bench_IsPrime();
+        bench_IsPrimeNoTable();
+    } else {
+        auto th1 = std::thread(bench_IsPrime);
+        auto th2 = std::thread(bench_IsPrimeNoTable);
+        th1.join();
+        th2.join();
+    }
 
     // Output summary
     std::ofstream summary("benchmarks/bench_summary.csv", std::ios::trunc);
