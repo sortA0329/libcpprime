@@ -149,7 +149,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
 }  // namespace internal
 
 CPPR_INTERNAL_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
-    if (n < 131072) {
+    if (n < 131072) [[likely]] {
         return internal::IsPrime17(n);
     } else if (n <= 0xffffffff) {
         if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;

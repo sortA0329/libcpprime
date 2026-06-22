@@ -302,12 +302,15 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
     std::uint64_t k = (x + 1) << CountlZero(x + 1);
     D = mint.raw(D);
     std::uint64_t t = (x >> 1) + 1;
-    for (k <<= 1; k; k <<= 1) {
+    k <<= 1;
+    while (k) {
         std::uint64_t Qt = mint.add(Qn, Qn);
         Qn = mint.mul(Qn, Qn);
         u = mint.mul(u, v);
         v = mint.sub(mint.mul(v, v), Qt);
-        if (k >> 63) {
+        std::uint64_t tmp = k;
+        k <<= 1;
+        if (tmp >> 63) {
             Qn = mint.mul(Qn, Q);
             std::uint64_t uu = u;
             u = mint.add(u, v);
@@ -330,7 +333,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
 }  // namespace internal
 
 CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
-    if (n < 1024) {
+    if (n < 1024) [[likely]] {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
         if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;
