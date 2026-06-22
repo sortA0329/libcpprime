@@ -88,6 +88,15 @@
 
 #ifdef __has_attribute
 #if __has_attribute(always_inline)
+#define CPPR_INTERNAL_INLINE_LAMBDA __attribute__((always_inline))
+#endif
+#endif
+#ifndef CPPR_INTERNAL_INLINE_LAMBDA
+#define CPPR_INTERNAL_INLINE_LAMBDA
+#endif
+
+#ifdef __has_attribute
+#if __has_attribute(always_inline)
 #define CPPR_INTERNAL_CONSTEXPR_INLINE CPPR_INTERNAL_CONSTEXPR __attribute__((always_inline))
 #endif
 #endif

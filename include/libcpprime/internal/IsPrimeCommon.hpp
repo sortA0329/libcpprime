@@ -183,7 +183,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
     d >>= s;
     if (x < (1u << 21)) {
         std::uint64_t m = 0xffffffffffffffff / x + 1;
-        auto mul = [m, x](std::uint32_t a, std::uint32_t b) -> std::uint32_t { return static_cast<std::uint32_t>(Mulu128High(static_cast<std::uint64_t>(a) * b * m, x)); };
+        auto mul = [m, x](std::uint32_t a, std::uint32_t b) CPPR_INTERNAL_INLINE_LAMBDA -> std::uint32_t { return static_cast<std::uint32_t>(Mulu128High(static_cast<std::uint64_t>(a) * b * m, x)); };
         std::uint32_t cur = pw;
         if (d != 1) {
             pw = mul(pw, pw);

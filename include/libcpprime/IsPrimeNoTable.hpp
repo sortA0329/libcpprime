@@ -26,7 +26,7 @@ constexpr std::uint32_t FlagTable10[32] = {
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE bool GCDFilter(const std::uint32_t n) noexcept {
-    auto GCD = [](std::uint32_t x, std::uint32_t y) -> std::uint32_t {
+    auto GCD = [](std::uint32_t x, std::uint32_t y) CPPR_INTERNAL_INLINE_LAMBDA -> std::uint32_t {
         // Binary GCD (Stein's algorithm). Assumes y != 0 when x != 0.
         if (x == 0) return 0;
         Assume(y != 0);
@@ -194,7 +194,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
         }
         return true;
     };
-    auto test4 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3, std::uint64_t base4) -> bool {
+    auto test4 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3, std::uint64_t base4) CPPR_INTERNAL_INLINE_LAMBDA -> bool {
         // Four-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
@@ -267,7 +267,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
     const MontgomeryModint64Impl<true> mint(x);
     const auto one = mint.one();
     const auto mone = mint.neg(one);
-    auto miller_rabin_test = [&]() -> bool {
+    auto miller_rabin_test = [&]() CPPR_INTERNAL_INLINE_LAMBDA -> bool {
         // Baillie-PSW starts with a base-2 Miller-Rabin test.
         const std::int32_t S = CountrZero(x - 1);
         const std::uint64_t D = (x - 1) >> S;
