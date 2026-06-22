@@ -19,7 +19,10 @@
 #if defined(_MSC_VER)
 
 template <typename T>
-void doNotOptimizeAway(T const& val);
+void doNotOptimizeAway(T const& val) {
+    volatile T sink = val;
+    (void)sink;
+}
 
 #else
 
