@@ -153,6 +153,13 @@ tasks:
       - uv run mkdocs serve
 
   # ============================
+  # Bundle
+  # ============================
+  bundle:
+    desc: Bundle public headers by expanding all local includes
+    cmd: uv run python scripts/bundle_headers.py
+
+  # ============================
   # Aggregates
   # ============================
   configure:
