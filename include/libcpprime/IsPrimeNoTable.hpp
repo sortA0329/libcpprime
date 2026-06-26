@@ -120,7 +120,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
     const auto mone = mint.neg(one);
-    auto test2 = [=](std::uint64_t base1, std::uint64_t base2) -> bool {
+    auto test2 = [=](std::uint64_t base1, std::uint64_t base2) CPPR_INTERNAL_INLINE_LAMBDA -> bool {
         // Two-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
@@ -153,7 +153,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
         }
         return true;
     };
-    auto test3 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3) -> bool {
+    auto test3 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3) CPPR_INTERNAL_INLINE_LAMBDA -> bool {
         // Three-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;

@@ -176,7 +176,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool TrialDivision32(const std::uint32_t n) noexc
 constexpr std::uint16_t Bases32[256] = {
 #include "IsPrimeBases32.txt"
 };
-CPPR_INTERNAL_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime32(const std::uint32_t x) noexcept {
     const std::uint32_t h = x * 0xad625b89;
     std::uint32_t d = x - 1;
     std::uint32_t pw = static_cast<std::uint32_t>(Bases32[h >> 24]);
