@@ -10,7 +10,7 @@
  *
  * The algorithm in this library is based on Bradley Berg's method.
  * See this page for more information:
- *https://www.techneon.com/download/is.prime.64.base.data
+ * https://www.techneon.com/download/is.prime.64.base.data
  *
  * Copyright 2018 Bradley Berg   < (My last name) @ t e c h n e o n . c o m >
  *
@@ -30,6 +30,7 @@
 
 #include <cstdint>
 
+#include "internal/Environment.hpp"
 #include "internal/IsPrimeCommon.hpp"
 #include "internal/Utils.hpp"
 

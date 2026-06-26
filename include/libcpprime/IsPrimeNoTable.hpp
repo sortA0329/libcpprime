@@ -12,6 +12,7 @@
 
 #include <cstdint>
 
+#include "internal/Environment.hpp"
 #include "internal/IsPrimeCommon.hpp"
 #include "internal/Utils.hpp"
 

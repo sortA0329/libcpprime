@@ -10,7 +10,7 @@
 #ifndef CPPR_INTERNAL_INCLUDED_FEATURE_TEST_MACROS
 #define CPPR_INTERNAL_INCLUDED_FEATURE_TEST_MACROS
 
-#include "internal/Utils.hpp"
+#include "internal/Environment.hpp"
 
 #ifdef CPPR_INTERNAL_CONSTEXPR_ENABLED
 #define CPPR_HAS_CONSTEXPR_IS_PRIME 1
