@@ -334,7 +334,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
 }  // namespace internal
 
 CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
-    if (n < 1024) [[likely]] {
+    if (n < 1024) {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
         if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;

@@ -33,7 +33,6 @@ tasks:
     desc: Configure MSVC build
     cmds:
       - cmake -S . -B build-msvc
-        -G "Visual Studio 17 2022"
         -DLIBCPPRIME_COMPILER=msvc
 
   # ============================
