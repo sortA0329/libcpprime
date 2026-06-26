@@ -37,16 +37,16 @@ jobs:
             cc: clang
             cxx: clang++
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: |
           sudo apt-get update -y
           sudo apt-get install -y ninja-build ccache
       - name: Install Task
-        uses: go-task/setup-task@v1
+        uses: go-task/setup-task@v2
         with:
           version: 3.x
       - name: Cache build dir (${{ matrix.compiler }})
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ matrix.build_dir }}
           key: ${{ runner.os }}-${{ matrix.compiler }}-build-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
@@ -70,7 +70,7 @@ jobs:
           - compiler: clang-cl
             build_dir: build-clang-cl
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install LLVM + Ninja (clang-cl)
         if: matrix.compiler == 'clang-cl'
@@ -78,7 +78,7 @@ jobs:
         run: |
           choco install llvm ninja -y --no-progress
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ${{ matrix.build_dir }}
           key: ${{ runner.os }}-${{ matrix.compiler }}-build-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
@@ -86,7 +86,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.compiler }}-build-
 
       - name: Install Task
-        uses: go-task/setup-task@v1
+        uses: go-task/setup-task@v2
         with:
           version: 3.x
 
