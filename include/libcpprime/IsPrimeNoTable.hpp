@@ -119,7 +119,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     auto test2 = [=](std::uint64_t base1, std::uint64_t base2) CPPR_INTERNAL_INLINE_LAMBDA -> bool {
         // Two-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
@@ -267,7 +267,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<true> mint(x);
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     auto miller_rabin_test = [&]() CPPR_INTERNAL_INLINE_LAMBDA -> bool {
         // Baillie-PSW starts with a base-2 Miller-Rabin test.
         const std::int32_t S = CountrZero(x - 1);

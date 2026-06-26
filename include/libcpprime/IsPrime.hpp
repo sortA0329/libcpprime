@@ -54,7 +54,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime49(const std::uint64_t x) noexcept {
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     auto c = mint.raw(2);
     auto d = mint.raw(GetBase(x));
     auto a = c;
@@ -97,7 +97,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     const std::uint32_t base = GetBase(x);
     // Third base is packed as a small lookup indexed by the high bits of `base`.
     const std::uint64_t base_mask = static_cast<std::uint64_t>(15ull | (135ull << 8) | (13ull << 16) | (60ull << 24) | (15ull << 32) | (117ull << 40) | (65ull << 48) | (29ull << 56));

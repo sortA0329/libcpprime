@@ -109,13 +109,13 @@ class MontgomeryModint64Impl {
             return np;
         }
     }
-    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t neg(std::uint64_t x) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t mone() const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
-            Assume(x < mod_);
-            return (mod_ - x) * (x != 0);
+            Assume(np != 0 && np < mod_);
+            return mod_ - np;
         } else {
-            Assume(x < 2 * mod_);
-            return (2 * mod_ - x) * (x != 0);
+            Assume(np != 0 && np < 2 * mod_);
+            return 2 * mod_ - np;
         }
     }
     CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t mul(std::uint64_t x, std::uint64_t y) const noexcept {
