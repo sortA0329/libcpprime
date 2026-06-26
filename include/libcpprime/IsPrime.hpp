@@ -157,9 +157,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
         // Cheap small-prime screening before the heavier probable-prime tests.
-        if (internal::TrialDivision64(n)) {
-            return false;
-        }
+        if (internal::TrialDivision64(n)) return false;
         if (n < (std::uint64_t(1) << 49)) {
             return internal::IsPrime49(n);
         } else if (n < (std::uint64_t(1) << 62)) {

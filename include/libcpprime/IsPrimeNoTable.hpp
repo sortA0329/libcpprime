@@ -338,14 +338,10 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
         if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;
-        if (n < 39601) {
-            return internal::GCDFilter(static_cast<std::uint32_t>(n));
-        }
+        if (n < 39601) return internal::GCDFilter(static_cast<std::uint32_t>(n));
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
-        if (internal::TrialDivision64(n)) {
-            return false;
-        }
+        if (internal::TrialDivision64(n)) return false;
         if (n < (std::uint64_t(1) << 62)) {
             return internal::IsPrime64MillerRabin(n);
         } else {
