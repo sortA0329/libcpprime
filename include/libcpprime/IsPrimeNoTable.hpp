@@ -263,8 +263,8 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
             Qn = mint.mul(Qn, Q);
             std::uint64_t uu = u;
             u = mint.add(u, v);
-            u = (u >> 1) + ((u & 1) ? t : 0);
             v = mint.add(mint.mul(D, uu), v);
+            u = (u >> 1) + ((u & 1) ? t : 0);
             v = (v >> 1) + ((v & 1) ? t : 0);
         }
     }
