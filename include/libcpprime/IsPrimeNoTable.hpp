@@ -345,17 +345,17 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
         if (internal::TrialDivision64(n)) return false;
-#ifndef _MSC_VER
-        if (n < 7999252175582851ull) {
+#if defined(_MSC_VER) && !defined(__clang__)
+        if (n < (std::uint64_t(1) << 62)) {
             return internal::IsPrime64MillerRabin(n);
-        } else if (n < (std::uint64_t(1) << 62)) {
-            return internal::IsPrime64BailliePSW<false>(n);
         } else {
             return internal::IsPrime64BailliePSW<true>(n);
         }
 #else
-        if (n < (std::uint64_t(1) << 62)) {
+        if (n < 7999252175582851ull) {
             return internal::IsPrime64MillerRabin(n);
+        } else if (n < (std::uint64_t(1) << 62)) {
+            return internal::IsPrime64BailliePSW<false>(n);
         } else {
             return internal::IsPrime64BailliePSW<true>(n);
         }
