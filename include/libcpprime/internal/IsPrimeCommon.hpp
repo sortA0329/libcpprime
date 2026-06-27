@@ -69,7 +69,7 @@ class MontgomeryModint64Impl {
     }
 
    public:
-    CPPR_INTERNAL_CONSTEXPR MontgomeryModint64Impl(std::uint64_t n) noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE MontgomeryModint64Impl(std::uint64_t n) noexcept {
         // Precondition: n is an odd modulus > 2.
         // Internals:
         // - rs: R^2 mod n (with R = 2^64) for Montgomery domain conversion
