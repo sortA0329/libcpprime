@@ -1,0 +1,54 @@
+{
+    "format_on_save": "on",
+    "formatter": "language_server",
+    "tab_size": 4,
+    "hard_tabs": false,
+    "ensure_final_newline_on_save": true,
+    "remove_trailing_whitespace_on_save": true,
+    "file_types": {
+        "YAML": [
+            ".clang-format",
+            ".clangd"
+        ],
+    },
+    "file_scan_exclusions": [
+        "**/.git",
+        "**/.DS_Store",
+        "build-*",
+        ".cache",
+        ".venv"
+    ],
+    "lsp": {
+        "clangd": {
+            "binary": {
+                "path": "clangd",
+            },
+        },
+    },
+    "languages": {
+        "YAML": {
+            "tab_size": 2,
+        },
+        "C++": {
+            "language_servers": [
+                "clangd"
+            ],
+            "formatter": {
+                "language_server": {
+                    "name": "clangd",
+                },
+            },
+        },
+        "Python": {
+            "language_servers": [
+                "basedpyright",
+                "ruff"
+            ],
+            "formatter": {
+                "language_server": {
+                    "name": "ruff",
+                },
+            },
+        },
+    },
+}
