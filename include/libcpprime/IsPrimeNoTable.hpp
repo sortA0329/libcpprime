@@ -195,72 +195,17 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
         }
         return true;
     };
-    auto test4 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3, std::uint64_t base4) -> bool {
-        // Four-base Miller-Rabin using Montgomery arithmetic.
-        auto a = one;
-        auto b = one;
-        auto c = one;
-        auto d = one;
-        auto e = mint.build(base1);
-        auto f = mint.build(base2);
-        auto g = mint.build(base3);
-        auto h = mint.build(base4);
-        std::uint64_t ex = D;
-        while (ex != 1) {
-            auto i = mint.mul(e, e);
-            auto j = mint.mul(f, f);
-            auto k = mint.mul(g, g);
-            auto l = mint.mul(h, h);
-            if (ex & 1) {
-                a = mint.mul(a, e);
-                b = mint.mul(b, f);
-                c = mint.mul(c, g);
-                d = mint.mul(d, h);
-            }
-            e = i;
-            f = j;
-            g = k;
-            h = l;
-            ex >>= 1;
-        }
-        a = mint.mul(a, e);
-        b = mint.mul(b, f);
-        c = mint.mul(c, g);
-        d = mint.mul(d, h);
-        bool res1 = mint.same(a, one) || mint.same(a, mone);
-        bool res2 = mint.same(b, one) || mint.same(b, mone);
-        bool res3 = mint.same(c, one) || mint.same(c, mone);
-        bool res4 = mint.same(d, one) || mint.same(d, mone);
-        if (!(res1 && res2 && res3 && res4)) {
-            for (std::int32_t i = 0; i != S - 1; ++i) {
-                a = mint.mul(a, a);
-                b = mint.mul(b, b);
-                c = mint.mul(c, c);
-                d = mint.mul(d, d);
-                res1 |= mint.same(a, mone);
-                res2 |= mint.same(b, mone);
-                res3 |= mint.same(c, mone);
-                res4 |= mint.same(d, mone);
-            }
-            if (!res1 || !res2 || !res3 || !res4) return false;
-        }
-        return true;
-    };
     // These bases were discovered by Steve Worley and Jim Sinclair.
-    if (x < 585226005592931977ull) {
-        if (x < 7999252175582851ull) {
-            if (x < 350269456337ull) {
-                return test3(4230279247111683200ull, 14694767155120705706ull, 16641139526367750375ull);
-            } else if (x < 55245642489451ull) {
-                return test2(2ull, 141889084524735ull) && test2(1199124725622454117ull, 11096072698276303650ull);
-            } else {
-                return test2(2ull, 4130806001517ull) && test3(149795463772692060ull, 186635894390467037ull, 3967304179347715805ull);
-            }
+    if (x < 7999252175582851ull) {
+        if (x < 350269456337ull) {
+            return test3(4230279247111683200ull, 14694767155120705706ull, 16641139526367750375ull);
+        } else if (x < 55245642489451ull) {
+            return test2(2ull, 141889084524735ull) && test2(1199124725622454117ull, 11096072698276303650ull);
         } else {
-            return test3(2ull, 123635709730000ull, 9233062284813009ull) && test3(43835965440333360ull, 761179012939631437ull, 1263739024124850375ull);
+            return test2(2ull, 4130806001517ull) && test3(149795463772692060ull, 186635894390467037ull, 3967304179347715805ull);
         }
     } else {
-        return test3(2ull, 325ull, 9375ull) && test4(28178ull, 450775ull, 9780504ull, 1795265022ull);
+        return test3(2ull, 123635709730000ull, 9233062284813009ull) && test3(43835965440333360ull, 761179012939631437ull, 1263739024124850375ull);
     }
 }
 
@@ -346,7 +291,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
     } else {
         if (internal::TrialDivision64(n)) return false;
 #if defined(_MSC_VER) && !defined(__clang__)
-        if (n < (std::uint64_t(1) << 62)) {
+        if (n < 585226005592931977ull) {
             return internal::IsPrime64MillerRabin(n);
         } else {
             return internal::IsPrime64BailliePSW<true>(n);
