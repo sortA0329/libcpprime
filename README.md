@@ -143,6 +143,11 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 
 ## Releases
 
+-   2026/06/28 ver 1.3.4
+    - Improve performance
+    - Prevent unnecessary code from being included when `FeatureTestMacros.hpp` is included
+    - Fix the name and link in the copyright notice
+    - Add the copyright notice for Bradley Berg's algorithm to the LICENSE file
 -   2026/02/25 ver 1.3.3
     - Update copyright year to 2026
     - Add -O3 -march=native to the compilation flags during benchmarking and testing
