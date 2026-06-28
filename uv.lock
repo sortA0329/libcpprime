@@ -327,7 +327,6 @@ dependencies = [
     { name = "mkdocs-material", extra = ["imaging"] },
     { name = "mkdocs-minify-plugin" },
     { name = "numpy" },
-    { name = "pillow" },
     { name = "pymdown-extensions" },
 ]
 
@@ -338,7 +337,6 @@ requires-dist = [
     { name = "mkdocs-material", extras = ["imaging"], specifier = ">=9.7.1" },
     { name = "mkdocs-minify-plugin", specifier = ">=0.8.0" },
     { name = "numpy", specifier = ">=2.3.4" },
-    { name = "pillow", specifier = ">=11.3.0" },
     { name = "pymdown-extensions", specifier = ">=10.19.1" },
 ]
 

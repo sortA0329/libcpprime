@@ -1,8 +1,8 @@
 /**
  *
- * libcpprime https://github.com/Rac75116/libcpprime
+ * libcpprime https://github.com/sortA0329/libcpprime
  *
- * Copyright (c) 2026 Rac75116
+ * Copyright (c) 2026 sortA
  * SPDX-License-Identifier: MIT
  *
  **/
@@ -10,7 +10,7 @@
  *
  * The algorithm in this library is based on Bradley Berg's method.
  * See this page for more information:
- *https://www.techneon.com/download/is.prime.64.base.data
+ * https://www.techneon.com/download/is.prime.64.base.data
  *
  * Copyright 2018 Bradley Berg   < (My last name) @ t e c h n e o n . c o m >
  *
@@ -30,6 +30,7 @@
 
 #include <cstdint>
 
+#include "internal/Environment.hpp"
 #include "internal/IsPrimeCommon.hpp"
 #include "internal/Utils.hpp"
 
@@ -53,7 +54,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime49(const std::uint64_t x) noexcept {
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     auto c = mint.raw(2);
     auto d = mint.raw(GetBase(x));
     auto a = c;
@@ -96,7 +97,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     const std::uint32_t base = GetBase(x);
     // Third base is packed as a small lookup indexed by the high bits of `base`.
     const std::uint64_t base_mask = static_cast<std::uint64_t>(15ull | (135ull << 8) | (13ull << 16) | (60ull << 24) | (15ull << 32) | (117ull << 40) | (65ull << 48) | (29ull << 56));
@@ -156,9 +157,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime(std::uint64_t n) noexcept {
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
         // Cheap small-prime screening before the heavier probable-prime tests.
-        if (internal::TrialDivision64(n)) {
-            return false;
-        }
+        if (internal::TrialDivision64(n)) return false;
         if (n < (std::uint64_t(1) << 49)) {
             return internal::IsPrime49(n);
         } else if (n < (std::uint64_t(1) << 62)) {

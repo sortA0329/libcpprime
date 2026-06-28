@@ -1,6 +1,6 @@
 # libcpprime
 
-![badge](https://github.com/Rac75116/libcpprime/actions/workflows/tests.yml/badge.svg)
+![badge](https://github.com/sortA0329/libcpprime/actions/workflows/tests.yml/badge.svg)
 
 **libcpprime** is an efficient C++ implementation of a primality test optimized for 64-bit integers.
 
@@ -98,51 +98,56 @@ g++ -I ./libcpprime -O3 Main.cpp
 
 Benchmarks are executed on GitHub Actions.
 
-Workflow: [bench.yml](https://github.com/Rac75116/libcpprime/actions/workflows/bench.yml)
+Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/bench.yml)
 
 ### Linux (gcc)
 
-[View Summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.md)
+[View Summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.md)
 
 <p>
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.webp" width="500px" alt="Linux gcc summary" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrime.webp" width="500px" alt="Linux gcc IsPrime" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.webp" width="500px" alt="Linux gcc IsPrimeNoTable" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.webp" width="500px" alt="Linux gcc summary" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrime.webp" width="500px" alt="Linux gcc IsPrime" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.webp" width="500px" alt="Linux gcc IsPrimeNoTable" />
 </p>
 
 ### Linux (clang)
 
-[View summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.md)
+[View summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.md)
 
 <p>
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.webp" width="500px" alt="Linux clang summary" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrime.webp" width="500px" alt="Linux clang IsPrime" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.webp" width="500px" alt="Linux clang IsPrimeNoTable" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.webp" width="500px" alt="Linux clang summary" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrime.webp" width="500px" alt="Linux clang IsPrime" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.webp" width="500px" alt="Linux clang IsPrimeNoTable" />
 </p>
 
 ### Windows (msvc)
 
-[View Summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.md)
+[View Summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.md)
 
 <p>
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.webp" width="500px" alt="Windows msvc summary" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrime.webp" width="500px" alt="Windows msvc IsPrime" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.webp" width="500px" alt="Windows msvc IsPrimeNoTable" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.webp" width="500px" alt="Windows msvc summary" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrime.webp" width="500px" alt="Windows msvc IsPrime" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.webp" width="500px" alt="Windows msvc IsPrimeNoTable" />
 </p>
 
 ### Windows (clang-cl)
 
-[View Summary](https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.md)
+[View Summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.md)
 
 <p>
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.webp" width="500px" alt="Windows clang-cl summary" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrime.webp" width="500px" alt="Windows clang-cl IsPrime" />
-    <img src="https://rac75116.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.webp" width="500px" alt="Windows clang-cl IsPrimeNoTable" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.webp" width="500px" alt="Windows clang-cl summary" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrime.webp" width="500px" alt="Windows clang-cl IsPrime" />
+    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.webp" width="500px" alt="Windows clang-cl IsPrimeNoTable" />
 </p>
 
 
 ## Releases
 
+-   2026/06/28 ver 1.3.4
+    - Improve performance
+    - Prevent unnecessary code from being included when `FeatureTestMacros.hpp` is included
+    - Fix the name and link in the copyright notice
+    - Add the copyright notice for Bradley Berg's algorithm to the LICENSE file
 -   2026/02/25 ver 1.3.3
     - Update copyright year to 2026
     - Add -O3 -march=native to the compilation flags during benchmarking and testing

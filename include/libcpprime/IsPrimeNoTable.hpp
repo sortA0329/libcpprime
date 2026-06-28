@@ -1,8 +1,8 @@
 /**
  *
- * libcpprime https://github.com/Rac75116/libcpprime
+ * libcpprime https://github.com/sortA0329/libcpprime
  *
- * Copyright (c) 2026 Rac75116
+ * Copyright (c) 2026 sortA
  * SPDX-License-Identifier: MIT
  *
  **/
@@ -12,6 +12,7 @@
 
 #include <cstdint>
 
+#include "internal/Environment.hpp"
 #include "internal/IsPrimeCommon.hpp"
 #include "internal/Utils.hpp"
 
@@ -26,7 +27,7 @@ constexpr std::uint32_t FlagTable10[32] = {
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE bool GCDFilter(const std::uint32_t n) noexcept {
-    auto GCD = [](std::uint32_t x, std::uint32_t y) -> std::uint32_t {
+    auto GCD = [](std::uint32_t x, std::uint32_t y) CPPR_INTERNAL_INLINE_LAMBDA -> std::uint32_t {
         // Binary GCD (Stein's algorithm). Assumes y != 0 when x != 0.
         if (x == 0) return 0;
         Assume(y != 0);
@@ -118,7 +119,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
+    const auto mone = mint.mone();
     auto test2 = [=](std::uint64_t base1, std::uint64_t base2) -> bool {
         // Two-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
@@ -263,38 +264,41 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
     }
 }
 
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
-    const MontgomeryModint64Impl<true> mint(x);
+template <bool Strict>
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Base2(const std::uint64_t x, const MontgomeryModint64Impl<Strict> mint) noexcept {
     const auto one = mint.one();
-    const auto mone = mint.neg(one);
-    auto miller_rabin_test = [&]() -> bool {
-        // Baillie-PSW starts with a base-2 Miller-Rabin test.
-        const std::int32_t S = CountrZero(x - 1);
-        const std::uint64_t D = (x - 1) >> S;
-        auto a = one;
-        auto b = mint.raw(2);
-        std::uint64_t ex = D;
-        while (ex != 1) {
-            auto c = mint.mul(b, b);
-            if (ex & 1) a = mint.mul(a, b);
-            b = c;
-            ex >>= 1;
-        }
-        a = mint.mul(a, b);
-        bool flag = mint.same(a, one) || mint.same(a, mone);
-        if (x % 4 == 3) return flag;
-        if (flag) return true;
-        for (std::int32_t i = 0; i != S - 1; ++i) {
-            a = mint.mul(a, a);
-            if (mint.same(a, mone)) return true;
-        }
-        return false;
-    };
-    if (!miller_rabin_test()) return false;
+    const auto mone = mint.mone();
+    const std::int32_t S = CountrZero(x - 1);
+    const std::uint64_t D = (x - 1) >> S;
+    auto a = one;
+    auto b = mint.raw(2);
+    std::uint64_t ex = D;
+    while (ex != 1) {
+        auto c = mint.mul(b, b);
+        if (ex & 1) a = mint.mul(a, b);
+        b = c;
+        ex >>= 1;
+    }
+    a = mint.mul(a, b);
+    bool flag = mint.same(a, one) || mint.same(a, mone);
+    if (x % 4 == 3) return flag;
+    if (flag) return true;
+    for (std::int32_t i = 0; i != S - 1; ++i) {
+        a = mint.mul(a, a);
+        if (mint.same(a, mone)) return true;
+    }
+    return false;
+}
+
+template <bool Strict>
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
+    const MontgomeryModint64Impl<Strict> mint(x);
+    if (!IsPrime64Base2(x, mint)) return false;
     std::uint64_t D = GetLucasBase(x);
     if (D <= 1) return D == 1;
     // Strong Lucas probable prime test (implemented via Lucas sequences in Montgomery domain).
     const std::uint64_t Q = mint.raw(x - (D - 1) / 4);
+    const auto one = mint.one();
     std::uint64_t u = one;
     std::uint64_t v = one;
     std::uint64_t Qn = Q;
@@ -302,17 +306,20 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
     std::uint64_t k = (x + 1) << CountlZero(x + 1);
     D = mint.raw(D);
     std::uint64_t t = (x >> 1) + 1;
-    for (k <<= 1; k; k <<= 1) {
+    k <<= 1;
+    while (k) {
         std::uint64_t Qt = mint.add(Qn, Qn);
         Qn = mint.mul(Qn, Qn);
         u = mint.mul(u, v);
         v = mint.sub(mint.mul(v, v), Qt);
-        if (k >> 63) {
+        std::uint64_t tmp = k;
+        k <<= 1;
+        if (tmp >> 63) {
             Qn = mint.mul(Qn, Q);
             std::uint64_t uu = u;
             u = mint.add(u, v);
-            u = (u >> 1) + ((u & 1) ? t : 0);
             v = mint.add(mint.mul(D, uu), v);
+            u = (u >> 1) + ((u & 1) ? t : 0);
             v = (v >> 1) + ((v & 1) ? t : 0);
         }
     }
@@ -334,19 +341,25 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
         if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;
-        if (n < 39601) {
-            return internal::GCDFilter(static_cast<std::uint32_t>(n));
-        }
+        if (n < 39601) return internal::GCDFilter(static_cast<std::uint32_t>(n));
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
-        if (internal::TrialDivision64(n)) {
-            return false;
-        }
+        if (internal::TrialDivision64(n)) return false;
+#if defined(_MSC_VER) && !defined(__clang__)
         if (n < (std::uint64_t(1) << 62)) {
             return internal::IsPrime64MillerRabin(n);
         } else {
-            return internal::IsPrime64BailliePSW(n);
+            return internal::IsPrime64BailliePSW<true>(n);
         }
+#else
+        if (n < 7999252175582851ull) {
+            return internal::IsPrime64MillerRabin(n);
+        } else if (n < (std::uint64_t(1) << 62)) {
+            return internal::IsPrime64BailliePSW<false>(n);
+        } else {
+            return internal::IsPrime64BailliePSW<true>(n);
+        }
+#endif
     }
 }
 

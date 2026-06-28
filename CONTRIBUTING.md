@@ -21,7 +21,7 @@ Thanks for your interest in improving `libcpprime`.
 
 ### Python tooling (benchmarks/docs)
 
-- Python >= 3.12
+- Python >= 3.14
 - `uv`
 - pngquant
 
@@ -52,7 +52,7 @@ cd libcpprime
 ### 2) Install dependencies
 
 - Install CMake, compiler(s), and Task.
-- For docs/benchmark plots, install Python 3.12+ and `uv`.
+- For docs/benchmark plots, install Python 3.14+ and `uv`.
 
 ### 3) Run tests
 
@@ -63,7 +63,7 @@ task test:msvc
 task test:clang-cl
 ```
 
-Typical runtime for tests is around 20-60 seconds per run.
+Typical runtime for tests is around 10 seconds per run.
 
 ## Command reference
 

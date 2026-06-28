@@ -146,7 +146,7 @@ if(LIBCPPRIME_BUILD_TESTS)
 		FetchContent_Declare(
 			googletest
 			GIT_REPOSITORY https://github.com/google/googletest.git
-			GIT_TAG release-1.12.1
+			GIT_TAG v1.17.0
 		)
 
 		set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -207,15 +207,7 @@ if(LIBCPPRIME_BUILD_BENCHMARKS)
 	add_executable(benchmark_isprime benchmarks/isprime_bench.cpp)
 	target_compile_features(benchmark_isprime PRIVATE cxx_std_23)
 
-	include(FetchContent)
-	FetchContent_Declare(
-		nanobench
-		GIT_REPOSITORY https://github.com/martinus/nanobench.git
-		GIT_TAG v4.3.11
-	)
-	FetchContent_MakeAvailable(nanobench)
-
-	target_link_libraries(benchmark_isprime PRIVATE libcpprime nanobench::nanobench)
+	target_link_libraries(benchmark_isprime PRIVATE libcpprime)
 
 	if(LIBCPPRIME_MSVC_LIKE)
 		target_compile_options(benchmark_isprime PRIVATE /W4 /permissive- /Zc:__cplusplus)

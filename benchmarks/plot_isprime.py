@@ -10,7 +10,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
-from PIL import Image
 
 file_type = "webp"
 
@@ -90,7 +89,14 @@ def save_scatter(
     ax.grid(True, linestyle=":", linewidth=0.5, alpha=0.3, which="minor")
     fig.tight_layout()
 
-    fig.savefig(out_path + "." + file_type, format=file_type)
+    fig.savefig(
+        out_path + "." + file_type,
+        format=file_type,
+        pil_kwargs={
+            "optimize": True,
+            "quality": 60,
+        },
+    )
     plt.close(fig)
 
 
@@ -153,7 +159,14 @@ def save_summary_plots(summary: np.ndarray, out_prefix: str) -> None:
     ax2.legend(loc="best")
 
     fig.tight_layout()
-    fig.savefig(out_prefix + "." + file_type, format=file_type)
+    fig.savefig(
+        out_prefix + "." + file_type,
+        format=file_type,
+        pil_kwargs={
+            "optimize": True,
+            "quality": 60,
+        },
+    )
     plt.close(fig)
 
 
@@ -200,15 +213,6 @@ def main() -> int:
     os.remove(p_prime)
     os.remove(p_notable)
     os.remove(p_summary)
-
-    # Optimize generated images
-    for fname in [
-        "benchmarks/bench_IsPrime." + file_type,
-        "benchmarks/bench_IsPrimeNoTable." + file_type,
-        "benchmarks/bench_summary." + file_type,
-    ]:
-        with Image.open(fname) as img:
-            img.save(fname, optimize=True, quality=60)
 
     return 0
 

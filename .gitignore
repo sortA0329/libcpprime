@@ -49,6 +49,7 @@ ENV/
 CMakeUserPresets.json
 
 /tmp
+/bundled
 compile_commands.json
 
 # Documentation

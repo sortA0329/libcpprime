@@ -1,8 +1,8 @@
 /**
  *
- * libcpprime https://github.com/Rac75116/libcpprime
+ * libcpprime https://github.com/sortA0329/libcpprime
  *
- * Copyright (c) 2026 Rac75116
+ * Copyright (c) 2026 sortA
  * SPDX-License-Identifier: MIT
  *
  **/
@@ -10,7 +10,7 @@
  *
  * The algorithm in this library is based on Bradley Berg's method.
  * See this page for more information:
- *https://www.techneon.com/download/is.prime.32.base.data
+ * https://www.techneon.com/download/is.prime.32.base.data
  *
  * Copyright 2018 Bradley Berg   < (My last name) @ t e c h n e o n . c o m >
  *
@@ -30,6 +30,7 @@
 
 #include <cstdint>
 
+#include "Environment.hpp"
 #include "Utils.hpp"
 
 namespace cppr {
@@ -68,7 +69,7 @@ class MontgomeryModint64Impl {
     }
 
    public:
-    CPPR_INTERNAL_CONSTEXPR MontgomeryModint64Impl(std::uint64_t n) noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE MontgomeryModint64Impl(std::uint64_t n) noexcept {
         // Precondition: n is an odd modulus > 2.
         // Internals:
         // - rs: R^2 mod n (with R = 2^64) for Montgomery domain conversion
@@ -108,13 +109,13 @@ class MontgomeryModint64Impl {
             return np;
         }
     }
-    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t neg(std::uint64_t x) const noexcept {
+    CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t mone() const noexcept {
         if CPPR_INTERNAL_IF_CONSTEXPR (Strict) {
-            Assume(x < mod_);
-            return (mod_ - x) * (x != 0);
+            Assume(np != 0 && np < mod_);
+            return mod_ - np;
         } else {
-            Assume(x < 2 * mod_);
-            return (2 * mod_ - x) * (x != 0);
+            Assume(np != 0 && np < 2 * mod_);
+            return 2 * mod_ - np;
         }
     }
     CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t mul(std::uint64_t x, std::uint64_t y) const noexcept {
@@ -175,7 +176,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool TrialDivision32(const std::uint32_t n) noexc
 constexpr std::uint16_t Bases32[256] = {
 #include "IsPrimeBases32.txt"
 };
-CPPR_INTERNAL_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime32(const std::uint32_t x) noexcept {
     const std::uint32_t h = x * 0xad625b89;
     std::uint32_t d = x - 1;
     std::uint32_t pw = static_cast<std::uint32_t>(Bases32[h >> 24]);
@@ -183,7 +184,7 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrime32(const std::uint32_t x) noexcept {
     d >>= s;
     if (x < (1u << 21)) {
         std::uint64_t m = 0xffffffffffffffff / x + 1;
-        auto mul = [m, x](std::uint32_t a, std::uint32_t b) -> std::uint32_t { return static_cast<std::uint32_t>(Mulu128High(static_cast<std::uint64_t>(a) * b * m, x)); };
+        auto mul = [m, x](std::uint32_t a, std::uint32_t b) CPPR_INTERNAL_INLINE_LAMBDA -> std::uint32_t { return static_cast<std::uint32_t>(Mulu128High(static_cast<std::uint64_t>(a) * b * m, x)); };
         std::uint32_t cur = pw;
         if (d != 1) {
             pw = mul(pw, pw);

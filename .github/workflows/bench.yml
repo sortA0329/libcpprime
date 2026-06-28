@@ -31,7 +31,7 @@ jobs:
           - compiler: clang
             build_dir: build-clang
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install build dependencies
         run: |
@@ -39,12 +39,12 @@ jobs:
           sudo apt-get install -y ninja-build ccache clang
 
       - name: Install Task
-        uses: go-task/setup-task@v1
+        uses: go-task/setup-task@v2
         with:
           version: 3.x
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
           cache-dependency-glob: |
@@ -52,7 +52,7 @@ jobs:
             uv.lock
 
       - name: Cache deps
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ matrix.build_dir }}/_deps
           key: ${{ runner.os }}-${{ matrix.compiler }}-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
@@ -63,7 +63,7 @@ jobs:
         run: task bench-heavy:${{ matrix.compiler }}
 
       - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: benchmark-${{ runner.os }}-${{ matrix.compiler }}
           if-no-files-found: warn
@@ -85,7 +85,7 @@ jobs:
           - compiler: clang-cl
             build_dir: build-clang-cl
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install LLVM + Ninja (clang-cl)
         if: matrix.compiler == 'clang-cl'
@@ -94,12 +94,12 @@ jobs:
           choco install llvm ninja -y --no-progress
 
       - name: Install Task
-        uses: go-task/setup-task@v1
+        uses: go-task/setup-task@v2
         with:
           version: 3.x
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v8.2.0
         with:
           enable-cache: true
           cache-dependency-glob: |
@@ -107,7 +107,7 @@ jobs:
             uv.lock
 
       - name: Cache deps
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ matrix.build_dir }}/_deps
           key: ${{ runner.os }}-${{ matrix.compiler }}-deps-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
@@ -118,7 +118,7 @@ jobs:
         run: task bench-heavy:${{ matrix.compiler }}
 
       - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: benchmark-${{ runner.os }}-${{ matrix.compiler }}
           if-no-files-found: warn
@@ -136,10 +136,10 @@ jobs:
       group: gh-pages-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download benchmark artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts
           pattern: benchmark-*
