@@ -61,11 +61,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t GetLucasBase(const std::uint64_t x)
     // - 0: definitely composite (quick checks found a factor or perfect square)
     // - 1: no suitable D found in the search range (treated as pass by caller)
     // - otherwise: selected D
-    std::uint64_t tmp = x % 5;
-    if (tmp == 2 || tmp == 3) {
-        return 5;
-    }
-    tmp = x % 13;
+    std::uint64_t tmp = x % 13;
     if (tmp == 2 || tmp == 5 || tmp == 6 || tmp == 7 || tmp == 8 || tmp == 11) {
         return 13;
     }
@@ -232,10 +228,54 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Base2(const std::uint64_t x, const 
 }
 
 template <bool Strict>
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64StrongLucasBase5(const std::uint64_t x, const MontgomeryModint64Impl<Strict> mint) noexcept {
+    const std::uint64_t D = mint.raw(5);
+    const auto one = mint.one();
+    const auto mone = mint.mone();
+    const auto two = mint.add(one, one);
+    const auto mtwo = mint.add(mone, mone);
+    std::uint64_t u = one;
+    std::uint64_t v = one;
+    std::uint64_t Qt = mtwo;
+    std::uint64_t k = (x + 1) << CountlZero(x + 1);
+    std::uint64_t t = (x >> 1) + 1;
+    k <<= 1;
+    while (k) {
+        u = mint.mul(u, v);
+        v = mint.sub(mint.mul(v, v), Qt);
+        std::uint64_t tmp = k;
+        k <<= 1;
+        Qt = two;
+        if (tmp >> 63) {
+            std::uint64_t uu = u;
+            u = mint.add(u, v);
+            v = mint.add(mint.mul(D, uu), v);
+            u = (u >> 1) + ((u & 1) ? t : 0);
+            v = (v >> 1) + ((v & 1) ? t : 0);
+            Qt = mtwo;
+        }
+    }
+    if (mint.is_zero(u) || mint.is_zero(v)) return true;
+    std::uint64_t f = ((x + 1) & ~x) >> 1;
+    if (!f) return false;
+    v = mint.sub(mint.mul(v, v), Qt);
+    f >>= 1;
+    if (mint.is_zero(v)) return true;
+    while (f) {
+        v = mint.sub(mint.mul(v, v), two);
+        f >>= 1;
+        if (mint.is_zero(v)) return true;
+    }
+    return false;
+}
+
+template <bool Strict>
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     if (!IsPrime64Base2(x, mint)) return false;
     // Strong Lucas probable prime test.
+    const std::uint64_t mod5 = x % 5;
+    if (mod5 == 2 || mod5 == 3) return IsPrime64StrongLucasBase5(x, mint);
     const std::uint64_t Base = GetLucasBase(x);
     if (Base <= 1) return Base == 1;
     const std::uint64_t Q = mint.raw(x - (Base - 1) / 4);
