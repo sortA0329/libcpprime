@@ -235,16 +235,16 @@ template <bool Strict>
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     if (!IsPrime64Base2(x, mint)) return false;
-    std::uint64_t D = GetLucasBase(x);
-    if (D <= 1) return D == 1;
     // Strong Lucas probable prime test.
-    const std::uint64_t Q = mint.raw(x - (D - 1) / 4);
+    const std::uint64_t Base = GetLucasBase(x);
+    if (Base <= 1) return Base == 1;
+    const std::uint64_t Q = mint.raw(x - (Base - 1) / 4);
+    const std::uint64_t D = mint.raw(Base);
     const auto one = mint.one();
     std::uint64_t u = one;
     std::uint64_t v = one;
     std::uint64_t Qn = Q;
     std::uint64_t k = (x + 1) << CountlZero(x + 1);
-    D = mint.raw(D);
     std::uint64_t t = (x >> 1) + 1;
     k <<= 1;
     while (k) {
