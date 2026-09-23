@@ -143,6 +143,8 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 
 ## Releases
 
+-   2026/09/23 ver 1.3.5
+    - Improve performance of `cppr::IsPrimeNoTable`
 -   2026/06/28 ver 1.3.4
     - Improve performance
     - Prevent unnecessary code from being included when `FeatureTestMacros.hpp` is included
