@@ -10,7 +10,6 @@ Makefile
 *.cmake
 
 # IDE files
-.vscode/settings.local.json
 .idea/
 *.swp
 *.swo

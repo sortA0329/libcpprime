@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import os
 import sys
-from typing import Tuple
+from typing import Any
 
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
 import numpy as np
 
 file_type = "webp"
@@ -17,7 +16,7 @@ COLOR_1 = "#379777"
 COLOR_2 = "#F4CE14"
 
 
-def read_csv_fast(path: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def read_csv_fast(path: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     # Columns: n, is_prime, time_ns
     # Use numpy.loadtxt with converters to avoid Python-level loops
     data = np.loadtxt(path, delimiter=",", skiprows=1, dtype=np.float64)
@@ -119,39 +118,39 @@ def save_summary_plots(summary: np.ndarray, out_prefix: str) -> None:
         ax.grid(True, linestyle=":", linewidth=0.5, alpha=0.3, which="minor")
         ax.set_ylabel("avg time [ns]")
 
-    prime_style_a = dict(
-        color=COLOR_2,
-        marker="o",
-        markersize=3,
-        linewidth=1.2,
-        label="IsPrime",
-    )
-    prime_style_b = dict(
-        color=COLOR_1,
-        marker="o",
-        markersize=3,
-        linewidth=1.2,
-        label="IsPrimeNoTable",
-    )
+    prime_style_a: dict[str, Any] = {
+        "color": COLOR_2,
+        "marker": "o",
+        "markersize": 3,
+        "linewidth": 1.2,
+        "label": "IsPrime",
+    }
+    prime_style_b: dict[str, Any] = {
+        "color": COLOR_1,
+        "marker": "o",
+        "markersize": 3,
+        "linewidth": 1.2,
+        "label": "IsPrimeNoTable",
+    }
     ax1.plot(x, prime_isprime, **prime_style_a)
     ax1.plot(x, prime_notable, **prime_style_b)
     ax1.set_title("Average time by bit-length (Prime)")
     ax1.legend(loc="best")
 
-    comp_style_a = dict(
-        color=COLOR_2,
-        marker="o",
-        markersize=3,
-        linewidth=1.2,
-        label="IsPrime",
-    )
-    comp_style_b = dict(
-        color=COLOR_1,
-        marker="o",
-        markersize=3,
-        linewidth=1.2,
-        label="IsPrimeNoTable",
-    )
+    comp_style_a: dict[str, Any] = {
+        "color": COLOR_2,
+        "marker": "o",
+        "markersize": 3,
+        "linewidth": 1.2,
+        "label": "IsPrime",
+    }
+    comp_style_b: dict[str, Any] = {
+        "color": COLOR_1,
+        "marker": "o",
+        "markersize": 3,
+        "linewidth": 1.2,
+        "label": "IsPrimeNoTable",
+    }
     ax2.plot(x, comp_isprime, **comp_style_a)
     ax2.plot(x, comp_notable, **comp_style_b)
     ax2.set_title("Average time by bit-length (Composite)")

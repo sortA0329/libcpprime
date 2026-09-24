@@ -77,9 +77,7 @@ def extract_changelog(readme_text: str, version: str) -> str:
 
     # Dedent by the common leading indentation so that nested bullets
     # become top-level bullets in the release body.
-    indent = min(
-        len(line) - len(line.lstrip(" ")) for line in body if line.strip()
-    )
+    indent = min(len(line) - len(line.lstrip(" ")) for line in body if line.strip())
     dedented = [line[indent:] if len(line) >= indent else line for line in body]
     return "\n".join(dedented) + "\n"
 
@@ -113,9 +111,7 @@ def main() -> int:
         return 1
 
     try:
-        body = extract_changelog(
-            readme_path.read_text(encoding="utf-8"), version
-        )
+        body = extract_changelog(readme_path.read_text(encoding="utf-8"), version)
     except ValueError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1

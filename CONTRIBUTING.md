@@ -11,21 +11,10 @@ Thanks for your interest in improving `libcpprime`.
 
 ## Required tools
 
-### Build and test
-
-- CMake >= 3.20
-- A C++ compiler toolchain (GCC/Clang/MSVC/clang-cl)
-- Ninja
-- Task (`go-task`)
+- A system C++ compiler toolchain
+- mise
 - Git
-
-### Python tooling (benchmarks/docs)
-
-- Python >= 3.14
-- `uv`
-- pngquant
-
-Python dependencies are managed by `uv`.
+- Zed (recommended editor)
 
 ### Why Windows development is recommended
 
@@ -34,11 +23,6 @@ Windows development is recommended when contributing significant changes, becaus
 However, since it is difficult to generate a proper Compilation database with MSVC and clang-cl, if you are developing on Windows, configuring with MinGW GCC or Clang is also required.
 
 Linux/macOS development is still fine for day-to-day work, especially for GCC/Clang checks.
-
-### Dev Container support
-
-This repository includes a Dev Container at `.devcontainer/`.
-Use it if you want a reproducible Linux environment without installing tools manually.
 
 ## Quick start
 
@@ -51,45 +35,56 @@ cd libcpprime
 
 ### 2) Install dependencies
 
-- Install CMake, compiler(s), and Task.
-- For docs/benchmark plots, install Python 3.14+ and `uv`.
+- Install a system C++ compiler toolchain, mise, and Git.
 
-### 3) Run tests
+### 3) Open in Zed
 
 ```bash
-task test:gcc
-task test:clang
-task test:msvc
-task test:clang-cl
+zed .
+```
+
+### 4) Run tests
+
+```bash
+mise run test:gcc
+mise run test:clang
+mise run test:msvc
+mise run test:clang-cl
 ```
 
 Typical runtime for tests is around 10 seconds per run.
 
 ## Command reference
 
-All project commands are defined in `Taskfile.yml`.
+All project commands are defined in `mise.toml`.
+List them with `mise tasks ls`.
 
 ### Configure
 
-- `task configure:gcc|clang|clang-cl|msvc`: Configure a build directory
-- `task configure`: Run all configure tasks above
+- `mise run configure:gcc|clang|clang-cl|msvc`: Configure a build directory
+- `mise run configure`: Run all configure tasks above
 
 ### Tests
 
-- `task test:gcc|clang|clang-cl|msvc`: Run tests
-- `task test`: Run all test tasks above
+- `mise run test:gcc|clang|clang-cl|msvc`: Run tests
+- `mise run test`: Run all test tasks above
 
 ### Benchmarks
 
-- `task bench:gcc|clang|clang-cl|msvc`: Run standard benchmark and generate plots
-- `task bench-heavy:gcc|clang|clang-cl|msvc`: Run heavier benchmark variant (`--heavy`)
+- `mise run bench:gcc|clang|clang-cl|msvc`: Run standard benchmark and generate plots
+- `mise run bench-heavy:gcc|clang|clang-cl|msvc`: Run heavier benchmark variant (`--heavy`)
 
 ### Docs
 
-- `task docs`: Copy `README.md` to `docs/index.md`, then build MkDocs site
-- `task serve`: Serve MkDocs locally
+- `mise run docs`: Copy `README.md` to `docs/index.md`, then build MkDocs site
+- `mise run serve`: Serve MkDocs locally
 
 ### Clean
 
-- `task clean:gcc|clang|clang-cl|msvc`: Remove one build directory
-- `task clean`: Remove all build directories
+- `mise run clean:gcc|clang|clang-cl|msvc`: Remove one build directory
+- `mise run clean`: Remove all build directories
+
+### Lint and format
+
+- `mise run check`: Check for lint and formatting issues
+- `mise run fix`: Auto-fix lint and formatting issues

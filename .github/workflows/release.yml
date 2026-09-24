@@ -1,61 +1,69 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Tag name to release
-        required: true
-        type: string
+    push:
+        tags:
+            - "v*"
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: Tag name to release
+                required: true
+                type: string
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.tag || github.ref }}
+    release:
+        name: Create GitHub Release
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  ref: ${{ inputs.tag || github.ref }}
+                  persist-credentials: false
 
-      - name: Resolve tag and version
-        id: meta
-        run: |
-          if [ -n "${{ inputs.tag }}" ]; then
-            TAG="${{ inputs.tag }}"
-          else
-            TAG="${GITHUB_REF_NAME}"
-          fi
-          VERSION="${TAG#v}"
-          VERSION="${VERSION#V}"
-          echo "TAG=${TAG}" >> "$GITHUB_ENV"
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Releasing ${TAG} (version ${VERSION})"
+            - name: Setup mise tools
+              uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
+              with:
+                  cache: false
 
-      - name: Bundle headers
-        run: |
-          python3 scripts/bundle_headers.py
-          ls -la bundled/
+            - name: Resolve tag and version
+              id: meta
+              env:
+                  INPUT_TAG: ${{ inputs.tag }}
+              run: |
+                  if [ -n "${INPUT_TAG}" ]; then
+                    TAG="${INPUT_TAG}"
+                  else
+                    TAG="${GITHUB_REF_NAME}"
+                  fi
+                  VERSION="${TAG#v}"
+                  VERSION="${VERSION#V}"
+                  echo "TAG=${TAG}" >> "$GITHUB_ENV"
+                  echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+                  echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+                  echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+                  echo "Releasing ${TAG} (version ${VERSION})"
 
-      - name: Extract changelog from README
-        run: python3 scripts/extract_changelog.py --version "$VERSION" --readme README.md --output RELEASE_BODY.md
+            - name: Bundle headers
+              run: |
+                  mise run bundle
+                  ls -la bundled/
 
-      - name: Show release body
-        run: cat RELEASE_BODY.md
+            - name: Extract changelog from README
+              run: mise x -- uv run scripts/extract_changelog.py --version "$VERSION" --readme README.md --output RELEASE_BODY.md
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.meta.outputs.tag }}
-          name: ${{ steps.meta.outputs.tag }}
-          body_path: RELEASE_BODY.md
-          files: bundled/*.hpp
-          fail_on_unmatched_files: true
-          generate_release_notes: false
+            - name: Show release body
+              run: cat RELEASE_BODY.md
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2 # zizmor: ignore[superfluous-actions] keep dedicated action for asset upload behavior
+              with:
+                  tag_name: ${{ steps.meta.outputs.tag }}
+                  name: ${{ steps.meta.outputs.tag }}
+                  body_path: RELEASE_BODY.md
+                  files: bundled/*.hpp
+                  fail_on_unmatched_files: true
+                  generate_release_notes: false

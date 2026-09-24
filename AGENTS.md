@@ -3,7 +3,8 @@
   Benchmark and other temporary files may use the latest C++ features.
   The library implementation should pay particular attention to compatibility with older compilers.
 - Supported compilers include gcc, clang, msvc, clang-cl, and the gcc and clang versions within mingw.
-- When you want to run tests or benchmarks, execute the tasks described in Taskfile.yml.
+- When you want to run tests or benchmarks, execute the tasks defined in mise.toml via `mise run <task>` (list them with `mise tasks ls`).
+- When using toolchains installed via mise, use `mise x -- <command>`.
 - When optimizing code, primarily use gcc or msvc for benchmarks.
   However, to avoid significant speed differences between compilers, run them with clang and clang-cl once you have finished the initial implementation.
 - Inform users of any breaking changes.
