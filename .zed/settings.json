@@ -6,12 +6,25 @@
     "ensure_final_newline_on_save": true,
     "remove_trailing_whitespace_on_save": true,
     "file_types": {
-        "YAML": [".clang-format", ".clangd"]
+        "YAML": [
+            ".clang-format",
+            ".clangd"
+        ]
     },
-    "file_scan_exclusions": ["**/.git", "**/.DS_Store", "build-*", ".cache", ".venv"],
+    "file_scan_exclusions": [
+        "**/.git",
+        "**/.DS_Store",
+        "build-*",
+        "site",
+        ".cache",
+        ".ruff_cache",
+        ".venv",
+    ],
     "languages": {
         "C++": {
-            "language_servers": ["clangd"],
+            "language_servers": [
+                "clangd"
+            ],
             "formatter": {
                 "language_server": {
                     "name": "clangd"
@@ -19,10 +32,88 @@
             }
         },
         "Python": {
-            "language_servers": ["ty", "ruff"],
+            "language_servers": [
+                "ty",
+                "ruff"
+            ],
             "formatter": {
                 "language_server": {
                     "name": "ruff"
+                }
+            }
+        },
+        "JSON": {
+            "formatter": {
+                "external": {
+                    "command": "mise",
+                    "arguments": [
+                        "x",
+                        "--",
+                        "dprint",
+                        "fmt",
+                        "--stdin",
+                        "{buffer_path}"
+                    ]
+                }
+            }
+        },
+        "JSONC": {
+            "formatter": {
+                "external": {
+                    "command": "mise",
+                    "arguments": [
+                        "x",
+                        "--",
+                        "dprint",
+                        "fmt",
+                        "--stdin",
+                        "{buffer_path}"
+                    ]
+                }
+            }
+        },
+        "YAML": {
+            "formatter": {
+                "external": {
+                    "command": "mise",
+                    "arguments": [
+                        "x",
+                        "--",
+                        "dprint",
+                        "fmt",
+                        "--stdin",
+                        "{buffer_path}"
+                    ]
+                }
+            }
+        },
+        "TOML": {
+            "formatter": {
+                "external": {
+                    "command": "mise",
+                    "arguments": [
+                        "x",
+                        "--",
+                        "dprint",
+                        "fmt",
+                        "--stdin",
+                        "{buffer_path}"
+                    ]
+                }
+            }
+        },
+        "Markdown": {
+            "formatter": {
+                "external": {
+                    "command": "mise",
+                    "arguments": [
+                        "x",
+                        "--",
+                        "dprint",
+                        "fmt",
+                        "--stdin",
+                        "{buffer_path}"
+                    ]
                 }
             }
         }
@@ -31,19 +122,33 @@
         "clangd": {
             "binary": {
                 "path": "mise",
-                "arguments": ["x", "--", "clangd"]
+                "arguments": [
+                    "x",
+                    "--",
+                    "clangd"
+                ]
             }
         },
         "ruff": {
             "binary": {
                 "path": "mise",
-                "arguments": ["x", "--", "ruff", "server"]
+                "arguments": [
+                    "x",
+                    "--",
+                    "ruff",
+                    "server"
+                ]
             }
         },
         "ty": {
             "binary": {
                 "path": "mise",
-                "arguments": ["x", "--", "ty", "server"]
+                "arguments": [
+                    "x",
+                    "--",
+                    "ty",
+                    "server"
+                ]
             }
         }
     }

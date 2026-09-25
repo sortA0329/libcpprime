@@ -83,8 +83,8 @@ int main() {
 
 ## Requirements
 
--   C++11
--   GCC, Clang, GCC (MinGW), Clang (MinGW), MSVC, clang-cl
+- C++11
+- GCC, Clang, GCC (MinGW), Clang (MinGW), MSVC, clang-cl
 
 ## Compilation
 
@@ -105,9 +105,21 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 [View Summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.md)
 
 <p>
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.webp" width="500px" alt="Linux gcc summary" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrime.webp" width="500px" alt="Linux gcc IsPrime" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.webp" width="500px" alt="Linux gcc IsPrimeNoTable" />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_summary.webp"
+        width="500px"
+        alt="Linux gcc summary"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrime.webp"
+        width="500px"
+        alt="Linux gcc IsPrime"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.webp"
+        width="500px"
+        alt="Linux gcc IsPrimeNoTable"
+    />
 </p>
 
 ### Linux (clang)
@@ -115,9 +127,21 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 [View summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.md)
 
 <p>
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.webp" width="500px" alt="Linux clang summary" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrime.webp" width="500px" alt="Linux clang IsPrime" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.webp" width="500px" alt="Linux clang IsPrimeNoTable" />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_summary.webp"
+        width="500px"
+        alt="Linux clang summary"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrime.webp"
+        width="500px"
+        alt="Linux clang IsPrime"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.webp"
+        width="500px"
+        alt="Linux clang IsPrimeNoTable"
+    />
 </p>
 
 ### Windows (msvc)
@@ -125,9 +149,21 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 [View Summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.md)
 
 <p>
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.webp" width="500px" alt="Windows msvc summary" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrime.webp" width="500px" alt="Windows msvc IsPrime" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.webp" width="500px" alt="Windows msvc IsPrimeNoTable" />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_summary.webp"
+        width="500px"
+        alt="Windows msvc summary"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrime.webp"
+        width="500px"
+        alt="Windows msvc IsPrime"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.webp"
+        width="500px"
+        alt="Windows msvc IsPrimeNoTable"
+    />
 </p>
 
 ### Windows (clang-cl)
@@ -135,68 +171,79 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 [View Summary](https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.md)
 
 <p>
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.webp" width="500px" alt="Windows clang-cl summary" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrime.webp" width="500px" alt="Windows clang-cl IsPrime" />
-    <img src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.webp" width="500px" alt="Windows clang-cl IsPrimeNoTable" />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_summary.webp"
+        width="500px"
+        alt="Windows clang-cl summary"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrime.webp"
+        width="500px"
+        alt="Windows clang-cl IsPrime"
+    />
+    <img
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.webp"
+        width="500px"
+        alt="Windows clang-cl IsPrimeNoTable"
+    />
 </p>
-
 
 ## Releases
 
--   2026/09/23 ver 1.3.5
-    - Improve performance of `cppr::IsPrimeNoTable`
--   2026/06/28 ver 1.3.4
-    - Improve performance
-    - Prevent unnecessary code from being included when `FeatureTestMacros.hpp` is included
-    - Fix the name and link in the copyright notice
-    - Add the copyright notice for Bradley Berg's algorithm to the LICENSE file
--   2026/02/25 ver 1.3.3
-    - Update copyright year to 2026
-    - Add -O3 -march=native to the compilation flags during benchmarking and testing
--   2026/01/04 ver 1.3.2
-    - Improve performance
--   2025/12/24 ver 1.3.1
-    - Improve performance and reduce binary size for `cppr::IsPrime`
--   2025/12/21 ver 1.3.0
-    - Add `CPPR_HAS_CONSTEXPR_IS_PRIME`
-    - Support clang-cl
-    - Accelerating Compile-Time Computation
-    - Improved compatibility
--   2025/03/10 ver 1.2.11
-    -   Change the name on the license
-    -   Change Multiprication Algorithm
-    -   Replace `__uint128_t` with `unsigned __int128`
--   2025/01/05 ver 1.2.10
-    -   Change the condition of `constexpr`
--   2025/01/03 ver 1.2.9
-    -   Fix a bug
--   2025/01/02 ver 1.2.8
-    -   Improve performance
-    -   Suppress warnings
--   2024/12/31 ver 1.2.7
-    -   Improve performance
--   2024/12/30 ver 1.2.6
-    -   Improve performance
--   2024/12/29 ver 1.2.5
-    -   Add copyrights notice
--   2024/12/28 ver 1.2.4
-    -   Improve performance
--   2024/12/26 ver 1.2.3
-    -   Improve performance
--   2024/12/25 ver 1.2.2
-    -   Improve performance
--   2024/12/23 ver 1.2.1
-    -   Improve performance
--   2024/12/19 ver 1.2.0
-    -   Split `cppr::IsPrime` into `cppr::IsPrime` and `cppr::IsPrimeNoTable`
--   2024/12/19 ver 1.1.2
-    -   Fix typo
--   2024/12/18 ver 1.1.1
-    -   Add include guards
--   2024/12/18 ver 1.1.0
-    -   Add `cppr::IsPrime` with a table
--   2024/12/18 ver 1.0.0
-    -   Add `cppr::IsPrime`
+- 2026/09/23 ver 1.3.5
+  - Improve performance of `cppr::IsPrimeNoTable`
+- 2026/06/28 ver 1.3.4
+  - Improve performance
+  - Prevent unnecessary code from being included when `FeatureTestMacros.hpp` is included
+  - Fix the name and link in the copyright notice
+  - Add the copyright notice for Bradley Berg's algorithm to the LICENSE file
+- 2026/02/25 ver 1.3.3
+  - Update copyright year to 2026
+  - Add -O3 -march=native to the compilation flags during benchmarking and testing
+- 2026/01/04 ver 1.3.2
+  - Improve performance
+- 2025/12/24 ver 1.3.1
+  - Improve performance and reduce binary size for `cppr::IsPrime`
+- 2025/12/21 ver 1.3.0
+  - Add `CPPR_HAS_CONSTEXPR_IS_PRIME`
+  - Support clang-cl
+  - Accelerating Compile-Time Computation
+  - Improved compatibility
+- 2025/03/10 ver 1.2.11
+  - Change the name on the license
+  - Change Multiprication Algorithm
+  - Replace `__uint128_t` with `unsigned __int128`
+- 2025/01/05 ver 1.2.10
+  - Change the condition of `constexpr`
+- 2025/01/03 ver 1.2.9
+  - Fix a bug
+- 2025/01/02 ver 1.2.8
+  - Improve performance
+  - Suppress warnings
+- 2024/12/31 ver 1.2.7
+  - Improve performance
+- 2024/12/30 ver 1.2.6
+  - Improve performance
+- 2024/12/29 ver 1.2.5
+  - Add copyrights notice
+- 2024/12/28 ver 1.2.4
+  - Improve performance
+- 2024/12/26 ver 1.2.3
+  - Improve performance
+- 2024/12/25 ver 1.2.2
+  - Improve performance
+- 2024/12/23 ver 1.2.1
+  - Improve performance
+- 2024/12/19 ver 1.2.0
+  - Split `cppr::IsPrime` into `cppr::IsPrime` and `cppr::IsPrimeNoTable`
+- 2024/12/19 ver 1.1.2
+  - Fix typo
+- 2024/12/18 ver 1.1.1
+  - Add include guards
+- 2024/12/18 ver 1.1.0
+  - Add `cppr::IsPrime` with a table
+- 2024/12/18 ver 1.0.0
+  - Add `cppr::IsPrime`
 
 ## References
 
