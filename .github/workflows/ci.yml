@@ -1,0 +1,35 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    check:
+        name: Check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+            - name: Setup mise tools
+              uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
+            - name: Cache dprint plugins
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+              with:
+                  path: ~/.cache/dprint
+                  key: ${{ runner.os }}-dprint-${{ hashFiles('dprint.json', 'mise.toml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-dprint-
+            - name: Run check
+              run: mise run check

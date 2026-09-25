@@ -23,12 +23,11 @@ namespace internal {
 constexpr std::uint32_t FlagTable10[32] = {
 #include "internal/IsPrimeTable10.txt"
 };
-// Bitset for small n < 1024.
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime10(const std::uint64_t n) noexcept { return (FlagTable10[n / 32] >> (n % 32)) & 1; }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE bool GCDFilter(const std::uint32_t n) noexcept {
     auto GCD = [](std::uint32_t x, std::uint32_t y) CPPR_INTERNAL_INLINE_LAMBDA -> std::uint32_t {
-        // Binary GCD (Stein's algorithm). Assumes y != 0 when x != 0.
+        // Binary GCD (Stein's algorithm).
         if (x == 0) return 0;
         Assume(y != 0);
         const std::int32_t n = CountrZero(x);
@@ -50,7 +49,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool GCDFilter(const std::uint32_t n) noexcept {
         return x << l;
     };
 
-    // Very small range: fast GCD-based filters with precomputed constants.
     const std::uint32_t a = static_cast<std::uint32_t>(Modu128(272518712866683587u % n, 10755835586592736005u, n));
     if (n < 11881) return GCD(a, n) == 1;
     const std::uint32_t b = static_cast<std::uint32_t>(Modu128(827936745744686818u % n, 10132550402535125089u, n));
@@ -63,11 +61,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t GetLucasBase(const std::uint64_t x)
     // - 0: definitely composite (quick checks found a factor or perfect square)
     // - 1: no suitable D found in the search range (treated as pass by caller)
     // - otherwise: selected D
-    std::uint64_t tmp = x % 5;
-    if (tmp == 2 || tmp == 3) {
-        return 5;
-    }
-    tmp = x % 13;
+    std::uint64_t tmp = x % 13;
     if (tmp == 2 || tmp == 5 || tmp == 6 || tmp == 7 || tmp == 8 || tmp == 11) {
         return 13;
     }
@@ -121,7 +115,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
     const auto one = mint.one();
     const auto mone = mint.mone();
     auto test2 = [=](std::uint64_t base1, std::uint64_t base2) -> bool {
-        // Two-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
         auto c = mint.build(base1);
@@ -154,7 +147,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
         return true;
     };
     auto test3 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3) -> bool {
-        // Three-base Miller-Rabin using Montgomery arithmetic.
         auto a = one;
         auto b = one;
         auto c = one;
@@ -236,20 +228,63 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Base2(const std::uint64_t x, const 
 }
 
 template <bool Strict>
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64StrongLucasBase5(const std::uint64_t x, const MontgomeryModint64Impl<Strict> mint) noexcept {
+    const std::uint64_t D = mint.raw(5);
+    const auto one = mint.one();
+    const auto mone = mint.mone();
+    const auto two = mint.add(one, one);
+    const auto mtwo = mint.add(mone, mone);
+    std::uint64_t u = one;
+    std::uint64_t v = one;
+    std::uint64_t Qt = mtwo;
+    std::uint64_t k = (x + 1) << CountlZero(x + 1);
+    std::uint64_t t = (x >> 1) + 1;
+    k <<= 1;
+    while (k) {
+        u = mint.mul(u, v);
+        v = mint.sub(mint.mul(v, v), Qt);
+        std::uint64_t tmp = k;
+        k <<= 1;
+        Qt = two;
+        if (tmp >> 63) {
+            std::uint64_t uu = u;
+            u = mint.add(u, v);
+            v = mint.add(mint.mul(D, uu), v);
+            u = (u >> 1) + ((u & 1) ? t : 0);
+            v = (v >> 1) + ((v & 1) ? t : 0);
+            Qt = mtwo;
+        }
+    }
+    if (mint.is_zero(u) || mint.is_zero(v)) return true;
+    std::uint64_t f = ((x + 1) & ~x) >> 1;
+    if (!f) return false;
+    v = mint.sub(mint.mul(v, v), Qt);
+    f >>= 1;
+    if (mint.is_zero(v)) return true;
+    while (f) {
+        v = mint.sub(mint.mul(v, v), two);
+        f >>= 1;
+        if (mint.is_zero(v)) return true;
+    }
+    return false;
+}
+
+template <bool Strict>
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     if (!IsPrime64Base2(x, mint)) return false;
-    std::uint64_t D = GetLucasBase(x);
-    if (D <= 1) return D == 1;
-    // Strong Lucas probable prime test (implemented via Lucas sequences in Montgomery domain).
-    const std::uint64_t Q = mint.raw(x - (D - 1) / 4);
+    // Strong Lucas probable prime test.
+    const std::uint64_t mod5 = x % 5;
+    if (mod5 == 2 || mod5 == 3) return IsPrime64StrongLucasBase5(x, mint);
+    const std::uint64_t Base = GetLucasBase(x);
+    if (Base <= 1) return Base == 1;
+    const std::uint64_t Q = mint.raw(x - (Base - 1) / 4);
+    const std::uint64_t D = mint.raw(Base);
     const auto one = mint.one();
     std::uint64_t u = one;
     std::uint64_t v = one;
     std::uint64_t Qn = Q;
-    // Iterate Lucas sequences according to bits of (x + 1).
     std::uint64_t k = (x + 1) << CountlZero(x + 1);
-    D = mint.raw(D);
     std::uint64_t t = (x >> 1) + 1;
     k <<= 1;
     while (k) {
@@ -269,7 +304,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) n
         }
     }
     if (mint.is_zero(u) || mint.is_zero(v)) return true;
-    // Extra check over factors of (x + 1) as required by the strong Lucas condition.
     std::uint64_t f = (x + 1) & ~x;
     for (f >>= 1; f; f >>= 1) {
         v = mint.sub(mint.mul(v, v), mint.add(Qn, Qn));

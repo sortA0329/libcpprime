@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Bundle script: for each public header in include/libcpprime/*.hpp,
 expand all local #include "..." directives (both .hpp and .txt)
@@ -12,15 +11,15 @@ import sys
 LOCAL_INCLUDE_RE = re.compile(r'#\s*include\s+"([^"]+)"')
 
 CPPR_LICENSE = re.compile(
-    r'/\*\*\n(?: \*[^\n]*\n)*?'
-    r' \* libcpprime https://github\.com/sortA0329/libcpprime\n'
-    r'(?: \*[^\n]*\n)*? \*\*/\n?'
+    r"/\*\*\n(?: \*[^\n]*\n)*?"
+    r" \* libcpprime https://github\.com/sortA0329/libcpprime\n"
+    r"(?: \*[^\n]*\n)*? \*\*/\n?"
 )
 
 LIBDIVIDE_LICENSE = re.compile(
-    r'// This file contains code derived from libdivide\n'
-    r'(?://[^\n]*\n)*?'
-    r'// library is licensed under the MIT License\.\n?'
+    r"// This file contains code derived from libdivide\n"
+    r"(?://[^\n]*\n)*?"
+    r"// library is licensed under the MIT License\.\n?"
 )
 
 IWYU_PRAGMA_RE = re.compile(r"\s*// IWYU pragma: export")

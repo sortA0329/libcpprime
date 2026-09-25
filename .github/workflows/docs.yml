@@ -1,68 +1,49 @@
 name: Docs
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "README.md"
-      - "mkdocs.yml"
-      - ".github/workflows/docs.yml"
-  workflow_dispatch:
+    push:
+        branches: [main]
+        paths:
+            - "docs/**"
+            - "README.md"
+            - "mkdocs.yml"
+            - "mise.toml"
+            - "pyproject.toml"
+            - "uv.lock"
+            - ".github/workflows/docs.yml"
+    workflow_dispatch:
 
 permissions:
-  contents: write
+    contents: write
 
 concurrency:
-  group: docs-pages
-  cancel-in-progress: true
+    group: docs-pages
+    cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
-    name: Build and deploy MkDocs
-    runs-on: ubuntu-latest
-    concurrency:
-      group: gh-pages-deploy
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
+    build-and-deploy:
+        name: Build and deploy MkDocs
+        runs-on: ubuntu-latest
+        concurrency:
+            group: gh-pages-deploy
+            cancel-in-progress: false
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y pngquant
+            - name: Setup mise tools
+              uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
 
-      - name: Install Task
-        uses: go-task/setup-task@v2
-        with:
-          version: 3.x
+            - name: Build site
+              run: mise run docs
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
-
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v8.2.0
-        with:
-          enable-cache: true
-          cache-dependency-glob: |
-            pyproject.toml
-            uv.lock
-
-      - name: Install Python dependencies
-        run: uv sync --frozen
-
-      - name: Build site
-        run: task docs
-
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: site
-          keep_files: true
-          commit_message: "chore(docs): publish run ${{ github.run_id }}"
+            - name: Deploy to gh-pages
+              uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_branch: gh-pages
+                  publish_dir: site
+                  keep_files: true
+                  commit_message: "chore(docs): publish run ${{ github.run_id }}"

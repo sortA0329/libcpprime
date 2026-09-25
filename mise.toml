@@ -1,0 +1,229 @@
+[tools]
+uv = "0.12.17"
+cmake = "4.4.3"
+ninja = "1.13.2"
+clang-format = "23.1.2"
+ty = "0.0.84"
+ruff = "0.16.8"
+zizmor = "1.30.1"
+dprint = "0.57.4"
+lefthook = "2.1.14"
+"github:clangd/clangd" = "23.1.0"
+"aqua:nushell/nushell" = "0.115.1"
+
+[task_config]
+shell = "nu -c"
+
+[hooks]
+postinstall = "lefthook install"
+
+# ============================
+# Configure
+# ============================
+
+[tasks."configure:gcc"]
+description = "Configure GCC build"
+run = [
+    'cmake -S . -B build-gcc -G "Ninja" -DLIBCPPRIME_COMPILER=gcc -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON',
+    "cp build-gcc/compile_commands.json compile_commands.json",
+]
+
+[tasks."configure:clang"]
+description = "Configure Clang build"
+run = [
+    'cmake -S . -B build-clang -G "Ninja" -DLIBCPPRIME_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON',
+    "cp build-clang/compile_commands.json compile_commands.json",
+]
+
+[tasks."configure:clang-cl"]
+description = "Configure clang-cl build (Windows only)"
+run = 'cmake -S . -B build-clang-cl -G "Ninja" -DLIBCPPRIME_COMPILER=clang-cl -DCMAKE_BUILD_TYPE=Release'
+
+[tasks."configure:msvc"]
+description = "Configure MSVC build (Windows only)"
+run = "cmake -S . -B build-msvc -DLIBCPPRIME_COMPILER=msvc"
+
+[tasks.configure]
+description = "Configure all builds (Windows only: includes msvc/clang-cl)"
+depends = ["configure:gcc", "configure:clang", "configure:clang-cl", "configure:msvc"]
+run = "cp build-clang/compile_commands.json compile_commands.json"
+
+# ============================
+# Clean
+# ============================
+
+[tasks."clean:gcc"]
+description = "Remove GCC build directory"
+run = "rm -rf build-gcc"
+
+[tasks."clean:clang"]
+description = "Remove Clang build directory"
+run = "rm -rf build-clang"
+
+[tasks."clean:clang-cl"]
+description = "Remove clang-cl build directory"
+run = "rm -rf build-clang-cl"
+
+[tasks."clean:msvc"]
+description = "Remove MSVC build directory"
+run = "rm -rf build-msvc"
+
+[tasks.clean]
+description = "Remove all build directories"
+depends = ["clean:gcc", "clean:clang", "clean:clang-cl", "clean:msvc"]
+
+# ============================
+# Tests
+# ============================
+
+[tasks."test:gcc"]
+description = "Build and run tests (GCC)"
+depends = ["configure:gcc"]
+run = [
+    "cmake --build build-gcc --parallel --target test_isprime",
+    "ctest --test-dir build-gcc --output-on-failure --stop-on-failure --parallel",
+]
+
+[tasks."test:clang"]
+description = "Build and run tests (Clang)"
+depends = ["configure:clang"]
+run = [
+    "cmake --build build-clang --parallel --target test_isprime",
+    "ctest --test-dir build-clang --output-on-failure --stop-on-failure --parallel",
+]
+
+[tasks."test:clang-cl"]
+description = "Build and run tests (clang-cl, Windows only)"
+depends = ["configure:clang-cl"]
+run = [
+    "cmake --build build-clang-cl --parallel --target test_isprime",
+    "ctest --test-dir build-clang-cl --output-on-failure --stop-on-failure --parallel",
+]
+
+[tasks."test:msvc"]
+description = "Build and run tests (MSVC, Windows only)"
+depends = ["configure:msvc"]
+run = [
+    "cmake --build build-msvc --parallel --config Release --target test_isprime",
+    "ctest --test-dir build-msvc -C Release --output-on-failure --stop-on-failure --parallel",
+]
+
+[tasks.test]
+description = "Build and run tests with all compilers (Windows only)"
+depends = ["test:gcc", "test:clang", "test:clang-cl", "test:msvc"]
+
+# ============================
+# Benchmarks
+# ============================
+
+[tasks."bench:gcc"]
+description = "Run standard benchmark and generate plots (GCC)"
+depends = ["configure:gcc"]
+run = [
+    "cmake --build build-gcc --parallel --target benchmark_isprime",
+    "./build-gcc/benchmark_isprime",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench:clang"]
+description = "Run standard benchmark and generate plots (Clang)"
+depends = ["configure:clang"]
+run = [
+    "cmake --build build-clang --parallel --target benchmark_isprime",
+    "./build-clang/benchmark_isprime",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench:clang-cl"]
+description = "Run standard benchmark and generate plots (clang-cl, Windows only)"
+depends = ["configure:clang-cl"]
+run = [
+    "cmake --build build-clang-cl --parallel --target benchmark_isprime",
+    "./build-clang-cl/benchmark_isprime.exe",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench:msvc"]
+description = "Run standard benchmark and generate plots (MSVC, Windows only)"
+depends = ["configure:msvc"]
+run = [
+    "cmake --build build-msvc --parallel --config Release --target benchmark_isprime",
+    "./build-msvc/Release/benchmark_isprime.exe",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench-heavy:gcc"]
+description = "Run heavier benchmark variant (--heavy) and generate plots (GCC)"
+depends = ["configure:gcc"]
+run = [
+    "cmake --build build-gcc --parallel --target benchmark_isprime",
+    "./build-gcc/benchmark_isprime --heavy",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench-heavy:clang"]
+description = "Run heavier benchmark variant (--heavy) and generate plots (Clang)"
+depends = ["configure:clang"]
+run = [
+    "cmake --build build-clang --parallel --target benchmark_isprime",
+    "./build-clang/benchmark_isprime --heavy",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench-heavy:clang-cl"]
+description = "Run heavier benchmark variant (--heavy) and generate plots (clang-cl, Windows only)"
+depends = ["configure:clang-cl"]
+run = [
+    "cmake --build build-clang-cl --parallel --target benchmark_isprime",
+    "./build-clang-cl/benchmark_isprime.exe --heavy",
+    "uv run benchmarks/plot_isprime.py",
+]
+[tasks."bench-heavy:msvc"]
+description = "Run heavier benchmark variant (--heavy) and generate plots (MSVC, Windows only)"
+depends = ["configure:msvc"]
+run = [
+    "cmake --build build-msvc --parallel --config Release --target benchmark_isprime",
+    "./build-msvc/Release/benchmark_isprime.exe --heavy",
+    "uv run benchmarks/plot_isprime.py",
+]
+# ============================
+# Documentation
+# ============================
+
+[tasks.docs]
+description = "Generate documentation"
+run = ["cp README.md docs/index.md", "uv run mkdocs build"]
+
+[tasks.serve]
+description = "Serve documentation locally"
+run = ["cp README.md docs/index.md", "uv run mkdocs serve"]
+
+# ============================
+# Bundle
+# ============================
+
+[tasks.bundle]
+description = "Bundle public headers by expanding all local includes"
+run = "uv run scripts/bundle_headers.py"
+
+# ============================
+# Lint and format
+# ============================
+
+[tasks.check]
+description = "Check for lint and formatting issues"
+run = [
+    "uv sync --frozen",
+    "ty check",
+    "ruff check",
+    "ruff format --check",
+    "dprint check",
+    "clang-format --dry-run --Werror ...((glob 'include/**/*.{cpp,hpp,h}') ++ (glob 'tests/**/*.{cpp,hpp,h}') ++ (glob 'benchmarks/**/*.{cpp,hpp,h}') ++ (glob 'examples/**/*.{cpp,hpp,h}'))",
+    "zizmor --quiet --offline .github/workflows",
+]
+
+[tasks.fix]
+description = "Auto-fix lint and formatting issues"
+run = [
+    "uv sync --frozen",
+    "ty check --fix",
+    "ruff check --fix",
+    "ruff format",
+    "dprint fmt",
+    "clang-format -i ...((glob 'include/**/*.{cpp,hpp,h}') ++ (glob 'tests/**/*.{cpp,hpp,h}') ++ (glob 'benchmarks/**/*.{cpp,hpp,h}') ++ (glob 'examples/**/*.{cpp,hpp,h}'))",
+    "zizmor --quiet --offline --fix .github/workflows",
+]

@@ -1,25 +1,13 @@
 # Build directories
-build/
 build-*/
-cmake-build-*/
-CMakeFiles/
 .cache/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-*.cmake
 
 # IDE files
-.vscode/settings.local.json
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
-
-# Test outputs
-Testing/
-*.testlog
 
 # Executables
 *.exe
@@ -42,16 +30,15 @@ __pycache__/
 *.py[cod]
 *$py.class
 .Python
-venv/
 ENV/
 
 # CMake user preference file
 CMakeUserPresets.json
 
-/tmp
-/bundled
-compile_commands.json
-
 # Documentation
 /docs/index.md
 /site
+
+/tmp
+/bundled
+compile_commands.json

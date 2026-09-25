@@ -56,7 +56,7 @@ struct Int64Pair {
 };
 
 CPPR_INTERNAL_CONSTEXPR_INLINE void Assume(const bool cond) noexcept {
-    // Hint for the optimizer; ignored during constant evaluation.
+    // Hint for the optimizer.
     if (IsConstantEvaluated()) return;
 #if CPPR_INTERNAL_HAS_BUILTIN(__builtin_assume)
     __builtin_assume(cond);
@@ -70,7 +70,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE void Assume(const bool cond) noexcept {
 }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint32_t n) noexcept {
-    // Precondition: n != 0 (matches std::countr_zero requirements).
     Assume(n != 0);
 #ifdef __cpp_lib_bitops
     return std::countr_zero(n);
@@ -109,7 +108,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint32_t n) noexcept
 }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept {
-    // Precondition: n != 0 (matches std::countr_zero requirements).
     Assume(n != 0);
 #ifdef __cpp_lib_bitops
     return std::countr_zero(n);
@@ -129,7 +127,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountrZero(std::uint64_t n) noexcept
 }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint32_t n) noexcept {
-    // Precondition: n != 0 (matches std::countl_zero requirements).
     Assume(n != 0);
 #ifdef __cpp_lib_bitops
     return std::countl_zero(n);
@@ -168,7 +165,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint32_t n) noexcept
 }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept {
-    // Precondition: n != 0 (matches std::countl_zero requirements).
     Assume(n != 0);
 #ifdef __cpp_lib_bitops
     return std::countl_zero(n);
@@ -188,7 +184,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::int32_t CountlZero(std::uint64_t n) noexcept
 }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint64_t mulnd) noexcept {
-    // Full 128-bit product split into {high, low}.
 #if defined(CPPR_INTERNAL_HAS_INT128_T)
     UInt128 tmp = static_cast<UInt128>(muler) * mulnd;
     return {static_cast<std::uint64_t>(tmp >> 64), static_cast<std::uint64_t>(tmp)};
@@ -217,7 +212,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE Int64Pair Mulu128(std::uint64_t muler, std::uint6
 }
 
 CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t Mulu128High(std::uint64_t muler, std::uint64_t mulnd) noexcept {
-    // High 64 bits of the 128-bit product.
 #if defined(CPPR_INTERNAL_HAS_INT128_T)
     return static_cast<std::uint64_t>((static_cast<UInt128>(muler) * mulnd) >> 64);
 #else
@@ -229,7 +223,6 @@ CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t Mulu128High(std::uint64_t muler, st
 }
 
 CPPR_INTERNAL_CONSTEXPR std::uint64_t Modu128(std::uint64_t numhi, std::uint64_t numlo, std::uint64_t den) {
-    // Computes ((numhi << 64) | numlo) % den.
     // Preconditions: den != 0 and numhi < den (so the quotient fits in 64 bits).
     Assume(den != 0);
     Assume(numhi < den);
