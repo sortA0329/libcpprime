@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Bundle script: for each public header in include/libcpprime/*.hpp,
 expand all local #include "..." directives (both .hpp and .txt)

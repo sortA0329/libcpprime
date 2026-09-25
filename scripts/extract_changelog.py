@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Extract the changelog for a given version from README.md.
 
 The README contains a "Releases" section like:
