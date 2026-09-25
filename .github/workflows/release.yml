@@ -7,8 +7,9 @@ on:
     workflow_dispatch:
         inputs:
             tag:
-                description: Tag name to release
-                required: true
+                description: Tag name to release (empty = auto-detect from README.md)
+                required: false
+                default: ""
                 type: string
 
 permissions:
@@ -21,8 +22,8 @@ jobs:
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
               with:
-                  ref: ${{ inputs.tag || github.ref }}
                   persist-credentials: false
+                  fetch-tags: true
 
             - name: Setup mise tools
               uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
@@ -36,8 +37,20 @@ jobs:
               run: |
                   if [ -n "${INPUT_TAG}" ]; then
                     TAG="${INPUT_TAG}"
-                  else
+                    case "${TAG}" in
+                      v*|V*) ;;
+                      *) TAG="v${TAG}" ;;
+                    esac
+                  elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
                     TAG="${GITHUB_REF_NAME}"
+                  else
+                    # Auto-detect the latest version from the Releases section of README.md.
+                    VERSION="$(python3 -c 'import re,sys; m=re.search(r"^\s*-\s+\S+\s+ver\s+(\S+)\s*$", open("README.md", encoding="utf-8").read(), re.M); sys.stdout.write(m.group(1) if m else "")')"
+                    if [ -z "${VERSION}" ]; then
+                      echo "Error: could not detect version from README.md. Specify tag manually." >&2
+                      exit 1
+                    fi
+                    TAG="v${VERSION}"
                   fi
                   VERSION="${TAG#v}"
                   VERSION="${VERSION#V}"
@@ -46,6 +59,18 @@ jobs:
                   echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
                   echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
                   echo "Releasing ${TAG} (version ${VERSION})"
+
+            - name: Checkout release tag
+              if: ${{ inputs.tag != '' }}
+              env:
+                  TAG: ${{ steps.meta.outputs.tag }}
+              run: |
+                  git fetch origin --tags
+                  if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
+                    git checkout "${TAG}"
+                  else
+                    echo "Tag ${TAG} does not exist yet; staying on the dispatched ref so the release step creates it."
+                  fi
 
             - name: Bundle headers
               run: |
