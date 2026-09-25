@@ -84,7 +84,7 @@ jobs:
               run: cat RELEASE_BODY.md
 
             - name: Create GitHub Release
-              uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2 # zizmor: ignore[superfluous-actions] keep dedicated action for asset upload behavior
+              uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3 # zizmor: ignore[superfluous-actions] keep dedicated action for asset upload behavior
               with:
                   tag_name: ${{ steps.meta.outputs.tag }}
                   name: ${{ steps.meta.outputs.tag }}
