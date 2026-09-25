@@ -207,6 +207,7 @@ run = "uv run scripts/bundle_headers.py"
 [tasks.check]
 description = "Check for lint and formatting issues"
 run = [
+    "uv sync --frozen",
     "ty check",
     "ruff check",
     "ruff format --check",
@@ -218,6 +219,7 @@ run = [
 [tasks.fix]
 description = "Auto-fix lint and formatting issues"
 run = [
+    "uv sync --frozen",
     "ty check --fix",
     "ruff check --fix",
     "ruff format",
