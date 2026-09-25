@@ -1,0 +1,5 @@
+pre-commit:
+    commands:
+        fix:
+            run: mise run fix
+            stage_fixed: true
