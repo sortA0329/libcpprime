@@ -45,7 +45,7 @@ jobs:
                     TAG="${GITHUB_REF_NAME}"
                   else
                     # Auto-detect the latest version from the Releases section of README.md.
-                    VERSION="$(python3 -c 'import re,sys; m=re.search(r"^\s*-\s+\S+\s+ver\s+(\S+)\s*$", open("README.md", encoding="utf-8").read(), re.M); sys.stdout.write(m.group(1) if m else "")')"
+                    VERSION="$(mise x -- uv run scripts/extract_changelog.py --latest --readme README.md)"
                     if [ -z "${VERSION}" ]; then
                       echo "Error: could not detect version from README.md. Specify tag manually." >&2
                       exit 1
