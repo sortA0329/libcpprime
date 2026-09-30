@@ -26,7 +26,6 @@
 #define CPPR_INTERNAL_INCLUDED_INTERNAL_UTILS
 
 #include <cstdint>
-#include <type_traits>
 
 #include "Environment.hpp"
 

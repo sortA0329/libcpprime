@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include <libcpprime/IsPrime.hpp>
-#include <libcpprime/IsPrimeNoTable.hpp>
+#include <libcpprime/IsPrimeCompact.hpp>
 
 int main() {
     // Example usage of libcpprime
@@ -18,9 +18,9 @@ int main() {
     }
 
     std::cout << std::endl;
-    std::cout << "Testing cppr::IsPrimeNoTable():" << std::endl;
+    std::cout << "Testing cppr::IsPrimeCompact():" << std::endl;
     for (const auto& n : test_cases) {
-        std::cout << n << ": " << (cppr::IsPrimeNoTable(n) ? "Prime" : "Composite") << std::endl;
+        std::cout << n << ": " << (cppr::IsPrimeCompact(n) ? "Prime" : "Composite") << std::endl;
     }
 
     return 0;

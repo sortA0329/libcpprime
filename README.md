@@ -30,14 +30,14 @@ int main() {
 }
 ```
 
-### `cppr::IsPrimeNoTable`
+### `cppr::IsPrimeCompact`
 
-Header: `<libcpprime/IsPrimeNoTable.hpp>`
+Header: `<libcpprime/IsPrimeCompact.hpp>`
 
 ```cpp
 namespace cppr {
-    bool IsPrimeNoTable(std::uint64_t n) noexcept; // C++11
-    constexpr bool IsPrimeNoTable(std::uint64_t n) noexcept; // C++20
+    bool IsPrimeCompact(std::uint64_t n) noexcept; // C++11
+    constexpr bool IsPrimeCompact(std::uint64_t n) noexcept; // C++20
 }
 ```
 
@@ -47,11 +47,11 @@ If you want to reduce the size of the executable file, use this function instead
 #### example
 
 ```cpp
-#include <libcpprime/IsPrimeNoTable.hpp>
+#include <libcpprime/IsPrimeCompact.hpp>
 #include <cassert>
 int main() {
-    assert(cppr::IsPrimeNoTable(998244353) == true);
-    assert(cppr::IsPrimeNoTable(1314856348263588546) == false);
+    assert(cppr::IsPrimeCompact(998244353) == true);
+    assert(cppr::IsPrimeCompact(1314856348263588546) == false);
 }
 ```
 
@@ -63,7 +63,7 @@ Header: `<libcpprime/FeatureTestMacros.hpp>`
 #define CPPR_HAS_CONSTEXPR_IS_PRIME 1 // C++20
 ```
 
-This is a feature test macro that determines whether `cppr::IsPrime` and `cppr::IsPrimeNoTable` are declared with `constexpr`.
+This is a feature test macro that determines whether `cppr::IsPrime` and `cppr::IsPrimeCompact` are declared with `constexpr`.
 
 #### example
 
@@ -116,9 +116,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Linux gcc IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Linux gcc IsPrimeNoTable"
+        alt="Linux gcc IsPrimeCompact"
     />
 </p>
 
@@ -138,9 +138,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Linux clang IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Linux clang IsPrimeNoTable"
+        alt="Linux clang IsPrimeCompact"
     />
 </p>
 
@@ -160,9 +160,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Windows msvc IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Windows msvc IsPrimeNoTable"
+        alt="Windows msvc IsPrimeCompact"
     />
 </p>
 
@@ -182,67 +182,70 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Windows clang-cl IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Windows clang-cl IsPrimeNoTable"
+        alt="Windows clang-cl IsPrimeCompact"
     />
 </p>
 
 ## Releases
 
-- 2026/09/25 ver 1.3.5
+- 2026/10/01 v1.4.0
+  - Rename `cppr::IsPrimeNoTable` to `cppr::IsPrimeCompact`
+  - Improve performance of `cppr::IsPrimeCompact`
+- 2026/09/25 v1.3.5
   - Improve performance of `cppr::IsPrimeNoTable`
-- 2026/06/28 ver 1.3.4
+- 2026/06/28 v1.3.4
   - Improve performance
   - Prevent unnecessary code from being included when `FeatureTestMacros.hpp` is included
   - Fix the name and link in the copyright notice
   - Add the copyright notice for Bradley Berg's algorithm to the LICENSE file
-- 2026/02/25 ver 1.3.3
+- 2026/02/25 v1.3.3
   - Update copyright year to 2026
   - Add -O3 -march=native to the compilation flags during benchmarking and testing
-- 2026/01/04 ver 1.3.2
+- 2026/01/04 v1.3.2
   - Improve performance
-- 2025/12/24 ver 1.3.1
+- 2025/12/24 v1.3.1
   - Improve performance and reduce binary size for `cppr::IsPrime`
-- 2025/12/21 ver 1.3.0
+- 2025/12/21 v1.3.0
   - Add `CPPR_HAS_CONSTEXPR_IS_PRIME`
   - Support clang-cl
   - Accelerating Compile-Time Computation
   - Improved compatibility
-- 2025/03/10 ver 1.2.11
+- 2025/03/10 v1.2.11
   - Change the name on the license
   - Change Multiprication Algorithm
   - Replace `__uint128_t` with `unsigned __int128`
-- 2025/01/05 ver 1.2.10
+- 2025/01/05 v1.2.10
   - Change the condition of `constexpr`
-- 2025/01/03 ver 1.2.9
+- 2025/01/03 v1.2.9
   - Fix a bug
-- 2025/01/02 ver 1.2.8
+- 2025/01/02 v1.2.8
   - Improve performance
   - Suppress warnings
-- 2024/12/31 ver 1.2.7
+- 2024/12/31 v1.2.7
   - Improve performance
-- 2024/12/30 ver 1.2.6
+- 2024/12/30 v1.2.6
   - Improve performance
-- 2024/12/29 ver 1.2.5
+- 2024/12/29 v1.2.5
   - Add copyrights notice
-- 2024/12/28 ver 1.2.4
+- 2024/12/28 v1.2.4
   - Improve performance
-- 2024/12/26 ver 1.2.3
+- 2024/12/26 v1.2.3
   - Improve performance
-- 2024/12/25 ver 1.2.2
+- 2024/12/25 v1.2.2
   - Improve performance
-- 2024/12/23 ver 1.2.1
+- 2024/12/23 v1.2.1
   - Improve performance
-- 2024/12/19 ver 1.2.0
+- 2024/12/19 v1.2.0
   - Split `cppr::IsPrime` into `cppr::IsPrime` and `cppr::IsPrimeNoTable`
-- 2024/12/19 ver 1.1.2
+- 2024/12/19 v1.1.2
   - Fix typo
-- 2024/12/18 ver 1.1.1
+- 2024/12/18 v1.1.1
   - Add include guards
-- 2024/12/18 ver 1.1.0
+- 2024/12/18 v1.1.0
   - Add `cppr::IsPrime` with a table
-- 2024/12/18 ver 1.0.0
+- 2024/12/18 v1.0.0
   - Add `cppr::IsPrime`
 
 ## References
