@@ -55,61 +55,13 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool GCDFilter(const std::uint32_t n) noexcept {
     return GCD((a * b) % n, n) == 1;
 }
 
-CPPR_INTERNAL_CONSTEXPR_INLINE std::uint64_t GetLucasBase(const std::uint64_t x) noexcept {
-    // Chooses a Lucas parameter D for the strong Lucas probable prime test.
-    // Returns:
-    // - 0: definitely composite (quick checks found a factor or perfect square)
-    // - 1: no suitable D found in the search range (treated as pass by caller)
-    // - otherwise: selected D
-    std::uint64_t tmp = x % 13;
-    if (tmp == 2 || tmp == 5 || tmp == 6 || tmp == 7 || tmp == 8 || tmp == 11) {
-        return 13;
-    }
-    tmp = x % 17;
-    if (tmp == 3 || tmp == 5 || tmp == 6 || tmp == 7 || tmp == 10 || tmp == 11 || tmp == 12 || tmp == 14) {
-        return 17;
-    }
-    tmp = x % 21;
-    if (tmp == 2 || tmp == 8 || tmp == 10 || tmp == 11 || tmp == 13 || tmp == 19) {
-        return 21;
-    }
-    tmp = x % 29;
-    if (tmp == 0) return 0;
-    if (tmp == 2 || tmp == 3 || tmp == 8 || tmp == 10 || tmp == 11 || tmp == 12 || tmp == 14 || tmp == 15 || tmp == 17 || tmp == 18 || tmp == 19 || tmp == 21 || tmp == 26 || tmp == 27) {
-        return 29;
-    }
-    if (0x02030213u >> (x & 31) & 1) {
-        // Fast perfect-square check for candidates in specific residue classes.
-        std::int32_t k = 32 - (CountlZero(x - 1) >> 1);
-        std::uint64_t s = 1ull << k, t = (s + (x >> k)) >> 1;
-        while (t < s) {
-            s = t;
-            t = (s + x / s) >> 1;
-        }
-        if (s * s == x) return 0;
-    }
-    std::uint64_t Z = 33;
-    while (Z < x) {
-        std::uint64_t a = Z, n = x;
-        bool res = false;
-        while (a != 0) {
-            std::int32_t s = CountrZero(a);
-            a >>= s;
-            res ^= ((s & 1) & ((n & 7) == 3 || (n & 7) == 5));
-            res ^= ((a & 3) == 3 && (n & 3) == 3);
-            std::uint64_t t = n;
-            n = a;
-            a = t % n;
-        }
-        if (n == 1 && res) break;
-        Z += 4;
-    }
-    if (Z >= x) return 1;
-    return Z;
-}
+constexpr std::uint16_t BasesTiny[256] = {
+#include "internal/IsPrimeTinyBases.txt"
+};
 
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) noexcept {
-    const MontgomeryModint64Impl<false> mint(x);
+template <bool Strict>
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Tiny(const std::uint64_t x) noexcept {
+    const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
     const auto one = mint.one();
@@ -187,130 +139,20 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64MillerRabin(const std::uint64_t x) 
         }
         return true;
     };
+
     // These bases were discovered by Steve Worley and Jim Sinclair.
-    if (x < 7999252175582851ull) {
+    if (x < 55245642489451ull) {
         if (x < 350269456337ull) {
             return test3(4230279247111683200ull, 14694767155120705706ull, 16641139526367750375ull);
-        } else if (x < 55245642489451ull) {
-            return test2(2ull, 141889084524735ull) && test2(1199124725622454117ull, 11096072698276303650ull);
         } else {
-            return test2(2ull, 4130806001517ull) && test3(149795463772692060ull, 186635894390467037ull, 3967304179347715805ull);
-        }
-    } else {
-        return test3(2ull, 123635709730000ull, 9233062284813009ull) && test3(43835965440333360ull, 761179012939631437ull, 1263739024124850375ull);
-    }
-}
-
-template <bool Strict>
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Base2(const std::uint64_t x, const MontgomeryModint64Impl<Strict> mint) noexcept {
-    const auto one = mint.one();
-    const auto mone = mint.mone();
-    const std::int32_t S = CountrZero(x - 1);
-    const std::uint64_t D = (x - 1) >> S;
-    auto a = one;
-    auto b = mint.raw(2);
-    std::uint64_t ex = D;
-    while (ex != 1) {
-        auto c = mint.mul(b, b);
-        if (ex & 1) a = mint.mul(a, b);
-        b = c;
-        ex >>= 1;
-    }
-    a = mint.mul(a, b);
-    bool flag = mint.same(a, one) || mint.same(a, mone);
-    if (x % 4 == 3) return flag;
-    if (flag) return true;
-    for (std::int32_t i = 0; i != S - 1; ++i) {
-        a = mint.mul(a, a);
-        if (mint.same(a, mone)) return true;
-    }
-    return false;
-}
-
-template <bool Strict>
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64StrongLucasBase5(const std::uint64_t x, const MontgomeryModint64Impl<Strict> mint) noexcept {
-    const std::uint64_t D = mint.raw(5);
-    const auto one = mint.one();
-    const auto mone = mint.mone();
-    const auto two = mint.add(one, one);
-    const auto mtwo = mint.add(mone, mone);
-    std::uint64_t u = one;
-    std::uint64_t v = one;
-    std::uint64_t Qt = mtwo;
-    std::uint64_t k = (x + 1) << CountlZero(x + 1);
-    std::uint64_t t = (x >> 1) + 1;
-    k <<= 1;
-    while (k) {
-        u = mint.mul(u, v);
-        v = mint.sub(mint.mul(v, v), Qt);
-        std::uint64_t tmp = k;
-        k <<= 1;
-        Qt = two;
-        if (tmp >> 63) {
-            std::uint64_t uu = u;
-            u = mint.add(u, v);
-            v = mint.add(mint.mul(D, uu), v);
-            u = (u >> 1) + ((u & 1) ? t : 0);
-            v = (v >> 1) + ((v & 1) ? t : 0);
-            Qt = mtwo;
+            return test2(2ull, 141889084524735ull) && test2(1199124725622454117ull, 11096072698276303650ull);
         }
     }
-    if (mint.is_zero(u) || mint.is_zero(v)) return true;
-    std::uint64_t f = ((x + 1) & ~x) >> 1;
-    if (!f) return false;
-    v = mint.sub(mint.mul(v, v), Qt);
-    f >>= 1;
-    if (mint.is_zero(v)) return true;
-    while (f) {
-        v = mint.sub(mint.mul(v, v), two);
-        f >>= 1;
-        if (mint.is_zero(v)) return true;
-    }
-    return false;
-}
 
-template <bool Strict>
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64BailliePSW(const std::uint64_t x) noexcept {
-    const MontgomeryModint64Impl<Strict> mint(x);
-    if (!IsPrime64Base2(x, mint)) return false;
-    // Strong Lucas probable prime test.
-    const std::uint64_t mod5 = x % 5;
-    if (mod5 == 2 || mod5 == 3) return IsPrime64StrongLucasBase5(x, mint);
-    const std::uint64_t Base = GetLucasBase(x);
-    if (Base <= 1) return Base == 1;
-    const std::uint64_t Q = mint.raw(x - (Base - 1) / 4);
-    const std::uint64_t D = mint.raw(Base);
-    const auto one = mint.one();
-    std::uint64_t u = one;
-    std::uint64_t v = one;
-    std::uint64_t Qn = Q;
-    std::uint64_t k = (x + 1) << CountlZero(x + 1);
-    std::uint64_t t = (x >> 1) + 1;
-    k <<= 1;
-    while (k) {
-        std::uint64_t Qt = mint.add(Qn, Qn);
-        Qn = mint.mul(Qn, Qn);
-        u = mint.mul(u, v);
-        v = mint.sub(mint.mul(v, v), Qt);
-        std::uint64_t tmp = k;
-        k <<= 1;
-        if (tmp >> 63) {
-            Qn = mint.mul(Qn, Q);
-            std::uint64_t uu = u;
-            u = mint.add(u, v);
-            v = mint.add(mint.mul(D, uu), v);
-            u = (u >> 1) + ((u & 1) ? t : 0);
-            v = (v >> 1) + ((v & 1) ? t : 0);
-        }
-    }
-    if (mint.is_zero(u) || mint.is_zero(v)) return true;
-    std::uint64_t f = (x + 1) & ~x;
-    for (f >>= 1; f; f >>= 1) {
-        v = mint.sub(mint.mul(v, v), mint.add(Qn, Qn));
-        if (mint.is_zero(v)) return true;
-        Qn = mint.mul(Qn, Qn);
-    }
-    return false;
+    if (!test2(2ull, 9375ull)) return false;
+    const std::uint16_t pair = BasesTiny[(2298633409u * static_cast<std::uint32_t>(x)) >> 24];
+    const std::uint64_t base1 = pair >> 8, base2 = pair & 0xff;
+    return test3(13ull, base1, base2);
 }
 
 }  // namespace internal
@@ -324,21 +166,11 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
         return internal::IsPrime32(static_cast<std::uint32_t>(n));
     } else {
         if (internal::TrialDivision64(n)) return false;
-#if defined(_MSC_VER) && !defined(__clang__)
-        if (n < 585226005592931977ull) {
-            return internal::IsPrime64MillerRabin(n);
+        if (n < (std::uint64_t(1) << 62)) {
+            return internal::IsPrime64Tiny<false>(n);
         } else {
-            return internal::IsPrime64BailliePSW<true>(n);
+            return internal::IsPrime64Tiny<true>(n);
         }
-#else
-        if (n < 7999252175582851ull) {
-            return internal::IsPrime64MillerRabin(n);
-        } else if (n < (std::uint64_t(1) << 62)) {
-            return internal::IsPrime64BailliePSW<false>(n);
-        } else {
-            return internal::IsPrime64BailliePSW<true>(n);
-        }
-#endif
     }
 }
 
