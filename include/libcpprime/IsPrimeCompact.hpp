@@ -87,16 +87,15 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Compact(const std::uint64_t x) noex
         b = mint.mul(b, d);
         bool res1 = mint.same(a, one) || mint.same(a, mone);
         bool res2 = mint.same(b, one) || mint.same(b, mone);
-        if (!(res1 && res2)) {
+        if (x % 4 == 1 && !(res1 && res2)) {
             for (std::int32_t i = 0; i != S - 1; ++i) {
                 a = mint.mul(a, a);
                 b = mint.mul(b, b);
                 res1 |= mint.same(a, mone);
                 res2 |= mint.same(b, mone);
             }
-            if (!res1 || !res2) return false;
         }
-        return true;
+        return res1 && res2;
     };
     auto test3 = [=](std::uint64_t base1, std::uint64_t base2, std::uint64_t base3) -> bool {
         auto a = one;
@@ -126,7 +125,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Compact(const std::uint64_t x) noex
         bool res1 = mint.same(a, one) || mint.same(a, mone);
         bool res2 = mint.same(b, one) || mint.same(b, mone);
         bool res3 = mint.same(c, one) || mint.same(c, mone);
-        if (!(res1 && res2 && res3)) {
+        if (x % 4 == 1 && !(res1 && res2 && res3)) {
             for (std::int32_t i = 0; i != S - 1; ++i) {
                 a = mint.mul(a, a);
                 b = mint.mul(b, b);
@@ -135,9 +134,8 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Compact(const std::uint64_t x) noex
                 res2 |= mint.same(b, mone);
                 res3 |= mint.same(c, mone);
             }
-            if (!res1 || !res2 || !res3) return false;
         }
-        return true;
+        return res1 && res2 && res3;
     };
 
     // These bases were discovered by Steve Worley and Jim Sinclair.
