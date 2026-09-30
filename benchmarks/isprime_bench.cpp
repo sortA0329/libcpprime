@@ -7,7 +7,7 @@
 #include <ios>
 #include <iostream>
 #include <libcpprime/IsPrime.hpp>
-#include <libcpprime/IsPrimeNoTable.hpp>
+#include <libcpprime/IsPrimeCompact.hpp>
 #include <limits>
 #include <random>
 #include <sstream>
@@ -83,10 +83,10 @@ int main(int argc, char** argv) {
     std::int32_t count_prime[65] = {};
     double time_composite_sum[65] = {};
     std::int32_t count_composite[65] = {};
-    double time_prime_sum_NoTable[65] = {};
-    std::int32_t count_prime_NoTable[65] = {};
-    double time_composite_sum_NoTable[65] = {};
-    std::int32_t count_composite_NoTable[65] = {};
+    double time_prime_sum_Compact[65] = {};
+    std::int32_t count_prime_Compact[65] = {};
+    double time_composite_sum_Compact[65] = {};
+    std::int32_t count_composite_Compact[65] = {};
 
     // Emit results for cppr::IsPrime
     auto bench_IsPrime = [&] {
@@ -112,36 +112,36 @@ int main(int argc, char** argv) {
         }
     };
 
-    // Emit results for cppr::IsPrimeNoTable
-    auto bench_IsPrimeNoTable = [&] {
+    // Emit results for cppr::IsPrimeCompact
+    auto bench_IsPrimeCompact = [&] {
         std::mt19937_64 rng(100);
         std::uniform_int_distribution<> uniform(0, 89439);
-        for (std::uint32_t i = 0; i < 512; ++i) bench(rng, uniform, &cppr::IsPrimeNoTable);  // warmup
-        std::ofstream f("benchmarks/bench_IsPrimeNoTable.csv", std::ios::trunc);
+        for (std::uint32_t i = 0; i < 512; ++i) bench(rng, uniform, &cppr::IsPrimeCompact);  // warmup
+        std::ofstream f("benchmarks/bench_IsPrimeCompact.csv", std::ios::trunc);
         f << "n,is_prime,time_ns\n";
         f.setf(std::ios::fmtflags(0), std::ios::floatfield);  // default
         for (int i = 0; i < samples; ++i) {
-            auto [n, isp, t] = bench(rng, uniform, &cppr::IsPrimeNoTable);
+            auto [n, isp, t] = bench(rng, uniform, &cppr::IsPrimeCompact);
             char buf[96];
             int len = std::snprintf(buf, sizeof(buf), "%llu,%d,%.12f\n", static_cast<unsigned long long>(n), isp ? 1 : 0, t);
             f.write(buf, len);
             std::int32_t bitlen = std::bit_width(n);
             if (isp) {
-                time_prime_sum_NoTable[bitlen] += t;
-                count_prime_NoTable[bitlen] += 1;
+                time_prime_sum_Compact[bitlen] += t;
+                count_prime_Compact[bitlen] += 1;
             } else {
-                time_composite_sum_NoTable[bitlen] += t;
-                count_composite_NoTable[bitlen] += 1;
+                time_composite_sum_Compact[bitlen] += t;
+                count_composite_Compact[bitlen] += 1;
             }
         }
     };
 
     if (heavy) {
         bench_IsPrime();
-        bench_IsPrimeNoTable();
+        bench_IsPrimeCompact();
     } else {
         auto th1 = std::thread(bench_IsPrime);
-        auto th2 = std::thread(bench_IsPrimeNoTable);
+        auto th2 = std::thread(bench_IsPrimeCompact);
         th1.join();
         th2.join();
     }
@@ -149,7 +149,7 @@ int main(int argc, char** argv) {
     // Output summary
     std::ofstream summary("benchmarks/bench_summary.csv", std::ios::trunc);
     std::ostringstream summary_md;
-    summary << "avg_time_prime_IsPrime,avg_time_prime_IsPrimeNoTable,avg_time_composite_IsPrime,avg_time_composite_IsPrimeNoTable\n";
+    summary << "avg_time_prime_IsPrime,avg_time_prime_IsPrimeCompact,avg_time_composite_IsPrime,avg_time_composite_IsPrimeCompact\n";
     summary << std::fixed << std::setprecision(6);
     summary_md << std::fixed << std::setprecision(2);
     auto print_result = [](auto& f, double val, std::int32_t count) -> auto& {
@@ -180,18 +180,18 @@ int main(int argc, char** argv) {
     };
     for (std::int32_t i = 1; i <= 64; ++i) {
         print_result(summary, time_prime_sum[i], count_prime[i]) << ",";
-        print_result(summary, time_prime_sum_NoTable[i], count_prime_NoTable[i]) << ",";
+        print_result(summary, time_prime_sum_Compact[i], count_prime_Compact[i]) << ",";
         print_result(summary, time_composite_sum[i], count_composite[i]) << ",";
-        print_result(summary, time_composite_sum_NoTable[i], count_composite_NoTable[i]) << "\n";
+        print_result(summary, time_composite_sum_Compact[i], count_composite_Compact[i]) << "\n";
     }
     summary_md << "# Benchmark Summary\n\n";
     summary_md << "## Overall summary\n\n";
     summary_md << "- IsPrime averages " << range_average(1, 64, time_prime_sum, count_prime) << " ns on prime inputs and " << range_average(1, 64, time_composite_sum, count_composite)
                << " ns on composite inputs.\n";
-    summary_md << "- IsPrimeNoTable averages " << range_average(1, 64, time_prime_sum_NoTable, count_prime_NoTable) << " ns on prime inputs and "
-               << range_average(1, 64, time_composite_sum_NoTable, count_composite_NoTable) << " ns on composite inputs.\n\n";
+    summary_md << "- IsPrimeCompact averages " << range_average(1, 64, time_prime_sum_Compact, count_prime_Compact) << " ns on prime inputs and "
+               << range_average(1, 64, time_composite_sum_Compact, count_composite_Compact) << " ns on composite inputs.\n\n";
     summary_md << "## Averages by 8-bit range (nanoseconds)\n\n";
-    summary_md << "| Bit range | IsPrime (prime) | IsPrimeNoTable (prime) | IsPrime (composite) | IsPrimeNoTable (composite) |\n";
+    summary_md << "| Bit range | IsPrime (prime) | IsPrimeCompact (prime) | IsPrime (composite) | IsPrimeCompact (composite) |\n";
     summary_md << "|-----------|-----------------|------------------------|---------------------|----------------------------|\n";
     const std::pair<std::int32_t, std::int32_t> ranges[] = {
         {1, 8}, {9, 16}, {17, 24}, {25, 32}, {33, 40}, {41, 48}, {49, 56}, {57, 62}, {63, 64},
@@ -201,9 +201,9 @@ int main(int argc, char** argv) {
         const std::int32_t end = ranges[idx].second;
         summary_md << "| " << begin << "-" << end << " | ";
         summary_md << range_average(begin, end, time_prime_sum, count_prime) << " | ";
-        summary_md << range_average(begin, end, time_prime_sum_NoTable, count_prime_NoTable) << " | ";
+        summary_md << range_average(begin, end, time_prime_sum_Compact, count_prime_Compact) << " | ";
         summary_md << range_average(begin, end, time_composite_sum, count_composite) << " | ";
-        summary_md << range_average(begin, end, time_composite_sum_NoTable, count_composite_NoTable) << " |\n";
+        summary_md << range_average(begin, end, time_composite_sum_Compact, count_composite_Compact) << " |\n";
     }
     summary << std::flush;
 

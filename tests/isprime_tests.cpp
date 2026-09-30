@@ -5,7 +5,7 @@
 #include <fstream>
 #include <libcpprime/FeatureTestMacros.hpp>
 #include <libcpprime/IsPrime.hpp>
-#include <libcpprime/IsPrimeNoTable.hpp>
+#include <libcpprime/IsPrimeCompact.hpp>
 #include <random>
 #include <set>
 #include <string>
@@ -16,27 +16,27 @@
 struct IsPrimeImpl {
     constexpr static bool IsPrime(std::uint64_t n) { return cppr::IsPrime(n); }
 };
-struct IsPrimeNoTableImpl {
-    constexpr static bool IsPrime(std::uint64_t n) { return cppr::IsPrimeNoTable(n); }
+struct IsPrimeCompactImpl {
+    constexpr static bool IsPrime(std::uint64_t n) { return cppr::IsPrimeCompact(n); }
 };
 #else
 struct IsPrimeImpl {
     inline static bool IsPrime(std::uint64_t n) { return cppr::IsPrime(n); }
 };
-struct IsPrimeNoTableImpl {
-    inline static bool IsPrime(std::uint64_t n) { return cppr::IsPrimeNoTable(n); }
+struct IsPrimeCompactImpl {
+    inline static bool IsPrime(std::uint64_t n) { return cppr::IsPrimeCompact(n); }
 };
 #endif
 template <class Impl>
 class IsPrimeTest : public ::testing::Test {};
-using IsPrimeImplementations = ::testing::Types<IsPrimeImpl, IsPrimeNoTableImpl>;
+using IsPrimeImplementations = ::testing::Types<IsPrimeImpl, IsPrimeCompactImpl>;
 struct IsPrimeImplName {
     template <class T>
     static std::string GetName(int) {
         if (std::is_same<T, IsPrimeImpl>::value) {
             return "IsPrime";
-        } else if (std::is_same<T, IsPrimeNoTableImpl>::value) {
-            return "IsPrimeNoTable";
+        } else if (std::is_same<T, IsPrimeCompactImpl>::value) {
+            return "IsPrimeCompact";
         } else {
             return "Unknown";
         }
@@ -156,7 +156,7 @@ TEST(IsPrimeTest, CompareImplementations) {
     std::mt19937_64 rng;
     for (std::uint64_t i = 0; i < 10000000; i++) {
         std::uint64_t n = (rng() >> (rng() % 40)) | 1;
-        ASSERT_EQ(cppr::IsPrime(n), cppr::IsPrimeNoTable(n)) << "Mismatch for n = " << n;
+        ASSERT_EQ(cppr::IsPrime(n), cppr::IsPrimeCompact(n)) << "Mismatch for n = " << n;
     }
 }
 

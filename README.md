@@ -30,14 +30,14 @@ int main() {
 }
 ```
 
-### `cppr::IsPrimeNoTable`
+### `cppr::IsPrimeCompact`
 
-Header: `<libcpprime/IsPrimeNoTable.hpp>`
+Header: `<libcpprime/IsPrimeCompact.hpp>`
 
 ```cpp
 namespace cppr {
-    bool IsPrimeNoTable(std::uint64_t n) noexcept; // C++11
-    constexpr bool IsPrimeNoTable(std::uint64_t n) noexcept; // C++20
+    bool IsPrimeCompact(std::uint64_t n) noexcept; // C++11
+    constexpr bool IsPrimeCompact(std::uint64_t n) noexcept; // C++20
 }
 ```
 
@@ -47,11 +47,11 @@ If you want to reduce the size of the executable file, use this function instead
 #### example
 
 ```cpp
-#include <libcpprime/IsPrimeNoTable.hpp>
+#include <libcpprime/IsPrimeCompact.hpp>
 #include <cassert>
 int main() {
-    assert(cppr::IsPrimeNoTable(998244353) == true);
-    assert(cppr::IsPrimeNoTable(1314856348263588546) == false);
+    assert(cppr::IsPrimeCompact(998244353) == true);
+    assert(cppr::IsPrimeCompact(1314856348263588546) == false);
 }
 ```
 
@@ -63,7 +63,7 @@ Header: `<libcpprime/FeatureTestMacros.hpp>`
 #define CPPR_HAS_CONSTEXPR_IS_PRIME 1 // C++20
 ```
 
-This is a feature test macro that determines whether `cppr::IsPrime` and `cppr::IsPrimeNoTable` are declared with `constexpr`.
+This is a feature test macro that determines whether `cppr::IsPrime` and `cppr::IsPrimeCompact` are declared with `constexpr`.
 
 #### example
 
@@ -116,9 +116,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Linux gcc IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-gcc/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Linux gcc IsPrimeNoTable"
+        alt="Linux gcc IsPrimeCompact"
     />
 </p>
 
@@ -138,9 +138,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Linux clang IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Linux-clang/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Linux clang IsPrimeNoTable"
+        alt="Linux clang IsPrimeCompact"
     />
 </p>
 
@@ -160,9 +160,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Windows msvc IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-msvc/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Windows msvc IsPrimeNoTable"
+        alt="Windows msvc IsPrimeCompact"
     />
 </p>
 
@@ -182,9 +182,9 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
         alt="Windows clang-cl IsPrime"
     />
     <img
-        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeNoTable.webp"
+        src="https://sortA0329.github.io/libcpprime/benchmarks/latest/benchmark-Windows-clang-cl/bench_IsPrimeCompact.webp"
         width="500px"
-        alt="Windows clang-cl IsPrimeNoTable"
+        alt="Windows clang-cl IsPrimeCompact"
     />
 </p>
 

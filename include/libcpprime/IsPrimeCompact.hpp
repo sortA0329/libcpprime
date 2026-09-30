@@ -7,8 +7,8 @@
  *
  **/
 
-#ifndef CPPR_INTERNAL_INCLUDED_IS_PRIME_NO_TABLE
-#define CPPR_INTERNAL_INCLUDED_IS_PRIME_NO_TABLE
+#ifndef CPPR_INTERNAL_INCLUDED_IS_PRIME_COMPACT
+#define CPPR_INTERNAL_INCLUDED_IS_PRIME_COMPACT
 
 #include <cstdint>
 
@@ -55,12 +55,12 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool GCDFilter(const std::uint32_t n) noexcept {
     return GCD((a * b) % n, n) == 1;
 }
 
-constexpr std::uint16_t BasesTiny[256] = {
-#include "internal/IsPrimeTinyBases.txt"
+constexpr std::uint16_t BasesCompact[256] = {
+#include "internal/IsPrimeBases64Compact.txt"
 };
 
 template <bool Strict>
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Tiny(const std::uint64_t x) noexcept {
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Compact(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
     const std::int32_t S = CountrZero(x - 1);
     const std::uint64_t D = (x - 1) >> S;
@@ -150,14 +150,14 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Tiny(const std::uint64_t x) noexcep
     }
 
     if (!test2(2ull, 9375ull)) return false;
-    const std::uint16_t pair = BasesTiny[(2298633409u * static_cast<std::uint32_t>(x)) >> 24];
+    const std::uint16_t pair = BasesCompact[(2298633409u * static_cast<std::uint32_t>(x)) >> 24];
     const std::uint64_t base1 = pair >> 8, base2 = pair & 0xff;
     return test3(13ull, base1, base2);
 }
 
 }  // namespace internal
 
-CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
+CPPR_INTERNAL_CONSTEXPR bool IsPrimeCompact(std::uint64_t n) noexcept {
     if (n < 1024) {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
@@ -167,9 +167,9 @@ CPPR_INTERNAL_CONSTEXPR bool IsPrimeNoTable(std::uint64_t n) noexcept {
     } else {
         if (internal::TrialDivision64(n)) return false;
         if (n < (std::uint64_t(1) << 62)) {
-            return internal::IsPrime64Tiny<false>(n);
+            return internal::IsPrime64Compact<false>(n);
         } else {
-            return internal::IsPrime64Tiny<true>(n);
+            return internal::IsPrime64Compact<true>(n);
         }
     }
 }

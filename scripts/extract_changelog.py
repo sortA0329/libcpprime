@@ -1,15 +1,6 @@
 """Extract the changelog for a given version from README.md.
 
-The README contains a "Releases" section like:
-
-    ## Releases
-
-    -   2026/09/23 ver 1.3.5
-        - Improve performance of `cppr::IsPrimeNoTable`
-    -   2026/06/28 ver 1.3.4
-        - Improve performance
-        ...
-
+The README contains a "Releases" section.
 This script extracts the bullet points of the requested version so that
 they can be used as the body of a GitHub Release.
 """

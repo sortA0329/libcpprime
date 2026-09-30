@@ -25,7 +25,7 @@
 #ifndef CPPR_INTERNAL_INCLUDED_INTERNAL_ENVIRONMENT
 #define CPPR_INTERNAL_INCLUDED_INTERNAL_ENVIRONMENT
 
-#include <type_traits>
+#include <type_traits>  // IWYU pragma: export
 
 #if defined(__has_include) && __has_include(<bit>) && (!defined(_MSVC_LANG) || _MSVC_LANG >= 202002L)
 #include <bit>  // IWYU pragma: export

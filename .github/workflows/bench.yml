@@ -62,7 +62,7 @@ jobs:
                   path: |
                       benchmarks/bench_summary.md
                       benchmarks/bench_IsPrime.webp
-                      benchmarks/bench_IsPrimeNoTable.webp
+                      benchmarks/bench_IsPrimeCompact.webp
                       benchmarks/bench_summary.webp
 
     windows:
@@ -109,7 +109,7 @@ jobs:
                   path: |
                       benchmarks/bench_summary.md
                       benchmarks/bench_IsPrime.webp
-                      benchmarks/bench_IsPrimeNoTable.webp
+                      benchmarks/bench_IsPrimeCompact.webp
                       benchmarks/bench_summary.webp
 
     publish-pages:
