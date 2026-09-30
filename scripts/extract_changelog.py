@@ -12,7 +12,7 @@ import re
 import sys
 from pathlib import Path
 
-VERSION_HEADER_RE = re.compile(r"^\s*-\s+\S+\s+ver\s+(\S+)\s*$")
+VERSION_HEADER_RE = re.compile(r"^\s*-\s+\S+\s+v\s*(\d+\S*)\s*$")
 HEADING_RE = re.compile(r"^#{1,6}\s")
 
 
@@ -30,6 +30,14 @@ def find_available_versions(lines: list[str]) -> list[str]:
         if match:
             versions.append(normalize_version(match.group(1)))
     return versions
+
+
+def find_latest_version(readme_text: str) -> str:
+    for line in readme_text.splitlines():
+        match = VERSION_HEADER_RE.match(line)
+        if match:
+            return normalize_version(match.group(1))
+    raise ValueError("No version found in README.md.")
 
 
 def extract_changelog(readme_text: str, version: str) -> str:
@@ -78,8 +86,13 @@ def main() -> int:
     )
     parser.add_argument(
         "--version",
-        required=True,
-        help="Version to extract (e.g. 1.3.4 or v1.3.4).",
+        default=None,
+        help="Version to extract (e.g. 1.4.0 or v1.4.0).",
+    )
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        help="Print the latest version from README.md instead of extracting.",
     )
     parser.add_argument(
         "--readme",
@@ -93,23 +106,34 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    version = normalize_version(args.version)
-
     readme_path = Path(args.readme)
     if not readme_path.is_file():
         print(f"Error: README not found: {readme_path}", file=sys.stderr)
         return 1
 
-    try:
-        body = extract_changelog(readme_path.read_text(encoding="utf-8"), version)
-    except ValueError as exc:
-        print(f"Error: {exc}", file=sys.stderr)
-        return 1
+    readme_text = readme_path.read_text(encoding="utf-8")
+
+    if args.latest:
+        try:
+            output_text = find_latest_version(readme_text) + "\n"
+        except ValueError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
+    else:
+        if args.version is None:
+            parser.error("--version is required unless --latest is specified.")
+        version = normalize_version(args.version)
+
+        try:
+            output_text = extract_changelog(readme_text, version)
+        except ValueError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            return 1
 
     if args.output:
-        Path(args.output).write_text(body, encoding="utf-8")
+        Path(args.output).write_text(output_text, encoding="utf-8")
     else:
-        sys.stdout.write(body)
+        sys.stdout.write(output_text)
 
     return 0
 
