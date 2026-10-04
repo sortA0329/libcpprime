@@ -188,6 +188,39 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
     />
 </p>
 
+## Algorithm
+
+The core algorithm of `libcpprime` is the Miller–Rabin primality test. Although traditionally a randomized algorithm, it has been proven that any integer below 2^64 can be deterministically tested using seven fixed bases [1].
+
+Using a hash table optimizes this process further. For composite numbers that act as pseudoprimes to a specific base (such as base 2), their hash values are calculated to assign them into separate buckets. Bases are then selected for each bucket to correctly test every number mapped to it [2]. Finding these optimal bases took under a minute, aided by GPU acceleration and precomputed base-2 pseudoprimes.
+
+Thanks to this strategy, `cppr::IsPrime` requires only 2 bases, while `cppr::IsPrimeCompact` uses 5. For numbers smaller than 2^32, Bradley Berg's algorithm is applied, which relies on a single base [3].
+
+Beyond core algorithmic choices, micro-optimizations play a critical role. Because CPU division takes longer than multiplication, Montgomery reduction is employed. For numbers below 2^32, accepting both `MR(x)` and `MR(x) + n` (where `MR` denotes the Montgomery representation) eliminates unpredictable conditional branches. For values smaller than 2^21, fast modulo reduction using Lemire's method is applied [4] [5].
+
+Furthermore, tests against multiple bases are executed concurrently within a single loop. This design maximizes instruction-level parallelism (ILP) and minimizes conditional branching. Although this increases execution time for composite numbers that would otherwise be filtered out early in sequential testing, `libcpprime` prioritizes optimizing worst-case performance.
+
+Additional micro-optimizations include:
+
+- Trial division by small primes
+- Precomputed lookup flags for small numbers below 2^21 (`cppr::IsPrime`) or 2^10 (`cppr::IsPrimeCompact`)
+- Skipping the second step of the Miller–Rabin test (repeated squaring) when n ≡ 3 mod 4
+- Newton's method for computing `-n^-1 mod R` [6]
+- GCD calculation with products of small primes using Stein's algorithm (binary GCD) instead of division [7]
+- Standard division for numbers between 2^21 and 2^32
+- Inline assembly (GCC/Clang) and `_udiv128` (MSVC) for 128-bit modulo arithmetic, avoiding overhead from compiler built-in functions for `unsigned __int128`
+- `libdivide` for 128-bit modulo arithmetic when hardware/intrinsic support is unavailable
+- Compiler hints (e.g., `__builtin_assume`) providing value ranges for improved code generation
+- Skip for
+
+[1] https://miller-rabin.appspot.com/
+[2] https://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
+[3] https://www.techneon.com/download/is.prime.32.base.data
+[4] https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+[5] https://en.algorithmica.org/hpc/arithmetic/division/
+[6] https://rsk0315.hatenablog.com/entry/2022/11/27/060616
+[7] https://lpha-z.hatenablog.com/entry/2020/05/31/231500
+
 ## Releases
 
 - 2026/10/04 v1.4.1
@@ -249,11 +282,3 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
   - Add `cppr::IsPrime` with a table
 - 2024/12/18 v1.0.0
   - Add `cppr::IsPrime`
-
-## References
-
-- https://miller-rabin.appspot.com/
-- https://zenn.dev/mizar/articles/791698ea860581
-- https://www.techneon.com/download/is.prime.32.base.data
-- https://www.techneon.com/download/is.prime.64.base.data
-- https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
