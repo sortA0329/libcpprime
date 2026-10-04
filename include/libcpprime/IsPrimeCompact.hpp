@@ -156,7 +156,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64Compact(const std::uint64_t x) noex
 }  // namespace internal
 
 CPPR_INTERNAL_CONSTEXPR bool IsPrimeCompact(std::uint64_t n) noexcept {
-    if (n < 1024) {
+    if (n < (1ull << 10)) {
         return internal::IsPrime10(n);
     } else if (n <= 0xffffffff) {
         if (internal::TrialDivision32(static_cast<std::uint32_t>(n))) return false;
