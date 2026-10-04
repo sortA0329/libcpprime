@@ -212,12 +212,12 @@ Additional micro-optimizations include:
 - `libdivide` for 128-bit modulo arithmetic when hardware/intrinsic support is unavailable
 - Compiler hints (e.g., `__builtin_assume`) providing value ranges for improved code generation
 
-[1] https://miller-rabin.appspot.com/
-[2] https://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
-[3] https://www.techneon.com/download/is.prime.32.base.data
-[4] https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
-[5] https://en.algorithmica.org/hpc/arithmetic/division/
-[6] https://rsk0315.hatenablog.com/entry/2022/11/27/060616
+[1] https://miller-rabin.appspot.com/\
+[2] https://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html\
+[3] https://www.techneon.com/download/is.prime.32.base.data\
+[4] https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/\
+[5] https://en.algorithmica.org/hpc/arithmetic/division/\
+[6] https://rsk0315.hatenablog.com/entry/2022/11/27/060616\
 [7] https://lpha-z.hatenablog.com/entry/2020/05/31/231500
 
 ## Releases
