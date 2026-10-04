@@ -3,8 +3,6 @@
     "formatter": "language_server",
     "tab_size": 4,
     "hard_tabs": false,
-    "ensure_final_newline_on_save": true,
-    "remove_trailing_whitespace_on_save": true,
     "file_types": {
         "YAML": [
             ".clang-format",
@@ -88,21 +86,6 @@
             }
         },
         "TOML": {
-            "formatter": {
-                "external": {
-                    "command": "mise",
-                    "arguments": [
-                        "x",
-                        "--",
-                        "dprint",
-                        "fmt",
-                        "--stdin",
-                        "{buffer_path}"
-                    ]
-                }
-            }
-        },
-        "Markdown": {
             "formatter": {
                 "external": {
                     "command": "mise",
