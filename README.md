@@ -211,7 +211,6 @@ Additional micro-optimizations include:
 - Inline assembly (GCC/Clang) and `_udiv128` (MSVC) for 128-bit modulo arithmetic, avoiding overhead from compiler built-in functions for `unsigned __int128`
 - `libdivide` for 128-bit modulo arithmetic when hardware/intrinsic support is unavailable
 - Compiler hints (e.g., `__builtin_assume`) providing value ranges for improved code generation
-- Skip for
 
 [1] https://miller-rabin.appspot.com/
 [2] https://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
