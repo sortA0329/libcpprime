@@ -192,7 +192,7 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 
 The core algorithm of `libcpprime` is the Miller–Rabin primality test. Although traditionally a randomized algorithm, it has been proven that any integer below 2^64 can be deterministically tested using seven fixed bases [1].
 
-Using a hash table optimizes this process further. For composite numbers that act as pseudoprimes to a specific base (such as base 2), their hash values are calculated to assign them into separate buckets. Bases are then selected for each bucket to correctly test every number mapped to it [2]. Finding these optimal bases took under a minute, aided by GPU acceleration and precomputed base-2 pseudoprimes.
+Using a hash table optimizes this process further. For composite numbers that act as pseudoprimes to a specific base (such as base 2), their hash values are calculated to assign them into separate buckets. Bases are then selected for each bucket to correctly test every number mapped to it. Finding these optimal bases took under a minute, aided by GPU acceleration and precomputed base-2 pseudoprimes. [2]
 
 Thanks to this strategy, `cppr::IsPrime` requires only 2 bases, while `cppr::IsPrimeCompact` uses 5. For numbers smaller than 2^32, Bradley Berg's algorithm is applied, which relies on a single base [3].
 
