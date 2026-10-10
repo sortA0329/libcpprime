@@ -25,7 +25,7 @@ constexpr std::uint64_t FlagTable21[16384] = {
 };
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime21(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable21[n / 128] & (1ull << (n % 128 / 2)))); }
 
-constexpr std::uint16_t Bases64[262144] = {
+constexpr std::uint32_t Bases64[131072] = {
 #include "internal/IsPrimeBases64.txt"
 };
 template <bool Strict>
@@ -36,7 +36,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
     const auto one = mint.one();
     const auto mone = mint.mone();
     auto c = mint.raw(2);
-    auto d = mint.raw(Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 14]);
+    auto d = mint.raw(Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 15]);
     auto a = c;
     auto b = d;
     if (D != 1) {
