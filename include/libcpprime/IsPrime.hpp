@@ -20,10 +20,17 @@ namespace cppr {
 
 namespace internal {
 
-constexpr std::uint64_t FlagTable21[16384] = {
+constexpr std::uint64_t FlagTable21[8739] = {
 #include "internal/IsPrimeTable21.txt"
 };
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime21(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable21[n / 128] & (1ull << (n % 128 / 2)))); }
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime21(const std::uint64_t n) noexcept {
+    if (n < 6) return n == 2 || n == 3 || n == 5;
+    Assume(n < (1ull << 21));
+    const std::uint32_t q = static_cast<std::uint32_t>(n) / 30;
+    const std::uint32_t r = static_cast<std::uint32_t>(n) % 30;
+    // Mod-30 wheel lookup
+    return (((0x208a2882u >> r) & (FlagTable21[q >> 3] >> (((q & 7u) << 3) + ((r & 7u) ^ (r >> 4))))) & 1u) != 0;
+}
 
 constexpr std::uint32_t Bases64[131072] = {
 #include "internal/IsPrimeBases64.txt"

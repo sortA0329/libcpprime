@@ -42,7 +42,7 @@ namespace cppr {
 ```
 
 It returns true if the input value is a prime number; otherwise, it returns false.
-If you want to reduce the size of the executable file, use this function instead of `cppr::IsPrime` because `cppr::IsPrime` uses a 640KB table for performance optimization.
+If you want to reduce the size of the executable file, use this function instead of `cppr::IsPrime` because `cppr::IsPrime` uses a 580KB table for performance optimization.
 
 #### example
 
@@ -204,6 +204,7 @@ Additional micro-optimizations include:
 
 - Trial division by small primes
 - Precomputed lookup flags for small numbers below 2^21 (`cppr::IsPrime`) or 2^10 (`cppr::IsPrimeCompact`)
+- Improving cache efficiency by storing precomputed lookup flags only for numbers not divisible by 2, 3, or 5
 - Skipping the second step of the Miller–Rabin test (repeated squaring) when n ≡ 3 mod 4
 - Newton's method for computing `-n^-1 mod R` [6]
 - GCD calculation with products of small primes using Stein's algorithm (binary GCD) instead of division [7]
