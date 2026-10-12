@@ -45,6 +45,15 @@ def deduplicate_libdivide_license(text):
     return LIBDIVIDE_LICENSE.sub(replace, text)
 
 
+def format_size(size_bytes):
+    if size_bytes < 1024:
+        return f"{size_bytes} B"
+    elif size_bytes < 1024 * 1024:
+        return f"{size_bytes / 1024:.1f} KiB"
+    else:
+        return f"{size_bytes / (1024 * 1024):.1f} MiB"
+
+
 def bundle_file(filepath, processed, strip_license=False):
     abs_path = os.path.normpath(filepath)
     base_dir = os.path.dirname(abs_path)
@@ -108,7 +117,8 @@ def main():
         with open(output_path, "w") as f:
             f.write(bundled)
 
-        print(f"  -> {output_path}")
+        size = os.path.getsize(output_path)
+        print(f"  -> {output_path} ({format_size(size)})")
 
     print("Done.")
 
