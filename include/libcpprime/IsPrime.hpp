@@ -20,14 +20,39 @@ namespace cppr {
 
 namespace internal {
 
-constexpr std::uint64_t FlagTable21[16384] = {
+constexpr std::uint64_t FlagTable21[8739] = {
 #include "internal/IsPrimeTable21.txt"
 };
-CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime21(const std::uint64_t n) noexcept { return n == 2 || (n % 2 == 1 && (FlagTable21[n / 128] & (1ull << (n % 128 / 2)))); }
+CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime21(const std::uint64_t n) noexcept {
+    if (n < 6) return n == 2 || n == 3 || n == 5;
+    Assume(n < (1ull << 21));
+    const std::uint32_t q = static_cast<std::uint32_t>(n) / 30;
+    const std::uint32_t r = static_cast<std::uint32_t>(n) % 30;
+    // Mod-30 wheel lookup
+    return (((0x208a2882u >> r) & (FlagTable21[q >> 3] >> (((q & 7u) << 3) + ((r & 7u) ^ (r >> 4))))) & 1u) != 0;
+}
 
-constexpr std::uint16_t Bases64[262144] = {
+constexpr std::uint64_t Bases64[32768] = {
 #include "internal/IsPrimeBases64.txt"
 };
+constexpr std::uint16_t Seeds64[16384] = {
+#include "internal/IsPrimeSeeds64.txt"
+};
+constexpr std::uint16_t HardBases64[80] = {
+#include "internal/IsPrimeHard64.txt"
+};
+CPPR_INTERNAL_CONSTEXPR_INLINE std::uint32_t SelectBase64(const std::uint64_t x) noexcept {
+    const std::uint32_t low = static_cast<std::uint32_t>(x);
+    const std::uint32_t h = 0xd1f0e74du * low;
+    const std::uint32_t bucket = h >> 18;
+    const std::uint32_t seed = Seeds64[bucket];
+    if (seed == 0xffffu) {
+        const std::uint32_t pool = static_cast<std::uint32_t>(Bases64[bucket * 2] & 0xffffu);
+        return HardBases64[pool * 16 + ((h >> 14) & 15u)];
+    }
+    const std::uint32_t slot = ((seed ^ 0x9e3779b1u) * low) >> 29;
+    return static_cast<std::uint32_t>((Bases64[bucket * 2 + (slot >> 2)] >> ((slot & 3u) * 16)) & 0xffffu);
+}
 template <bool Strict>
 CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
     const MontgomeryModint64Impl<Strict> mint(x);
@@ -36,7 +61,7 @@ CPPR_INTERNAL_CONSTEXPR_INLINE bool IsPrime64(const std::uint64_t x) noexcept {
     const auto one = mint.one();
     const auto mone = mint.mone();
     auto c = mint.raw(2);
-    auto d = mint.raw(Bases64[(0xad625b89u * static_cast<std::uint32_t>(x)) >> 14]);
+    auto d = mint.raw(SelectBase64(x));
     auto a = c;
     auto b = d;
     if (D != 1) {

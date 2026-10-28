@@ -42,7 +42,7 @@ namespace cppr {
 ```
 
 It returns true if the input value is a prime number; otherwise, it returns false.
-If you want to reduce the size of the executable file, use this function instead of `cppr::IsPrime` because `cppr::IsPrime` uses a 640KB table for performance optimization.
+If you want to reduce the size of the executable file, use this function instead of `cppr::IsPrime` because `cppr::IsPrime` uses a 360KB table for performance optimization.
 
 #### example
 
@@ -192,7 +192,7 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 
 The core algorithm of `libcpprime` is the Miller–Rabin primality test. Although traditionally a randomized algorithm, it has been proven that any integer below 2^64 can be deterministically tested using seven fixed bases [1].
 
-Using a hash table optimizes this process further. For composite numbers that act as pseudoprimes to a specific base (such as base 2), their hash values are calculated to assign them into separate buckets. Bases are then selected for each bucket to correctly test every number mapped to it [2]. Finding these optimal bases took under a minute, aided by GPU acceleration and precomputed base-2 pseudoprimes.
+Using a two-level hash table optimizes this process further. For composite numbers that act as pseudoprimes to a specific base (such as base 2), their hash values are calculated to assign them into separate buckets. Each bucket stores eight candidate bases, and a per-bucket seed selects one of them for the number being tested. Bases are then selected so that every number mapped to a bucket is correctly tested. Finding these optimal bases took under a minute, aided by GPU acceleration and precomputed base-2 pseudoprimes. [2]
 
 Thanks to this strategy, `cppr::IsPrime` requires only 2 bases, while `cppr::IsPrimeCompact` uses 5. For numbers smaller than 2^32, Bradley Berg's algorithm is applied, which relies on a single base [3].
 
@@ -204,6 +204,7 @@ Additional micro-optimizations include:
 
 - Trial division by small primes
 - Precomputed lookup flags for small numbers below 2^21 (`cppr::IsPrime`) or 2^10 (`cppr::IsPrimeCompact`)
+- Improving cache efficiency by storing precomputed lookup flags only for numbers not divisible by 2, 3, or 5
 - Skipping the second step of the Miller–Rabin test (repeated squaring) when n ≡ 3 mod 4
 - Newton's method for computing `-n^-1 mod R` [6]
 - GCD calculation with products of small primes using Stein's algorithm (binary GCD) instead of division [7]
@@ -222,6 +223,8 @@ Additional micro-optimizations include:
 
 ## Releases
 
+- 2026/10/29 v1.4.2
+  - Reduce the table size of `cppr::IsPrime`
 - 2026/10/04 v1.4.1
   - Improve performance of `cppr::IsPrime`, which resulted in a 600KB increase in table size
 - 2026/10/01 v1.4.0
