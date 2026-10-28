@@ -12,9 +12,23 @@
 #include <random>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <tuple>
 #include <utility>
+
+#if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#elif defined(__APPLE__)
+#include <mach/mach.h>
+#include <mach/thread_policy.h>
+#else
+#include <sched.h>
+#endif
 
 #if defined(_MSC_VER)
 
@@ -42,8 +56,57 @@ void doNotOptimizeAway(T& val) {
 }
 #endif
 
+// Pins the calling thread to a fixed CPU so that scheduling differences between
+// runs do not dominate the measurements. Falls back to the CPU the thread is
+// already running on, and returns -1 when strict pinning is unavailable
+// (macOS only supports an advisory affinity hint).
+int pin_benchmark_thread() {
+#if defined(_WIN32)
+    if (SetThreadAffinityMask(GetCurrentThread(), DWORD_PTR(1)) != 0) {
+        return 0;
+    }
+    const int max_cpu = static_cast<int>(sizeof(DWORD_PTR) * 8);
+    const int current = static_cast<int>(GetCurrentProcessorNumber());
+    if (current >= 0 && current < max_cpu) {
+        const DWORD_PTR mask = DWORD_PTR(1) << current;
+        if (SetThreadAffinityMask(GetCurrentThread(), mask) != 0) {
+            return current;
+        }
+    }
+    return -1;
+#elif defined(__APPLE__)
+    // Affinity tags are only a hint on macOS; they cannot pin a thread.
+    thread_affinity_policy_data_t policy = {1};
+    const mach_port_t thread = mach_thread_self();
+    thread_policy_set(thread, THREAD_AFFINITY_POLICY, reinterpret_cast<thread_policy_t>(&policy), THREAD_AFFINITY_POLICY_COUNT);
+    mach_port_deallocate(mach_task_self(), thread);
+    return -1;
+#else
+    cpu_set_t set;
+    CPU_ZERO(&set);
+    CPU_SET(0, &set);
+    if (sched_setaffinity(0, sizeof(set), &set) == 0) {
+        return 0;
+    }
+    const int cpu = sched_getcpu();
+    if (cpu >= 0 && cpu < CPU_SETSIZE) {
+        CPU_ZERO(&set);
+        CPU_SET(cpu, &set);
+        if (sched_setaffinity(0, sizeof(set), &set) == 0) {
+            return cpu;
+        }
+    }
+    return -1;
+#endif
+}
+
 int main(int argc, char** argv) {
     bool heavy = (argc > 1 && std::string(argv[1]) == "--heavy");
+
+    const int pinned_cpu = pin_benchmark_thread();
+    if (pinned_cpu < 0) {
+        std::cout << "Warning: strict CPU pinning is unavailable; timings may vary.\n";
+    }
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -136,15 +199,8 @@ int main(int argc, char** argv) {
         }
     };
 
-    if (heavy) {
-        bench_IsPrime();
-        bench_IsPrimeCompact();
-    } else {
-        auto th1 = std::thread(bench_IsPrime);
-        auto th2 = std::thread(bench_IsPrimeCompact);
-        th1.join();
-        th2.join();
-    }
+    bench_IsPrime();
+    bench_IsPrimeCompact();
 
     // Output summary
     std::ofstream summary("benchmarks/bench_summary.csv", std::ios::trunc);
