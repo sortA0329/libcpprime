@@ -5,3 +5,11 @@ Diagnostics:
 InlayHints:
     ParameterNames: false
     DeducedTypes: false
+
+---
+
+If:
+    PathMatch: .*isprime_bench\.cpp
+
+Diagnostics:
+    MissingIncludes: None
