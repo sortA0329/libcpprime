@@ -205,7 +205,6 @@ Additional micro-optimizations include:
 - Trial division by small primes
 - Precomputed lookup flags for small numbers below 2^21 (`cppr::IsPrime`) or 2^10 (`cppr::IsPrimeCompact`)
 - Improving cache efficiency by storing precomputed lookup flags only for numbers not divisible by 2, 3, or 5
-- Packing four 16-bit Miller–Rabin bases into each 64-bit table entry
 - Skipping the second step of the Miller–Rabin test (repeated squaring) when n ≡ 3 mod 4
 - Newton's method for computing `-n^-1 mod R` [6]
 - GCD calculation with products of small primes using Stein's algorithm (binary GCD) instead of division [7]
@@ -224,6 +223,8 @@ Additional micro-optimizations include:
 
 ## Releases
 
+- 2026/10/29 v1.4.2
+  - Reduce the table size of `cppr::IsPrime`
 - 2026/10/04 v1.4.1
   - Improve performance of `cppr::IsPrime`, which resulted in a 600KB increase in table size
 - 2026/10/01 v1.4.0
