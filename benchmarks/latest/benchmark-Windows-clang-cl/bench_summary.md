@@ -2,19 +2,19 @@
 
 ## Overall summary
 
-- IsPrime averages 127.98 ns on prime inputs and 43.00 ns on composite inputs.
-- IsPrimeCompact averages 252.64 ns on prime inputs and 47.10 ns on composite inputs.
+- IsPrime averages 128.60 ns on prime inputs and 43.43 ns on composite inputs.
+- IsPrimeCompact averages 252.82 ns on prime inputs and 46.25 ns on composite inputs.
 
 ## Averages by 8-bit range (nanoseconds)
 
 | Bit range | IsPrime (prime) | IsPrimeCompact (prime) | IsPrime (composite) | IsPrimeCompact (composite) |
 |-----------|-----------------|------------------------|---------------------|----------------------------|
-| 1-8 | 3.04 | 1.85 | 3.02 | 1.80 |
-| 9-16 | 3.03 | 19.61 | 3.04 | 3.96 |
-| 17-24 | 30.03 | 61.15 | 9.02 | 15.00 |
-| 25-32 | 97.95 | 96.64 | 27.17 | 25.97 |
-| 33-40 | 166.73 | 249.17 | 53.09 | 66.30 |
-| 41-48 | 200.25 | 420.48 | 65.61 | 69.66 |
-| 49-56 | 234.11 | 528.53 | 79.22 | 83.80 |
-| 57-62 | 263.54 | 593.43 | 90.67 | 95.35 |
-| 63-64 | 301.77 | 669.09 | 103.29 | 109.85 |
+| 1-8 | 4.01 | 2.35 | 4.15 | 2.50 |
+| 9-16 | 4.19 | 19.37 | 4.19 | 4.43 |
+| 17-24 | 35.73 | 66.18 | 11.05 | 16.53 |
+| 25-32 | 119.74 | 124.02 | 33.44 | 33.47 |
+| 33-40 | 161.15 | 239.59 | 51.64 | 63.72 |
+| 41-48 | 193.71 | 407.27 | 63.78 | 64.95 |
+| 49-56 | 226.64 | 520.59 | 76.93 | 78.56 |
+| 57-62 | 254.81 | 586.06 | 87.98 | 89.84 |
+| 63-64 | 307.84 | 689.26 | 105.68 | 110.01 |
