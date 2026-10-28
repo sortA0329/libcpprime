@@ -1,19 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
 # ================================
-# Project
-# ================================
-project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
-
-# ================================
-# Build type handling
-# ================================
-# Single-config generators (Ninja, Makefiles): default to Release
-if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
-endif()
-
-# ================================
 # Compiler selection
 # ================================
 set(LIBCPPRIME_COMPILER "default" CACHE STRING "Select C++ compiler: default/gcc/clang/clang-cl/msvc")
@@ -63,6 +50,19 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
 			message(FATAL_ERROR "msvc is Windows only")
 		endif()
 	endif()
+endif()
+
+# ================================
+# Project
+# ================================
+project(libcpprime VERSION 0.0.0 LANGUAGES CXX)
+
+# ================================
+# Build type handling
+# ================================
+# Single-config generators (Ninja, Makefiles): default to Release
+if (NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
 # ================================
