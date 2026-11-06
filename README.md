@@ -190,13 +190,13 @@ Workflow: [bench.yml](https://github.com/sortA0329/libcpprime/actions/workflows/
 
 ## Algorithm
 
-The core algorithm of `libcpprime` is the Miller–Rabin primality test. Although traditionally a randomized algorithm, it has been proven that any integer below 2^64 can be deterministically tested using seven fixed bases [1].
+The core algorithm of `libcpprime` is the Miller–Rabin primality test. Although traditionally a randomized algorithm, it has been proven that any integer below 2^64 can be deterministically tested using seven fixed bases (2, 325, 9375, 28178, 450775, 9780504, 1795265022) [1].
 
-Using a two-level hash table optimizes this process further. For composite numbers that act as pseudoprimes to a specific base (such as base 2), their hash values are calculated to assign them into separate buckets. Each bucket stores eight candidate bases, and a per-bucket seed selects one of them for the number being tested. Bases are then selected so that every number mapped to a bucket is correctly tested. Finding these optimal bases took under a minute, aided by GPU acceleration and precomputed base-2 pseudoprimes. [2]
+Using a two-level hash table optimizes this process further. For composite numbers that act as pseudoprimes to base 2, their hash values are calculated to assign them into separate buckets. Each bucket stores eight candidate bases, and a per-bucket seed selects one of them for the number being tested. Bases are then selected so that every number mapped to a bucket is correctly tested. Finding these optimal bases took under a few tens of minutes, aided by GPU acceleration and precomputed base-2 pseudoprimes [2].
 
-Thanks to this strategy, `cppr::IsPrime` requires only 2 bases, while `cppr::IsPrimeCompact` uses 5. For numbers smaller than 2^32, Bradley Berg's algorithm is applied, which relies on a single base [3].
+Thanks to this strategy, `cppr::IsPrime` requires only 2 bases, while `cppr::IsPrimeCompact` uses 5. For numbers smaller than 2^32, the table created by Bradley Berg is applied, as it relies on a single base [3].
 
-Beyond core algorithmic choices, micro-optimizations play a critical role. Because CPU division takes longer than multiplication, Montgomery reduction is employed. For numbers below 2^32, accepting both `MR(x)` and `MR(x) + n` (where `MR` denotes the Montgomery representation) eliminates unpredictable conditional branches. For values smaller than 2^21, fast modulo reduction using Lemire's method is applied [4] [5].
+Beyond core algorithmic choices, micro-optimizations play a critical role. Because CPU division takes longer than multiplication, Montgomery reduction is employed. For numbers below 2^62, accepting both `MR(x)` and `MR(x) + n` (where `MR` denotes the Montgomery representation) eliminates unpredictable conditional branches. For values smaller than 2^21, fast modulo reduction using Lemire's method is applied [4] [5].
 
 Furthermore, tests against multiple bases are executed concurrently within a single loop. This design maximizes instruction-level parallelism (ILP) and minimizes conditional branching. Although this increases execution time for composite numbers that would otherwise be filtered out early in sequential testing, `libcpprime` prioritizes optimizing worst-case performance.
 
